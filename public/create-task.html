@@ -12,25 +12,20 @@
     input, textarea, select { width:100%; padding:8px 10px; margin-top:6px; border-radius:6px; border:1px solid #263446; background:#071226; color:#e6eef8 }
     button { margin-top:14px; padding:10px 14px; border-radius:8px; background:#06b6d4; color:#042027; border:0; cursor:pointer; font-weight:700 }
     .msg { margin-top:12px; padding:10px; border-radius:6px; background:#071a22; color:#cfe3ff; font-size:14px }
-    .error { background:#6b1111; color:#fff; padding:10px; border-radius:6px; margin-top:12px; white-space:pre-wrap; }
-    #google-signin { margin-top:8px; }
-    .small { font-size:13px; color:#a7cfe6; margin-top:6px; }
+    #userBanner { margin-bottom:15px; padding:10px; border-radius:6px; background:#132030; color:#aef; font-size:14px; }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Create Task</h2>
+    <div id="userBanner">Not signed in</div>
 
-    <!-- Google sign-in area -->
-    <div id="google-signin"></div>
-    <div id="signin-status" class="small">Not signed in — please sign in to submit a task.</div>
-
-    <form id="taskForm" style="margin-top:12px">
+    <form id="taskForm">
       <label>Task ID
         <input id="task_id" name="task_id" required placeholder="Auto-generated" readonly>
       </label>
 
-      <label>Task Description<textarea id="description" name="description" rows="3" placeholder="Describe the task"></textarea></label>
+      <label>Task Description<textarea name="description" rows="3" placeholder="Describe the task"></textarea></label>
 
       <label>Assigned To
         <select id="assigned_to" name="assigned_to">
@@ -51,7 +46,7 @@
         <select name="status" id="status">
           <option selected>Pending</option>
           <option>In Progress</option>
-          <option>Done</option>
+          <option>Completed</option>
         </select>
       </label>
 
@@ -62,162 +57,104 @@
       </label>
 
       <label>Deadline
-        <input id="deadline" name="deadline" type="date">
+        <input type="date" id="deadline" name="deadline" placeholder="DD/MM/YYYY">
       </label>
 
-      <label>Notes<textarea id="notes" name="notes" rows="2"></textarea></label>
+      <label>Notes<textarea name="notes" rows="2" placeholder="Any extra notes"></textarea></label>
 
-      <button type="submit" id="submitBtn">Create Task</button>
+      <button type="submit">Create Task</button>
+      <div class="msg" id="msgBox"></div>
     </form>
-
-    <div id="result" class="msg" style="display:none"></div>
-    <div id="rawError" class="error" style="display:none;"></div>
   </div>
 
   <script>
-    // ---------- CONFIG ----------
-    // Replace this with your Google OAuth Client ID (Web application)
     const GOOGLE_OAUTH_CLIENT_ID = "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com";
-    // ----------------------------
-
-    // state
     let idToken = null;
+    let userEmail = null;
 
-    // render Google Sign-In button and callback to capture ID token
-    function initGoogleSignIn() {
-      if (!GOOGLE_OAUTH_CLIENT_ID || GOOGLE_OAUTH_CLIENT_ID === "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com") {
-        document.getElementById('signin-status').textContent = 'Google client ID not configured — sign-in disabled. Replace GOOGLE_OAUTH_CLIENT_ID in the file.';
-        return;
-      }
-
+    // Google Sign-In
+    window.onload = function () {
       google.accounts.id.initialize({
-        client_id: GOOGLE_OAUTH_CLIENT_ID,
+        client_id: GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse
       });
+      google.accounts.id.renderButton(document.getElementById("userBanner"), {
+        theme: "outline", size: "small", text: "signin_with", shape: "pill"
+      });
+    };
 
-      google.accounts.id.renderButton(
-        document.getElementById('google-signin'),
-        { theme: 'outline', size: 'large' }
-      );
-      // optional: google.accounts.id.prompt(); // shows One Tap if desired
+    async function handleCredentialResponse(response) {
+      idToken = response.credential;
+      const payload = parseJwt(idToken);
+      userEmail = payload.email;
+      document.getElementById("userBanner").innerText = "Signed in as: " + userEmail;
     }
 
-    function handleCredentialResponse(response) {
-      if (response && response.credential) {
-        idToken = response.credential;
-        document.getElementById('signin-status').textContent = 'Signed in — you can submit a task.';
-      }
-    }
-
-    // load metadata from server: assignedTo, institutions, nextTaskId
-    async function loadMetadata() {
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
+    function parseJwt(token) {
       try {
-        const res = await fetch('/api/get-metadata');
-        if (!res.ok) throw new Error('Failed to load metadata');
-        const json = await res.json();
-
-        // Assigned To
-        const assignedSelect = document.getElementById('assigned_to');
-        assignedSelect.innerHTML = '<option value="">-- choose --</option>';
-        (json.assignedTo || []).forEach(name => {
-          const o = document.createElement('option'); o.value = name; o.textContent = name; assignedSelect.appendChild(o);
-        });
-
-        // Institutions -> Requested By
-        const reqSelect = document.getElementById('requested_by');
-        reqSelect.innerHTML = '<option value="">-- choose institution --</option>';
-        (json.institutions || []).forEach(name => {
-          const o = document.createElement('option'); o.value = name; o.textContent = name; reqSelect.appendChild(o);
-        });
-
-        // next task id
-        document.getElementById('task_id').value = json.nextTaskId || '';
-
-        submitBtn.disabled = false;
-      } catch (err) {
-        const result = document.getElementById('result');
-        result.style.display = 'block';
-        result.textContent = 'Unable to load metadata: ' + (err.message || err);
-        result.style.background = '#3a0f12';
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join('')));
+      } catch (e) {
+        return {};
       }
     }
 
-    // format date from yyyy-mm-dd -> dd/mm/yyyy
-    function formatDateToDDMMYYYY(isoDate) {
-      if (!isoDate) return '';
-      const [y,m,d] = isoDate.split('-');
-      if (!y) return isoDate;
-      return `${d}/${m}/${y}`;
-    }
+    // Load metadata (next TaskID, assignedTo, institutions)
+    async function loadMetadata() {
+      const res = await fetch('/api/get-metadata');
+      const meta = await res.json();
+      document.getElementById("task_id").value = meta.nextTaskId || "T000";
 
-    // submit form
-    document.getElementById('taskForm').addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const submitBtn = document.getElementById('submitBtn');
-      const result = document.getElementById('result');
-      const rawError = document.getElementById('rawError');
-      result.style.display = 'none';
-      rawError.style.display = 'none';
-      submitBtn.disabled = true;
+      let selAssigned = document.getElementById("assigned_to");
+      (meta.assignedTo || []).forEach(x=>{
+        let opt = document.createElement("option");
+        opt.value = x; opt.textContent = x;
+        selAssigned.appendChild(opt);
+      });
+
+      let selInst = document.getElementById("requested_by");
+      (meta.institutions || []).forEach(x=>{
+        let opt = document.createElement("option");
+        opt.value = x; opt.textContent = x;
+        selInst.appendChild(opt);
+      });
+    }
+    loadMetadata();
+
+    // Handle form submit
+    document.getElementById("taskForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const msgBox = document.getElementById("msgBox");
+      msgBox.innerText = "Submitting...";
 
       if (!idToken) {
-        rawError.style.display = 'block';
-        rawError.textContent = 'Please sign in with Google before creating a task.';
-        submitBtn.disabled = false;
+        msgBox.innerText = "Please sign in with Google first.";
         return;
       }
 
-      const fd = new FormData(ev.target);
-      const taskObj = Object.fromEntries(fd.entries());
-      if (taskObj.deadline) taskObj.deadline = formatDateToDDMMYYYY(taskObj.deadline);
-
-      try {
-        const headers = {
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + idToken
-        };
+        },
+        body: JSON.stringify({ task: data })
+      });
 
-        const resp = await fetch('/api/sync', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ task: taskObj })
-        });
+      let json = null;
+      try { json = await res.json(); } catch(e){ json = {error:"Invalid server response"}; }
 
-        const text = await resp.text();
-        let json = null;
-        try { json = JSON.parse(text); } catch(e){ json = null; }
-
-        if (!resp.ok) {
-          result.style.display = 'block';
-          result.style.background = '#6b1111';
-          result.textContent = 'Server returned an error — see details below';
-          rawError.style.display = 'block';
-          rawError.textContent = text;
-          submitBtn.disabled = false;
-          return;
-        }
-
-        result.style.display = 'block';
-        result.style.background = '#052e2a';
-        result.textContent = `Task created — appended_row=${json && (json.appended_row || 'unknown') || 'unknown'} (sheet: ${json && (json.sheet || 'unknown') || 'unknown'})`;
-        // reload metadata (to get nextTaskId)
-        await loadMetadata();
-        ev.target.reset();
-        document.getElementById('task_id').value = json && json.nextTaskId || document.getElementById('task_id').value;
-      } catch (err) {
-        rawError.style.display = 'block';
-        rawError.textContent = 'Network error: ' + (err.message || err);
-      } finally {
-        submitBtn.disabled = false;
+      if (!res.ok) {
+        msgBox.innerText = "Error: " + (json.error || res.statusText);
+      } else {
+        msgBox.innerText = "Task created ✅ Row " + json.appended_row;
+        e.target.reset();
+        loadMetadata();
       }
-    });
-
-    // init on DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      initGoogleSignIn();
-      loadMetadata();
     });
   </script>
 </body>
