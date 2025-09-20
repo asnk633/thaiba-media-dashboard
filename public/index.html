@@ -1,538 +1,428 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <title>Thaiba Media — Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Thaiba Garden - Media Task Manager</title>
-  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    :root { --primary:#4f46e5; --secondary:#10b981; --danger:#ef4444; --warning:#f59e0b; }
-    body{font-family:'Inter',sans-serif}
-    .priority-high{background-color:rgba(239,68,68,.08);border-left:4px solid var(--danger)}
-    .priority-medium{background-color:rgba(245,158,11,.08);border-left:4px solid var(--warning)}
-    .priority-low{background-color:rgba(16,185,129,.08);border-left:4px solid var(--secondary)}
-    .overdue{animation:pulse 2s infinite}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
-    .card-filter{cursor:pointer;transition:box-shadow .15s,transform .15s}
-    .card-filter:hover{transform:translateY(-2px)}
-    .card-filter.active{box-shadow:0 8px 30px rgba(2,6,23,.12);border:1px solid rgba(0,0,0,.06)}
-    .kanban-column{min-height:300px}
-    .task-card{transition:all .18s ease}
-    .task-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(2,6,23,.15)}
-    /* small modal styling */
-    .modal-backdrop{background:rgba(2,6,23,.5)}
+    :root{
+      --bg:#f7fafc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#6366f1;
+      --green:#10b981;
+      --red:#ef4444;
+      --yellow:#f59e0b;
+      --shadow: 0 8px 20px rgba(2,6,23,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{margin:0;background:var(--bg);color:#0f1724}
+    .container{max-width:1180px;margin:28px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:44px;height:44px;border-radius:6px}
+    h1{font-size:22px;margin:0}
+    .controls{display:flex;gap:12px;align-items:center}
+    .btn {background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+    .btn-ghost{background:#fff;border:1px solid #e6eaf2;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:14px 0 24px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+    .card .label{color:var(--muted);font-size:13px}
+    .card .value{font-size:20px;font-weight:700}
+    .card.clickable{cursor:pointer}
+    /* filters */
+    .filters{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+    .select{padding:8px;border-radius:8px;border:1px solid #e6eaf2;background:white}
+    .badge{background:#eef2ff;color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:600}
+    /* kanban columns */
+    .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:10px}
+    .col{background:transparent}
+    .col h3{margin:0 0 8px}
+    .column-inner{min-height:220px;background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow)}
+    .task-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;border-left:6px solid #ddd}
+    .task-card .meta{font-size:12px;color:var(--muted);margin-top:8px}
+    .small{font-size:13px;color:var(--muted)}
+    /* charts area */
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:24px}
+    .panel{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);min-height:220px}
+    .muted{color:var(--muted)}
+    /* helper */
+    .row{display:flex;gap:12px;align-items:center}
+    .hidden{display:none}
+    .error{background:#fff6f6;color:var(--red);padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.12)}
+    footer{margin:30px 0 60px;color:var(--muted);font-size:13px}
   </style>
 </head>
-<body class="bg-gray-50">
-  <!-- NAV -->
-  <nav class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <div class="flex items-center">
-          <img class="h-8 w-auto" src="http://static.photos/education/200x200/5" alt="Logo">
-          <span class="ml-2 text-xl font-semibold text-gray-900">Media Task Manager</span>
-        </div>
-        <div class="flex items-center space-x-4">
-          <div id="gSign" class="inline-block"></div>
-          <div id="signedInMsg" class="text-sm text-gray-600 hidden">Signed in as <span id="signedEmail" class="font-medium"></span></div>
-          <button id="sync-btn" class="inline-flex items-center px-3 py-2 border rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-            <i data-feather="refresh-cw" class="mr-2"></i> Sync
-          </button>
-          <span id="last-updated" class="text-xs text-gray-500"></span>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <img src="http://static.photos/education/200x200/5" alt="logo">
+        <div>
+          <h1>Media Task Manager</h1>
+          <div class="small muted">Media Department — Thaiba Garden</div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <!-- STATS -->
-    <div id="stats-cards" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-      <div id="card-total" class="card-filter bg-white shadow rounded-lg p-4" data-filter="total" title="Show all tasks">
-        <div class="flex items-center">
-          <div class="bg-indigo-500 p-3 rounded-md"><i data-feather="inbox" class="text-white"></i></div>
-          <div class="ml-4">
-            <dt class="text-sm text-gray-500">Total Tasks</dt>
-            <dd><div id="stat-total" class="text-lg font-bold">—</div></dd>
-          </div>
+      <div class="controls">
+        <button id="signinBtn" class="btn-ghost">Sign in with Google</button>
+        <button id="syncBtn" class="btn-ghost">⟳ Sync</button>
+        <div id="lastUpdated" class="muted small">Last updated: –</div>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div id="card-total" class="card clickable" data-filter="all">
+        <div>
+          <div class="label">Total Tasks</div>
+          <div class="value" id="totalCount">0</div>
         </div>
       </div>
-      <div id="card-overdue" class="card-filter bg-white shadow rounded-lg p-4" data-filter="overdue" title="Show overdue tasks">
-        <div class="flex items-center">
-          <div class="bg-red-500 p-3 rounded-md"><i data-feather="alert-circle" class="text-white"></i></div>
-          <div class="ml-4">
-            <dt class="text-sm text-gray-500">Overdue</dt>
-            <dd><div id="stat-overdue" class="text-lg font-bold">—</div></dd>
-          </div>
+
+      <div id="card-overdue" class="card clickable" data-filter="overdue">
+        <div>
+          <div class="label">Overdue</div>
+          <div class="value" id="overdueCount">0</div>
         </div>
       </div>
-      <div id="card-inprogress" class="card-filter bg-white shadow rounded-lg p-4" data-filter="inprogress" title="Show tasks in progress">
-        <div class="flex items-center">
-          <div class="bg-yellow-500 p-3 rounded-md"><i data-feather="clock" class="text-white"></i></div>
-          <div class="ml-4">
-            <dt class="text-sm text-gray-500">In Progress</dt>
-            <dd><div id="stat-inprogress" class="text-lg font-bold">—</div></dd>
-          </div>
+
+      <div id="card-inprogress" class="card clickable" data-filter="inprogress">
+        <div>
+          <div class="label">In Progress</div>
+          <div class="value" id="inProgressCount">0</div>
         </div>
       </div>
-      <div id="card-completed" class="card-filter bg-white shadow rounded-lg p-4" data-filter="completed" title="Show completed tasks">
-        <div class="flex items-center">
-          <div class="bg-green-500 p-3 rounded-md"><i data-feather="check-circle" class="text-white"></i></div>
-          <div class="ml-4">
-            <dt class="text-sm text-gray-500">Completed</dt>
-            <dd><div id="stat-completed" class="text-lg font-bold">—</div></dd>
-          </div>
+
+      <div id="card-completed" class="card clickable" data-filter="completed">
+        <div>
+          <div class="label">Completed</div>
+          <div class="value" id="completedCount">0</div>
         </div>
       </div>
     </div>
 
-    <!-- Filters & controls -->
-    <div class="flex items-center space-x-4 mb-3">
-      <label class="text-sm">Status:</label>
-      <select id="status-filter" class="px-2 py-1 border rounded-md text-sm">
-        <option value="">All</option>
-        <option>Pending</option>
-        <option>In Progress</option>
-        <option>On Hold</option>
-        <option>Completed</option>
+    <!-- Filters row -->
+    <div class="filters">
+      <label class="small">Status:</label>
+      <select id="statusFilter" class="select">
+        <option value="All">All</option>
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="On Hold">On Hold</option>
+        <option value="Completed">Completed</option>
       </select>
-      <button id="clear-filters" class="text-sm px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Clear Filters</button>
-      <div class="ml-auto flex items-center gap-3">
-        <button id="new-task-open" class="px-3 py-2 bg-indigo-600 text-white rounded-md"><i data-feather="plus" class="mr-2"></i>New Task</button>
-        <div id="active-filters" class="text-sm text-gray-600"></div>
-      </div>
+
+      <button id="clearFilters" class="btn-ghost">Clear Filters</button>
+      <div id="activeBadge" class="badge hidden">Filter: <span id="activeLabel"></span></div>
+      <div style="flex:1"></div>
+      <button id="newTaskBtn" class="btn">+ New Task</button>
     </div>
 
-    <!-- Kanban -->
-    <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
+    <!-- Kanban board -->
+    <div class="kanban">
+      <div class="col">
+        <h3>Pending <span class="muted" id="pendingCountLabel">(0)</span></h3>
+        <div id="pending-column" class="column-inner"></div>
+      </div>
+
+      <div class="col">
+        <h3>In Progress <span class="muted" id="inprogressCountLabel">(0)</span></h3>
+        <div id="inprogress-column" class="column-inner"></div>
+      </div>
+
+      <div class="col">
+        <h3>On Hold <span class="muted" id="onholdCountLabel">(0)</span></h3>
+        <div id="onhold-column" class="column-inner"></div>
+      </div>
+
+      <div class="col">
+        <h3>Completed <span class="muted" id="completedCountLabel">(0)</span></h3>
+        <div id="completed-column" class="column-inner"></div>
+      </div>
+    </div>
 
     <!-- Charts -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white p-4 rounded-lg shadow">
-        <h3 class="text-lg font-semibold mb-2">Tasks by Status</h3>
-        <canvas id="chart-status"></canvas>
+    <div class="charts">
+      <div class="panel">
+        <h3 style="margin-top:0">Tasks by Status</h3>
+        <canvas id="statusChart" style="max-height:300px"></canvas>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow">
-        <h3 class="text-lg font-semibold mb-2">Tasks by Priority</h3>
-        <canvas id="chart-priority"></canvas>
-      </div>
-    </div>
-  </main>
-
-  <!-- NEW TASK MODAL -->
-  <div id="modal" class="fixed inset-0 hidden items-center justify-center z-50">
-    <div class="absolute inset-0 modal-backdrop"></div>
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl z-10 overflow-auto">
-      <div class="p-6">
-        <div class="flex justify-between items-start">
-          <h3 class="text-lg font-semibold">Create New Task</h3>
-          <button id="modal-close" class="text-gray-500 hover:text-gray-700">Close</button>
-        </div>
-
-        <div id="modal-msg" class="mt-3 text-sm"></div>
-
-        <form id="modal-form" class="space-y-3 mt-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-sm font-medium">Task ID</label>
-              <input id="modal-task-id" class="mt-1 block w-full border rounded px-3 py-2 bg-gray-50" readonly>
-            </div>
-            <div>
-              <label class="text-sm font-medium">Priority</label>
-              <select id="modal-priority" class="mt-1 block w-full border rounded px-2 py-2">
-                <option>Urgent</option>
-                <option>High</option>
-                <option selected>Medium</option>
-                <option>Low</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium">Task Description</label>
-            <textarea id="modal-description" rows="3" class="mt-1 block w-full border rounded px-3 py-2"></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-sm font-medium">Assigned To</label>
-              <select id="modal-assigned" class="mt-1 block w-full border rounded px-2 py-2"></select>
-            </div>
-            <div>
-              <label class="text-sm font-medium">Requested By</label>
-              <select id="modal-requested" class="mt-1 block w-full border rounded px-2 py-2"></select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="text-sm font-medium">Status</label>
-              <select id="modal-status" class="mt-1 block w-full border rounded px-2 py-2">
-                <option selected>Pending</option>
-                <option>In Progress</option>
-                <option>Completed</option>
-                <option>On Hold</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-sm font-medium">Deadline</label>
-              <input id="modal-deadline" type="date" class="mt-1 block w-full border rounded px-2 py-2">
-            </div>
-            <div>
-              <label class="text-sm font-medium">Requested Email (optional)</label>
-              <input id="modal-email" type="email" class="mt-1 block w-full border rounded px-3 py-2" placeholder="name@example.com">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium">Notes</label>
-            <textarea id="modal-notes" rows="2" class="mt-1 block w-full border rounded px-3 py-2"></textarea>
-          </div>
-
-          <div class="flex justify-end gap-2">
-            <button type="button" id="modal-submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Create Task</button>
-            <button type="button" id="modal-cancel" class="px-4 py-2 border rounded-md">Cancel</button>
-          </div>
-        </form>
-
+      <div class="panel">
+        <h3 style="margin-top:0">Tasks by Priority</h3>
+        <canvas id="priorityChart" style="max-height:300px"></canvas>
       </div>
     </div>
+
+    <div id="messageArea" style="margin-top:16px"></div>
+
+    <footer>
+      <div>© Thaiba Media</div>
+    </footer>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 hidden z-50"></div>
+  <script>
+  // CONFIG - change only this if your API domain differs
+  const API_BASE = "https://thaiba-media-dashboard.vercel.app"; // <- your Vercel domain
+  const TASKS_ENDPOINT = API_BASE + "/api/tasks";
 
-<script>
-/* -------- CONFIG -------- */
-const GOOGLE_CLIENT_ID = "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com";
-let idToken = null;
-let signedPayload = null;
+  // Charts handles
+  let statusChart = null;
+  let priorityChart = null;
 
-/* -------- HELPERS -------- */
-function escapeHtml(s){ if(s==null) return ''; return String(s).replace(/[&<>"'`=\/]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#47;','`':'&#96;','=':'&#61;'}[c])); }
+  // utility: create element with classes
+  function el(tag, cls){ const d = document.createElement(tag); if(cls) d.className = cls; return d; }
 
-function showToast(msg, ok=true){
-  const t = document.getElementById('toast');
-  t.innerHTML = `<div class="bg-${ok?'green':'red'}-600 text-white px-4 py-2 rounded shadow">${escapeHtml(msg)}</div>`;
-  t.classList.remove('hidden');
-  setTimeout(()=>{ t.classList.add('hidden'); }, 3000);
-}
-
-function parseFlexibleDate(s){
-  if(!s) return null;
-  let str = String(s).trim();
-  let d = new Date(str);
-  if(!isNaN(d)) return d;
-  const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
-  const m2 = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-  if(m2) return new Date(+m2[1], +m2[2]-1, +m2[3]);
-  return null;
-}
-function fmtDDMMYYYY(d){ if(!d) return ''; const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); return dd+'/'+mm+'/'+d.getFullYear(); }
-
-/* -------- UI & DATA STATE -------- */
-let tasksCache = [];
-let activeCardFilter = '';
-let statusDropdownFilter = '';
-let charts = { status:null, priority:null };
-
-/* -------- GOOGLE IDENTITY (sign-in) -------- */
-function initGSI(){
-  if(!window.google || !google.accounts || !google.accounts.id) return;
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleCredentialResponse,
-    auto_select: false
-  });
-  google.accounts.id.renderButton(document.getElementById('gSign'), { theme: 'outline', size:'medium' });
-}
-function handleCredentialResponse(resp){
-  if(!resp || !resp.credential) return;
-  idToken = resp.credential;
-  try { signedPayload = JSON.parse(atob(resp.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch(e){ signedPayload = null; }
-  if(signedPayload && signedPayload.email){
-    document.getElementById('signedInMsg').classList.remove('hidden');
-    document.getElementById('signedEmail').textContent = signedPayload.email;
-    document.getElementById('gSign').style.display = 'none';
+  // Map/normalize statuses (frontend fallback)
+  function normalizeStatus(raw){
+    if(!raw) return 'Pending';
+    const s = String(raw).trim().toLowerCase();
+    if(s === 'working on' || s === 'working' || s === 'in progress') return 'In Progress';
+    if(s === 'cancelled' || s === 'canceled') return 'On Hold';
+    if(s === 'completed' || s === 'done') return 'Completed';
+    if(s === 'pending' || s === 'new' || s === '') return 'Pending';
+    // otherwise title-case incoming label
+    return s.split(/\s+/).map(w => w[0]?.toUpperCase()+w.slice(1)).join(' ');
   }
-}
 
-/* -------- FETCH / RENDER -------- */
-async function fetchTasks(){
-  const res = await fetch('/api/tasks');
-  if(!res.ok) throw new Error(await res.text());
-  const data = await res.json();
-  return data.tasks || [];
-}
-function updateStatsUI(){
-  document.getElementById('stat-total').textContent = tasksCache.length;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const overdue = tasksCache.filter(t=>{ const d=parseFlexibleDate(t.Deadline||t.deadline||''); return d && d<today && ((t.Status||'').toLowerCase()!=='completed'); }).length;
-  const inProg = tasksCache.filter(t=>((t.Status||'').toLowerCase()==='in progress')).length;
-  const completed = tasksCache.filter(t=>((t.Status||'').toLowerCase()==='completed')).length;
-  document.getElementById('stat-overdue').textContent = overdue;
-  document.getElementById('stat-inprogress').textContent = inProg;
-  document.getElementById('stat-completed').textContent = completed;
-  document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
-}
+  // Render a single task card HTML
+  function renderTaskCard(task){
+    const div = el('div','task-card');
+    let color = '#ddd';
+    if (task.priority === 'Urgent') color = '#ef4444';
+    else if (task.priority === 'High') color = '#f97316';
+    else if (task.priority === 'Medium') color = '#f59e0b';
+    else color = '#10b981';
+    div.style.borderLeftColor = color;
 
-function renderBadges(){
-  const container = document.getElementById('active-filters');
-  container.innerHTML = '';
-  if(activeCardFilter) container.innerHTML += `<span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">${escapeHtml(activeCardFilter)}</span>`;
-  if(statusDropdownFilter) container.innerHTML += `<span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">${escapeHtml(statusDropdownFilter)}</span>`;
-}
+    const title = el('div');
+    title.innerHTML = `<strong>${escapeHtml(task.description || '(no description)')}</strong>`;
+    div.appendChild(title);
 
-function renderKanban(tasks){
-  const statuses = ['Pending','In Progress','On Hold','Completed'];
-  let html = '';
-  statuses.forEach(st=>{
-    const col = tasks.filter(t => ((t.Status||'') + '').toLowerCase() === st.toLowerCase());
-    html += `<div class="kanban-column bg-gray-50 rounded-lg p-4"><h3 class="text-lg font-medium mb-3">${escapeHtml(st)} (${col.length})</h3>`;
-    if(!col.length) html += `<p class="text-sm text-gray-400">No tasks</p>`;
-    col.forEach(t=>{
-      const priority = (t.Priority||'').toLowerCase();
-      const priClass = priority==='high'?'priority-high':priority==='medium'?'priority-medium':'priority-low';
-      const d = parseFlexibleDate(t.Deadline||t.deadline||'');
-      const overdueClass = (d && d < (new Date(new Date().setHours(0,0,0,0))) && ((t.Status||'').toLowerCase()!=='completed')) ? 'overdue' : '';
-      html += `<div class="task-card bg-white rounded-lg shadow p-3 mb-3 ${priClass} ${overdueClass}">
-        <h4 class="font-medium">${escapeHtml(t['Task Description'] || t.description || '')}</h4>
-        <p class="text-xs text-gray-500">Requested by: ${escapeHtml(t['Requested By']||t.requested_by||'-')}</p>
-        <p class="text-xs">Assigned: ${escapeHtml(t['Assigned To']||t.assigned_to||'-')}</p>
-        <p class="text-xs">Deadline: ${escapeHtml(d?fmtDDMMYYYY(d):(t.Deadline||t.deadline||'-'))}</p>
-      </div>`;
+    const meta = el('div','meta');
+    meta.innerHTML = `Requested by: ${escapeHtml(task.requestedBy||'')}<br/>Assigned: ${escapeHtml(task.assignedTo||'')}<br/>Deadline: ${formatDate(task.deadline)}`;
+    div.appendChild(meta);
+
+    return div;
+  }
+
+  // safe text for HTML
+  function escapeHtml(t){ if(!t) return ''; return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function formatDate(d){
+    if(!d) return '';
+    // input could be ISO string or Date
+    const dt = (typeof d === 'string') ? new Date(d) : d;
+    if(isNaN(dt)) return d;
+    // display as DD/MM/YYYY
+    return dt.getDate().toString().padStart(2,'0') + '/' + (dt.getMonth()+1).toString().padStart(2,'0') + '/' + dt.getFullYear();
+  }
+
+  // update charts
+  function renderCharts(tasks){
+    const statusCounts = { 'Pending':0, 'In Progress':0, 'On Hold':0, 'Completed':0 };
+    const priorityCounts = { 'Urgent':0, 'High':0, 'Medium':0, 'Low':0 };
+
+    tasks.forEach(t => {
+      const s = normalizeStatus(t.status);
+      if(!statusCounts[s]) statusCounts[s]=0;
+      statusCounts[s]++;
+
+      const p = t.priority || 'Low';
+      if(!priorityCounts[p]) priorityCounts[p]=0;
+      priorityCounts[p]++;
     });
-    html += '</div>';
-  });
-  document.getElementById('kanban-board').innerHTML = html;
-  feather.replace();
-}
 
-/* Charts */
-function renderCharts(){
-  // prepare counts
-  const statusBuckets = { 'Pending':0, 'In Progress':0, 'On Hold':0, 'Completed':0 };
-  const priBuckets = { 'Urgent':0, 'High':0, 'Medium':0, 'Low':0 };
-  tasksCache.forEach(t=>{
-    const s = (t.Status||'').toString();
-    if(statusBuckets[s] !== undefined) statusBuckets[s]++;
-    const p = (t.Priority||'').toString();
-    if(priBuckets[p] !== undefined) priBuckets[p]++;
-  });
-  // destroy existing if exist
-  if(charts.status) charts.status.destroy();
-  if(charts.priority) charts.priority.destroy();
+    // statusChart (doughnut)
+    const sLabels = Object.keys(statusCounts);
+    const sData = Object.values(statusCounts);
+    const sColors = ['#9ca3af','#3b82f6','#f59e0b','#10b981'];
 
-  const ctxS = document.getElementById('chart-status').getContext('2d');
-  charts.status = new Chart(ctxS, {
-    type: 'pie',
-    data: {
-      labels: Object.keys(statusBuckets),
-      datasets: [{ data: Object.values(statusBuckets), backgroundColor: ['#9ca3af','#3b82f6','#f59e0b','#10b981'] }]
-    },
-    options: { plugins:{legend:{position:'bottom'}}}
-  });
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: { labels: sLabels, datasets: [{ data: sData, backgroundColor: sColors }]},
+      options: { plugins:{legend:{position:'bottom'}}}
+    });
 
-  const ctxP = document.getElementById('chart-priority').getContext('2d');
-  charts.priority = new Chart(ctxP, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(priBuckets),
-      datasets: [{ label:'Count', data: Object.values(priBuckets), backgroundColor: ['#ef4444','#f97316','#f59e0b','#10b981'] }]
-    },
-    options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-  });
-}
+    // priorityChart (bar)
+    const pLabels = Object.keys(priorityCounts);
+    const pData = Object.values(priorityCounts);
+    const pColors = ['#ef4444','#f97316','#f59e0b','#10b981'];
 
-/* APPLY FILTERS and RENDER */
-function applyFiltersAndRender(){
-  let filtered = tasksCache.slice();
-  if(statusDropdownFilter) filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === statusDropdownFilter.toLowerCase());
-  if(activeCardFilter === 'overdue'){
-    const today = new Date(); today.setHours(0,0,0,0);
-    filtered = filtered.filter(t => { const d = parseFlexibleDate(t.Deadline||t.deadline||''); return d && d < today && ((t.Status||'').toLowerCase()!=='completed'); });
-  } else if(activeCardFilter === 'inprogress'){
-    filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === 'in progress');
-  } else if(activeCardFilter === 'completed'){
-    filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === 'completed');
+    if(priorityChart) priorityChart.destroy();
+    priorityChart = new Chart(document.getElementById('priorityChart'), {
+      type: 'bar',
+      data: { labels: pLabels, datasets:[{ label:'Count', data:pData, backgroundColor:pColors }]},
+      options: { scales:{y:{beginAtZero:true, ticks:{precision:0}}}, plugins:{legend:{display:false}}}
+    });
   }
-  renderKanban(filtered);
-  renderBadges();
-}
 
-/* LOAD ALL */
-async function loadAll(){
-  try{
-    tasksCache = await fetchTasks();
-    updateStatsUI();
-    renderCharts();
-    applyFiltersAndRender();
-  } catch(e){
-    console.error('loadAll error', e);
-    document.getElementById('kanban-board').innerHTML = `<div class="p-4 text-red-600">Error loading tasks: ${escapeHtml(e.message||String(e))}</div>`;
+  // fill kanban from tasks
+  function populateKanban(tasks, activeFilter){
+    // clear columns
+    const cols = {
+      'Pending': document.getElementById('pending-column'),
+      'In Progress': document.getElementById('inprogress-column'),
+      'On Hold': document.getElementById('onhold-column'),
+      'Completed': document.getElementById('completed-column')
+    };
+    Object.values(cols).forEach(c => c.innerHTML = '');
+
+    const counts = { 'Pending':0, 'In Progress':0, 'On Hold':0, 'Completed':0 };
+
+    tasks.forEach(t => {
+      const status = normalizeStatus(t.status);
+      counts[status] = (counts[status]||0) + 1;
+
+      // apply UI filter if set (status drop-down / stat-card)
+      if(activeFilter && activeFilter !== 'All' && status !== activeFilter) return;
+
+      const card = renderTaskCard(t);
+      cols[status].appendChild(card);
+    });
+
+    // update column headings counts
+    document.getElementById('pendingCountLabel').innerText = `(${counts['Pending']})`;
+    document.getElementById('inprogressCountLabel').innerText = `(${counts['In Progress']})`;
+    document.getElementById('onholdCountLabel').innerText = `(${counts['On Hold']})`;
+    document.getElementById('completedCountLabel').innerText = `(${counts['Completed']})`;
   }
-}
 
-/* METADATA FOR MODAL (assignedTo, institutions, nextTaskId) */
-async function loadMetadataForModal(){
-  try{
-    const r = await fetch('/api/get-metadata');
-    if(!r.ok) throw new Error(await r.text());
-    const js = await r.json();
-    const assigned = js.assignedTo || [];
-    const inst = js.institutions || [];
-    const nextId = js.nextTaskId || '';
-    const assignedSel = document.getElementById('modal-assigned');
-    assignedSel.innerHTML = '<option value="">-- choose --</option>';
-    assigned.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a; assignedSel.appendChild(o); });
-    const reqSel = document.getElementById('modal-requested');
-    reqSel.innerHTML = '<option value="">-- choose --</option>';
-    inst.forEach(i=>{ const o=document.createElement('option'); o.value=i; o.textContent=i; reqSel.appendChild(o); });
-    document.getElementById('modal-task-id').value = nextId;
-  } catch(e){
-    console.warn('metadata load error', e);
+  // show message area
+  function showMessage(msg, type='info'){
+    const area = document.getElementById('messageArea');
+    area.innerHTML = '';
+    if(!msg) return;
+    const div = document.createElement('div');
+    div.className = (type==='error' ? 'error' : 'panel');
+    div.textContent = msg;
+    area.appendChild(div);
   }
-}
 
-/* MODAL HANDLERS */
-function openModal(){
-  document.getElementById('modal').classList.remove('hidden');
-  loadMetadataForModal();
-}
-function closeModal(){
-  document.getElementById('modal').classList.add('hidden');
-  document.getElementById('modal-form').reset();
-  document.getElementById('modal-msg').textContent = '';
-}
+  // main loader
+  async function loadData(activeFilter = null){
+    showMessage('');
+    const syncBtn = document.getElementById('syncBtn');
+    try {
+      syncBtn.disabled = true;
+      syncBtn.textContent = 'Syncing…';
 
-/* SUBMIT MODAL -> POST /api/sync */
-async function submitModal(){
-  const btn = document.getElementById('modal-submit');
-  btn.disabled = true;
-  btn.textContent = 'Creating...';
-  document.getElementById('modal-msg').textContent = '';
+      const res = await fetch(TASKS_ENDPOINT, { cache: 'no-store' });
+      if(!res.ok) throw new Error('API returned ' + res.status);
+      const payload = await res.json();
 
-  const task = {
-    task_id: document.getElementById('modal-task-id').value.trim(),
-    description: document.getElementById('modal-description').value.trim(),
-    assigned_to: document.getElementById('modal-assigned').value || '',
-    priority: document.getElementById('modal-priority').value || 'Medium',
-    status: document.getElementById('modal-status').value || 'Pending',
-    requested_by: document.getElementById('modal-requested').value || document.getElementById('modal-email').value || '',
-    deadline: document.getElementById('modal-deadline').value || '',
-    notes: document.getElementById('modal-notes').value || ''
-  };
+      // payload expected to include: ok (or at least counts, tasks, fetchedAt)
+      const counts = payload.counts || {};
+      const tasks = (payload.tasks || []).map(r => {
+        // front-end normalization: ensure status/titlecases
+        return {
+          id: r.id || r._id || '',
+          description: r.description || r.TaskDescription || r[1] || '',
+          assignedTo: r.assignedTo || r.AssignedTo || r[2] || '',
+          priority: r.priority || r.Priority || r[3] || '',
+          status: normalizeStatus(r.status || r.Status || r[4]),
+          requestedBy: r.requestedBy || r.RequestedBy || r.requestedBy || '',
+          deadline: r.deadline || r.Deadline || r.deadline || r[6] || '',
+          notes: r.notes || r.Notes || r[7] || '',
+          _sheetRow: r._sheetRow || r.sheetRow || null
+        };
+      });
 
-  // simple validation
-  if(!task.description){ document.getElementById('modal-msg').textContent = 'Please enter a description.'; btn.disabled=false; btn.textContent='Create Task'; return; }
-  if(!task.requested_by){ document.getElementById('modal-msg').textContent = 'Please select Requested By or provide an email.'; btn.disabled=false; btn.textContent='Create Task'; return; }
+      // update stat cards with counts from API (fall back to computing if missing)
+      const total = counts.total ?? tasks.length;
+      const overdue = counts.overdue ?? tasks.filter(t => {
+        if(!t.deadline) return false;
+        const d = new Date(t.deadline);
+        return !isNaN(d) && d < new Date() && (t.status !== 'Completed');
+      }).length;
+      const inProgress = counts.inProgress ?? tasks.filter(t => t.status === 'In Progress').length;
+      const completed = counts.completed ?? tasks.filter(t => t.status === 'Completed').length;
+      const onHold = counts.onHold ?? tasks.filter(t => t.status === 'On Hold').length;
 
-  try{
-    const headers = { 'Content-Type': 'application/json' };
-    if(idToken) headers['Authorization'] = 'Bearer ' + idToken;
-    const res = await fetch('/api/sync', { method:'POST', headers, body: JSON.stringify({ task }) });
-    const text = await res.text();
-    let json=null; try{ json = JSON.parse(text); }catch(e){ json = null; }
-    if(!res.ok){
-      const err = (json && (json.error||json.details)) ? (json.error + (json.details ? ' — ' + json.details : '')) : text || `Server returned ${res.status}`;
-      document.getElementById('modal-msg').textContent = err;
-      showToast('Create failed: ' + err, false);
-      return;
+      document.getElementById('totalCount').innerText = total;
+      document.getElementById('overdueCount').innerText = overdue;
+      document.getElementById('inProgressCount').innerText = inProgress;
+      document.getElementById('completedCount').innerText = completed;
+
+      // charts + kanban
+      renderCharts(tasks);
+      populateKanban(tasks, activeFilter || (document.getElementById('statusFilter').value === 'All' ? null : document.getElementById('statusFilter').value) );
+
+      // last updated
+      const fetchedAt = payload.fetchedAt ? new Date(payload.fetchedAt) : new Date();
+      document.getElementById('lastUpdated').innerText = 'Last updated: ' + fetchedAt.toLocaleTimeString();
+
+    } catch (err){
+      console.error('Load error', err);
+      showMessage('Failed to load tasks — ' + err.message, 'error');
+    } finally {
+      syncBtn.disabled = false;
+      syncBtn.textContent = '⟳ Sync';
     }
-    // success
-    showToast('Task created', true);
-    closeModal();
-    await loadAll();
-  } catch(e){
-    console.error(e);
-    document.getElementById('modal-msg').textContent = e.message || String(e);
-    showToast('Network error', false);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Create Task';
   }
-}
 
-/* SETUP UI BINDINGS */
-document.addEventListener('DOMContentLoaded', ()=>{
-  feather.replace();
-  AOS.init();
-  initGSI();
-
-  // card clicks
-  document.querySelectorAll('.card-filter').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const f = el.dataset.filter || '';
-      if(f==='total'){ activeCardFilter = ''; } else { activeCardFilter = (activeCardFilter===f?'':f); }
-      document.querySelectorAll('.card-filter').forEach(c=>c.classList.remove('active'));
-      if(activeCardFilter) document.querySelector(`.card-filter[data-filter="${activeCardFilter}"]`)?.classList.add('active');
-      else document.querySelector('.card-filter[data-filter="total"]')?.classList.add('active');
-      applyFiltersAndRender();
+  // Clickable stat-cards filter behavior
+  function setupCardFilters(){
+    document.querySelectorAll('.card.clickable').forEach(card => {
+      card.addEventListener('click', (e)=>{
+        const f = card.dataset.filter;
+        let label = 'All';
+        if(f === 'overdue') label = 'Overdue';
+        if(f === 'inprogress') label = 'In Progress';
+        if(f === 'completed') label = 'Completed';
+        document.getElementById('statusFilter').value = label;
+        document.getElementById('activeBadge').classList.remove('hidden');
+        document.getElementById('activeLabel').innerText = label;
+        loadData(label);
+      });
     });
-  });
 
-  // status dropdown
-  document.getElementById('status-filter').addEventListener('change', e=>{
-    statusDropdownFilter = e.target.value;
-    applyFiltersAndRender();
-  });
+    document.getElementById('statusFilter').addEventListener('change', (e)=>{
+      const v = e.target.value;
+      if(v === 'All') {
+        document.getElementById('activeBadge').classList.add('hidden');
+      } else {
+        document.getElementById('activeBadge').classList.remove('hidden');
+        document.getElementById('activeLabel').innerText = v;
+      }
+      loadData(v === 'All' ? null : v);
+    });
 
-  // clear filters
-  document.getElementById('clear-filters').addEventListener('click', ()=>{
-    activeCardFilter = '';
-    statusDropdownFilter = '';
-    document.getElementById('status-filter').value = '';
-    document.querySelectorAll('.card-filter').forEach(c=>c.classList.remove('active'));
-    document.querySelector('.card-filter[data-filter="total"]')?.classList.add('active');
-    applyFiltersAndRender();
-  });
-
-  // modal open/close
-  document.getElementById('new-task-open').addEventListener('click', openModal);
-  document.getElementById('modal-close').addEventListener('click', closeModal);
-  document.getElementById('modal-cancel').addEventListener('click', closeModal);
-  document.getElementById('modal-submit').addEventListener('click', submitModal);
-
-  // sync button
-  document.getElementById('sync-btn').addEventListener('click', async ()=>{
-    const btn = document.getElementById('sync-btn'); btn.disabled = true;
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<i data-feather="refresh-cw" class="animate-spin mr-2"></i> Sync';
-    feather.replace();
-    try{ await loadAll(); } finally { btn.disabled=false; btn.innerHTML = orig; feather.replace(); }
-  });
-
-  // init defaults
-  document.querySelector('.card-filter[data-filter="total"]')?.classList.add('active');
-
-  // initial load & auto refresh
-  loadAll();
-  setInterval(loadAll, 60000);
-});
-
-/* helper to call apply filters using current global variables */
-function applyFiltersAndRender(){ applyFiltersAndRenderInner(); }
-function applyFiltersAndRenderInner(){
-  let filtered = tasksCache.slice();
-  if(statusDropdownFilter) filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === statusDropdownFilter.toLowerCase());
-  if(activeCardFilter === 'overdue'){
-    const today = new Date(); today.setHours(0,0,0,0);
-    filtered = filtered.filter(t => { const d = parseFlexibleDate(t.Deadline||t.deadline||''); return d && d < today && ((t.Status||'').toLowerCase()!=='completed'); });
-  } else if(activeCardFilter === 'inprogress'){
-    filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === 'in progress');
-  } else if(activeCardFilter === 'completed'){
-    filtered = filtered.filter(t => ((t.Status||'') + '').toLowerCase() === 'completed');
+    document.getElementById('clearFilters').addEventListener('click', ()=>{
+      document.getElementById('statusFilter').value = 'All';
+      document.getElementById('activeBadge').classList.add('hidden');
+      loadData(null);
+    });
   }
-  renderKanban(filtered);
-  renderBadges();
-}
-</script>
+
+  // Wire buttons
+  function setupButtons(){
+    document.getElementById('syncBtn').addEventListener('click', ()=> loadData());
+    // placeholder new task modal – you can hook this into your create-task page
+    document.getElementById('newTaskBtn').addEventListener('click', ()=> {
+      window.location.href = '/create-task.html';
+    });
+
+    // Sign-in placeholder (we're not handling OAuth here)
+    document.getElementById('signinBtn').addEventListener('click', ()=> {
+      // If you have Google sign-in client integrated, call that flow here.
+      // For now just show a friendly note:
+      alert('Sign in with Google flow (client-side) is handled elsewhere. Ensure your OAuth client origins are configured in Google Cloud Console.');
+    });
+  }
+
+  // init
+  (function init(){
+    setupCardFilters();
+    setupButtons();
+    loadData();
+    // periodic refresh
+    setInterval(()=> loadData(), 1000 * 60 * 5); // every 5 minutes
+  })();
+
+  </script>
 </body>
 </html>
