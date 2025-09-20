@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
 
     const appendResult = await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Tasks!A:H',
+      range: 'Sheet1!A:H',   // 👈 Changed here
       valueInputOption: 'RAW',
       insertDataOption: 'INSERT_ROWS',
       resource: { values: [row] },
@@ -82,13 +82,13 @@ module.exports = async (req, res) => {
     const updatedRange = updates.updatedRange || null;
     let externalRow = null;
     if (updatedRange) {
-      // example updatedRange: "Tasks!A2:H2" -> capture the row number
+      // example updatedRange: "Sheet1!A2:H2" -> capture the row number
       const m = updatedRange.match(/!(?:[A-Z]+)(\d+):/);
       if (m && m[1]) externalRow = parseInt(m[1], 10);
     }
 
     if (externalRow) {
-      const extRange = `Tasks!H${externalRow}`;
+      const extRange = `Sheet1!H${externalRow}`;   // 👈 Changed here
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: extRange,
