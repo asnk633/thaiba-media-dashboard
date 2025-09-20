@@ -41,17 +41,19 @@
     .col{background:transparent}
     .col h3{margin:0 0 8px}
     .column-inner{min-height:220px;background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow)}
-    .task-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;border-left:6px solid #ddd}
-    .task-card .meta{font-size:12px;color:var(--muted);margin-top:8px}
+    .task-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;border-left:6px solid #ddd;display:flex;flex-direction:column}
+    .task-title{font-weight:700;margin-bottom:6px}
+    .task-meta{font-size:12px;color:var(--muted);margin-top:8px}
+    .priority-badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px;color:white;margin-left:8px}
     .small{font-size:13px;color:var(--muted)}
+    .muted{color:var(--muted)}
     /* charts area */
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:24px}
     .panel{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);min-height:220px}
-    .muted{color:var(--muted)}
+    .error{background:#fff6f6;color:var(--red);padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.12)}
     /* helper */
     .row{display:flex;gap:12px;align-items:center}
     .hidden{display:none}
-    .error{background:#fff6f6;color:var(--red);padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.12)}
     footer{margin:30px 0 60px;color:var(--muted);font-size:13px}
   </style>
 </head>
@@ -187,21 +189,24 @@
     return s.split(/\s+/).map(w => w[0]?.toUpperCase()+w.slice(1)).join(' ');
   }
 
+  // priority color map / severity for sorting
+  const PRIORITY_COLOR = {
+    'Urgent':'#ef4444',
+    'High':'#f97316',
+    'Medium':'#f59e0b',
+    'Low':'#10b981'
+  };
+  const PRIORITY_SEVERITY = { 'Urgent': 4, 'High':3, 'Medium':2, 'Low':1 };
+
   // Render a single task card HTML
   function renderTaskCard(task){
     const div = el('div','task-card');
-    let color = '#ddd';
-    if (task.priority === 'Urgent') color = '#ef4444';
-    else if (task.priority === 'High') color = '#f97316';
-    else if (task.priority === 'Medium') color = '#f59e0b';
-    else color = '#10b981';
-    div.style.borderLeftColor = color;
 
-    const title = el('div');
-    title.innerHTML = `<strong>${escapeHtml(task.description || '(no description)')}</strong>`;
+    const title = el('div','task-title');
+    title.innerHTML = `${escapeHtml(task.description || '(no description)')} <span class="priority-badge" style="background:${PRIORITY_COLOR[task.priority] || '#6b7280'}">${escapeHtml(task.priority || 'Low')}</span>`;
     div.appendChild(title);
 
-    const meta = el('div','meta');
+    const meta = el('div','task-meta');
     meta.innerHTML = `Requested by: ${escapeHtml(task.requestedBy||'')}<br/>Assigned: ${escapeHtml(task.assignedTo||'')}<br/>Deadline: ${formatDate(task.deadline)}`;
     div.appendChild(meta);
 
@@ -215,7 +220,7 @@
     if(!d) return '';
     // input could be ISO string or Date
     const dt = (typeof d === 'string') ? new Date(d) : d;
-    if(isNaN(dt)) return d;
+    if(isNaN(dt)) return String(d);
     // display as DD/MM/YYYY
     return dt.getDate().toString().padStart(2,'0') + '/' + (dt.getMonth()+1).toString().padStart(2,'0') + '/' + dt.getFullYear();
   }
@@ -227,12 +232,10 @@
 
     tasks.forEach(t => {
       const s = normalizeStatus(t.status);
-      if(!statusCounts[s]) statusCounts[s]=0;
-      statusCounts[s]++;
+      statusCounts[s] = (statusCounts[s]||0) + 1;
 
       const p = t.priority || 'Low';
-      if(!priorityCounts[p]) priorityCounts[p]=0;
-      priorityCounts[p]++;
+      priorityCounts[p] = (priorityCounts[p]||0) + 1;
     });
 
     // statusChart (doughnut)
@@ -260,7 +263,15 @@
     });
   }
 
-  // fill kanban from tasks
+  // sorting helper - parse a deadline into number (timestamp) or Infinity if missing
+  function deadlineValue(d){
+    if(!d) return Infinity;
+    const dt = (typeof d === 'string') ? new Date(d) : d;
+    const t = dt && !isNaN(dt) ? dt.getTime() : Infinity;
+    return t;
+  }
+
+  // fill kanban from tasks (with sorting by deadline, tie-break by priority severity)
   function populateKanban(tasks, activeFilter){
     // clear columns
     const cols = {
@@ -273,15 +284,41 @@
 
     const counts = { 'Pending':0, 'In Progress':0, 'On Hold':0, 'Completed':0 };
 
-    tasks.forEach(t => {
-      const status = normalizeStatus(t.status);
-      counts[status] = (counts[status]||0) + 1;
+    // Normalize tasks first
+    const normalized = tasks.map(t => {
+      return {
+        ...t,
+        status: normalizeStatus(t.status),
+        priority: t.priority || 'Low',
+        _deadlineVal: deadlineValue(t.deadline)
+      };
+    });
 
-      // apply UI filter if set (status drop-down / stat-card)
-      if(activeFilter && activeFilter !== 'All' && status !== activeFilter) return;
+    // group by status
+    const groups = { 'Pending':[], 'In Progress':[], 'On Hold':[], 'Completed':[] };
+    normalized.forEach(t => {
+      const s = t.status || 'Pending';
+      counts[s] = (counts[s]||0) + 1;
+      groups[s] = groups[s] || [];
+      groups[s].push(t);
+    });
 
-      const card = renderTaskCard(t);
-      cols[status].appendChild(card);
+    // For each group sort by deadline asc, then by priority severity desc (urgent first)
+    Object.keys(groups).forEach(k => {
+      groups[k].sort((a,b) => {
+        const dA = a._deadlineVal, dB = b._deadlineVal;
+        if(dA !== dB) return dA - dB;
+        const pA = PRIORITY_SEVERITY[a.priority] || 0;
+        const pB = PRIORITY_SEVERITY[b.priority] || 0;
+        return pB - pA; // higher severity first when deadlines equal
+      });
+
+      // append cards applying active filter if any
+      groups[k].forEach(item => {
+        if(activeFilter && activeFilter !== 'All' && item.status !== activeFilter) return;
+        const card = renderTaskCard(item);
+        cols[k].appendChild(card);
+      });
     });
 
     // update column headings counts
@@ -314,33 +351,34 @@
       if(!res.ok) throw new Error('API returned ' + res.status);
       const payload = await res.json();
 
-      // payload expected to include: ok (or at least counts, tasks, fetchedAt)
+      // payload expected to include: counts, tasks, fetchedAt
       const counts = payload.counts || {};
-      const tasks = (payload.tasks || []).map(r => {
-        // front-end normalization: ensure status/titlecases
+      const tasksRaw = payload.tasks || [];
+
+      // normalize tasks shape (safe mapping)
+      const tasks = tasksRaw.map(r => {
         return {
-          id: r.id || r._id || '',
+          id: r.id || r._id || r.ID || r[0] || '',
           description: r.description || r.TaskDescription || r[1] || '',
           assignedTo: r.assignedTo || r.AssignedTo || r[2] || '',
-          priority: r.priority || r.Priority || r[3] || '',
-          status: normalizeStatus(r.status || r.Status || r[4]),
-          requestedBy: r.requestedBy || r.RequestedBy || r.requestedBy || '',
-          deadline: r.deadline || r.Deadline || r.deadline || r[6] || '',
+          priority: (r.priority || r.Priority || r[3] || 'Low'),
+          status: r.status || r.Status || r[4] || '',
+          requestedBy: r.requestedBy || r.RequestedBy || r.requestedBy || r[5] || '',
+          deadline: r.deadline || r.Deadline || r[6] || '',
           notes: r.notes || r.Notes || r[7] || '',
           _sheetRow: r._sheetRow || r.sheetRow || null
         };
       });
 
-      // update stat cards with counts from API (fall back to computing if missing)
+      // compute counts as fallback
       const total = counts.total ?? tasks.length;
       const overdue = counts.overdue ?? tasks.filter(t => {
         if(!t.deadline) return false;
         const d = new Date(t.deadline);
-        return !isNaN(d) && d < new Date() && (t.status !== 'Completed');
+        return !isNaN(d) && d < new Date() && (normalizeStatus(t.status) !== 'Completed');
       }).length;
-      const inProgress = counts.inProgress ?? tasks.filter(t => t.status === 'In Progress').length;
-      const completed = counts.completed ?? tasks.filter(t => t.status === 'Completed').length;
-      const onHold = counts.onHold ?? tasks.filter(t => t.status === 'On Hold').length;
+      const inProgress = counts.inProgress ?? tasks.filter(t => normalizeStatus(t.status) === 'In Progress').length;
+      const completed = counts.completed ?? tasks.filter(t => normalizeStatus(t.status) === 'Completed').length;
 
       document.getElementById('totalCount').innerText = total;
       document.getElementById('overdueCount').innerText = overdue;
@@ -349,7 +387,8 @@
 
       // charts + kanban
       renderCharts(tasks);
-      populateKanban(tasks, activeFilter || (document.getElementById('statusFilter').value === 'All' ? null : document.getElementById('statusFilter').value) );
+      const uiFilter = (document.getElementById('statusFilter').value === 'All') ? null : document.getElementById('statusFilter').value;
+      populateKanban(tasks, activeFilter || uiFilter);
 
       // last updated
       const fetchedAt = payload.fetchedAt ? new Date(payload.fetchedAt) : new Date();
@@ -358,6 +397,12 @@
     } catch (err){
       console.error('Load error', err);
       showMessage('Failed to load tasks — ' + err.message, 'error');
+      // Clear visuals to avoid stale/incorrect UI
+      document.getElementById('totalCount').innerText = '0';
+      document.getElementById('overdueCount').innerText = '0';
+      document.getElementById('inProgressCount').innerText = '0';
+      document.getElementById('completedCount').innerText = '0';
+      ['pending','inprogress','onhold','completed'].forEach(id => document.getElementById(id+'-column').innerHTML='');
     } finally {
       syncBtn.disabled = false;
       syncBtn.textContent = '⟳ Sync';
@@ -401,15 +446,13 @@
   // Wire buttons
   function setupButtons(){
     document.getElementById('syncBtn').addEventListener('click', ()=> loadData());
-    // placeholder new task modal – you can hook this into your create-task page
+    // action to open create-task page
     document.getElementById('newTaskBtn').addEventListener('click', ()=> {
       window.location.href = '/create-task.html';
     });
 
     // Sign-in placeholder (we're not handling OAuth here)
     document.getElementById('signinBtn').addEventListener('click', ()=> {
-      // If you have Google sign-in client integrated, call that flow here.
-      // For now just show a friendly note:
       alert('Sign in with Google flow (client-side) is handled elsewhere. Ensure your OAuth client origins are configured in Google Cloud Console.');
     });
   }
