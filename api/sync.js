@@ -3,7 +3,24 @@ const { google } = require('googleapis');
 const SECRET = process.env.SECRET_KEY;
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
-const PRIVATE_KEY = (process.env.GOOGLE_SHEETS_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+let PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY || '';
+
+// If the value is wrapped in quotes (common if pasted incorrectly), remove them
+if (
+  (PRIVATE_KEY.startsWith('"') && PRIVATE_KEY.endsWith('"')) ||
+  (PRIVATE_KEY.startsWith("'") && PRIVATE_KEY.endsWith("'"))
+) {
+  PRIVATE_KEY = PRIVATE_KEY.slice(1, -1);
+}
+
+// If it contains literal "\n" sequences, convert them into real newlines
+if (PRIVATE_KEY.includes('\\n')) {
+  PRIVATE_KEY = PRIVATE_KEY.replace(/\\n/g, '\n');
+}
+
+// Trim whitespace/newline edges just in case
+PRIVATE_KEY = PRIVATE_KEY.trim();
+
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
