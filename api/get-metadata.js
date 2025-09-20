@@ -1,0 +1,1 @@
+[PASTE THE FULL CONTENT OF THE api/get-metadata.js I GAVE ABOVE HERE]
