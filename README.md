@@ -1,10 +1,12 @@
 ---
-title: Media Task Manager
-emoji: 👀
-colorFrom: blue
-colorTo: red
+title: media-task-manager
+emoji: 🐳
+colorFrom: purple
+colorTo: pink
 sdk: static
 pinned: false
+tags:
+  - deepsite
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

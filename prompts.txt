@@ -1,0 +1,71 @@
+Create a task management platform for the Media Department of Thaiba Garden Group of Institutions. The platform should be built around task tracking, assignment, and progress monitoring. It must integrate with Google Sheets and Microsoft To Do, and support real-time sync between them.
+
+Key Features:
+
+Task Input & Database
+
+Each task should include:
+
+Task Description
+
+Requested By (name/department)
+
+Assigned To (team member)
+
+Priority (High, Medium, Low)
+
+Deadline
+
+Status (Pending, In Progress, Completed, On Hold)
+
+Start Time & End Time
+
+Remarks/Notes
+
+Integration & Automation
+
+If a task is added in Microsoft To Do, it should appear in Google Sheets with all default columns.
+
+If a task is added in Google Sheets, it should create a corresponding task in Microsoft To Do.
+
+Updates in status, deadlines, or assignments should auto-sync both ways.
+
+User-Friendly Task Entry
+
+Provide a single quick-entry row/form for new tasks in the Google Sheet (so users don’t scroll down to add).
+
+Auto-assign task ID.
+
+Dashboard & Monitoring
+
+A visual dashboard (Kanban / Table view) showing:
+
+Tasks by Status (Pending, In Progress, Completed).
+
+Tasks by Priority.
+
+Tasks filtered by Assigned Person.
+
+Overdue tasks highlighted.
+
+Notifications & Reminders
+
+Send WhatsApp/Email notification to the assigned person when a new task is created.
+
+Reminder alerts before deadline.
+
+Permissions
+
+Media Team Members: Can view & update their own tasks.
+
+Admin (Me): Can view/edit all tasks.
+
+Scalability
+
+Should allow exporting reports (weekly/monthly task summary).
+
+Should handle high volume of tasks without duplication/loops.
+
+Objective:
+
+To have a smooth, real-time task management system that reduces last-minute rush, keeps tasks organized, avoids duplication, and helps the media team deliver work efficiently.
