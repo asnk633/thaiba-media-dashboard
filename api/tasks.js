@@ -1,21 +1,19 @@
 // api/tasks.js
-// Returns tasks read from the spreadsheet and normalizes status values.
+// Robust task reader + status normalization for the Thaiba Media dashboard.
 //
 // Environment variables expected:
-// - SPREADSHEET_ID (Google Sheets ID)
-// - SHEET_TAB (sheet tab name, default 'Sheet1')
+// - SPREADSHEET_ID
+// - SHEET_TAB (optional, default 'Sheet1')
 // - GOOGLE_SHEETS_CLIENT_EMAIL
 // - GOOGLE_SHEETS_PRIVATE_KEY
 
 const { google } = require('googleapis');
 
-// config from env
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_TAB = (process.env.SHEET_TAB || 'Sheet1').trim();
 const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL;
 let PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY || process.env.GOOGLE_PRIVATE_KEY || '';
 
-// safe private key normalization (strip surrounding quotes, fix escaped newlines)
 if ((PRIVATE_KEY.startsWith('"') && PRIVATE_KEY.endsWith('"')) ||
     (PRIVATE_KEY.startsWith("'") && PRIVATE_KEY.endsWith("'"))) {
   PRIVATE_KEY = PRIVATE_KEY.slice(1, -1);
@@ -25,72 +23,82 @@ if (PRIVATE_KEY.includes('\\n')) {
 }
 PRIVATE_KEY = PRIVATE_KEY.trim();
 
-// helper: normalize status values from sheet -> canonical frontend values
 function normalizeStatus(raw) {
   if (!raw) return 'Pending';
   const s = String(raw).trim().toLowerCase();
 
-  // map common variants to canonical values
-  if (
-    s === 'working on' ||
-    s === 'working' ||
-    s === 'in progress' ||
-    s === 'workingon' ||
-    s === 'working-on' ||
-    s === 'in-progress'
-  ) {
-    return 'In Progress';
-  }
-  if (s === 'cancelled' || s === 'canceled' || s === 'cancel' || s === 'cancelled ') {
-    return 'On Hold';
-  }
-  if (s === 'pending' || s === 'open' || s === 'todo' || s === 'new') {
-    return 'Pending';
-  }
-  if (s === 'completed' || s === 'done' || s === 'finished') {
-    return 'Completed';
+  // many aliases -> canonical
+  const inProgressAliases = new Set(['working on','working','workingon','in progress','in-progress','inprogress','working-on']);
+  const onHoldAliases = new Set(['cancelled','canceled','cancel','on hold','on-hold','onhold','hold','paused','archive']);
+  const completedAliases = new Set(['completed','done','finished','closed']);
+  const pendingAliases = new Set(['pending','open','todo','new']);
+
+  if (inProgressAliases.has(s)) return 'In Progress';
+  if (onHoldAliases.has(s)) return 'On Hold';
+  if (completedAliases.has(s)) return 'Completed';
+  if (pendingAliases.has(s)) return 'Pending';
+
+  // fallback: title-case the incoming text (so unknown labels still show nicely)
+  return s.split(/\s+/).map(w => w ? w[0].toUpperCase() + w.slice(1) : '').join(' ');
+}
+
+function parsePossibleDate(value) {
+  if (!value) return null;
+  const raw = String(value).trim();
+  // Try ISO / RFC first
+  const d1 = new Date(raw);
+  if (!isNaN(d1.getTime())) return d1.toISOString();
+
+  // Try common dd/mm/yyyy or dd-mm-yyyy
+  const m1 = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m1) {
+    const dd = parseInt(m1[1], 10);
+    const mm = parseInt(m1[2], 10) - 1;
+    const yy = parseInt(m1[3], 10);
+    const d2 = new Date(Date.UTC(yy, mm, dd));
+    if (!isNaN(d2.getTime())) return d2.toISOString();
   }
 
-  // fallback: Title Case the unknown status so UI shows nicer text
-  return s.split(/\s+/).map(w => (w[0] ? w[0].toUpperCase() + w.slice(1) : w)).join(' ');
+  // fallback: return original string (frontend may display as-is)
+  return raw;
 }
 
 async function getSheetsClient() {
   if (!CLIENT_EMAIL || !PRIVATE_KEY) {
-    throw new Error('Missing Google service account credentials (GOOGLE_SHEETS_CLIENT_EMAIL or GOOGLE_SHEETS_PRIVATE_KEY).');
+    throw new Error('Missing google service account env vars (GOOGLE_SHEETS_CLIENT_EMAIL, GOOGLE_SHEETS_PRIVATE_KEY).');
   }
-
+  // google-auth-library supports object constructor
   const jwt = new google.auth.JWT({
     email: CLIENT_EMAIL,
     key: PRIVATE_KEY,
     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
   });
-
-  // authorize (will throw on failure)
   await jwt.authorize();
   return google.sheets({ version: 'v4', auth: jwt });
 }
 
-function safeParseDate(value) {
-  if (!value) return null;
-  // If the sheet already returns an ISO date-like string, try to parse
-  const d = new Date(value);
-  if (!isNaN(d.getTime())) return d.toISOString();
-  // return original string as fallback
-  return String(value);
+function headerLooksLikeColumns(row) {
+  if (!row || !row.length) return false;
+  const joined = row.join(' ').toLowerCase();
+  // require at least two known column keywords to be confident it's a header
+  const keywords = ['task','task id','task description','description','assigned','assigned to','priority','status','requested','requested by','deadline','notes'];
+  let matches = 0;
+  for (const k of keywords) if (joined.includes(k)) matches++;
+  return matches >= 2;
+}
+
+function normalizeHeaderName(name) {
+  if (!name) return '';
+  return String(name).toLowerCase().replace(/[\s\-_]+/g, ' ').replace(/[^\w ]/g, '').trim();
 }
 
 module.exports = async (req, res) => {
   try {
-    if (!SPREADSHEET_ID) {
-      return res.status(500).json({ error: 'Missing SPREADSHEET_ID environment variable.' });
-    }
+    if (!SPREADSHEET_ID) return res.status(500).json({ error: 'Missing SPREADSHEET_ID env var' });
 
     const sheets = await getSheetsClient();
-
-    // Range: A:H (adjust if you ever have more columns)
-    const range = `${SHEET_TAB}!A:H`;
-
+    // fetch a wide range in case sheet layout shifted (A:Z)
+    const range = `${SHEET_TAB}!A:Z`;
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range,
@@ -99,39 +107,62 @@ module.exports = async (req, res) => {
 
     const values = resp.data.values || [];
 
-    // If the first row is a header row (it is in your sheet), drop it.
-    // We'll try to detect header by checking if first row contains "Task" or "Task ID".
-    let rows = values.slice();
-    if (rows.length > 0) {
-      const firstRowJoined = rows[0].join(' ').toLowerCase();
-      if (firstRowJoined.includes('task') || firstRowJoined.includes('task id') || firstRowJoined.includes('task description')) {
-        // assume header row: drop it
-        rows = rows.slice(1);
-      }
+    if (!values.length) {
+      return res.json({ ok: true, sheet: SHEET_TAB, tasks: [], counts: { total:0, pending:0, inProgress:0, onHold:0, completed:0, overdue:0 }, nextTaskId: null, fetchedAt: new Date().toISOString() });
     }
 
-    // Map rows -> tasks using the column mapping:
-    // A = 0 Task ID
-    // B = 1 Task Description
-    // C = 2 Assigned To
-    // D = 3 Priority
-    // E = 4 Status
-    // F = 5 Requested By
-    // G = 6 Deadline
-    // H = 7 Notes
-    const tasks = rows.map((row, idx) => {
-      // normalize and fallback to empty strings where necessary
-      const id = (row[0] || '').toString();
-      const description = row[1] || '';
-      const assignedTo = row[2] || '';
-      const priority = row[3] || '';
-      const rawStatus = row[4] || '';
-      const requestedBy = row[5] || '';
-      const deadlineRaw = row[6] || '';
-      const notes = row[7] || '';
+    // Decide whether the first row is a header (detect columns)
+    const firstRow = values[0];
+    const hasHeader = headerLooksLikeColumns(firstRow);
+
+    // Build a header map if header exists
+    const headerMap = {};
+    if (hasHeader) {
+      firstRow.forEach((cell, idx) => {
+        const key = normalizeHeaderName(cell);
+        if (!key) return;
+        headerMap[key] = idx;
+      });
+    }
+
+    // helpers to find index by various synonyms
+    const findIndex = (synonyms, fallbackIndex) => {
+      if (hasHeader) {
+        for (const s of synonyms) {
+          const k = normalizeHeaderName(s);
+          if (k in headerMap) return headerMap[k];
+        }
+      }
+      return fallbackIndex;
+    };
+
+    // Preferred indices (fallback to fixed A..H)
+    const idxId = findIndex(['task id','taskid','task','id'], 0);
+    const idxDescription = findIndex(['task description','description','taskdesc','task desc'], 1);
+    const idxAssigned = findIndex(['assigned to','assigned','assignee'], 2);
+    const idxPriority = findIndex(['priority'], 3);
+    const idxStatus = findIndex(['status'], 4);
+    const idxRequestedBy = findIndex(['requested by','requestedby','requested'], 5);
+    const idxDeadline = findIndex(['deadline','due','due date','date'], 6);
+    const idxNotes = findIndex(['notes','note','remarks'], 7);
+
+    // Determine rows to process
+    const dataRows = hasHeader ? values.slice(1) : values.slice(0);
+
+    // Map rows -> tasks
+    const tasks = dataRows.map((row, i) => {
+      // read using indices robustly
+      const id = (row[idxId] || '').toString().trim();
+      const description = (row[idxDescription] || '').toString().trim();
+      const assignedTo = (row[idxAssigned] || '').toString().trim();
+      const priority = (row[idxPriority] || '').toString().trim();
+      const rawStatus = (row[idxStatus] || '').toString().trim();
+      const requestedBy = (row[idxRequestedBy] || '').toString().trim();
+      const deadlineRaw = row[idxDeadline] || '';
+      const notes = (row[idxNotes] || '').toString().trim();
 
       const status = normalizeStatus(rawStatus);
-      const deadline = safeParseDate(deadlineRaw);
+      const deadline = parsePossibleDate(deadlineRaw);
 
       return {
         id,
@@ -142,37 +173,32 @@ module.exports = async (req, res) => {
         requestedBy,
         deadline,
         notes,
-        // index helps debugging/logging
-        _rowIndex: idx + 2, // +2 because we dropped header and sheet rows 1-based
+        _sheetRow: (hasHeader ? i + 2 : i + 1),
       };
     });
 
-    // compute basic counts for dashboard
-    const counts = tasks.reduce(
-      (acc, t) => {
-        acc.total += 1;
-        const s = (t.status || 'Pending').toLowerCase();
-        if (s === 'in progress' || s === 'inprogress' || s === 'in-progress') acc.inProgress += 1;
-        else if (s === 'on hold' || s === 'onhold') acc.onHold += 1;
-        else if (s === 'completed' || s === 'done' || s === 'finished') acc.completed += 1;
-        else acc.pending += 1;
+    // counts
+    const counts = tasks.reduce((acc, t) => {
+      acc.total++;
+      const s = (t.status || 'Pending').toLowerCase();
+      if (s === 'in progress' || s === 'inprogress' || s === 'in-progress') acc.inProgress++;
+      else if (s === 'on hold' || s === 'onhold') acc.onHold++;
+      else if (s === 'completed') acc.completed++;
+      else acc.pending++;
 
-        // overdue: if deadline is a date and < today (approx)
-        if (t.deadline) {
-          const d = new Date(t.deadline);
+      if (t.deadline) {
+        const d = new Date(t.deadline);
+        if (!isNaN(d.getTime())) {
           const today = new Date();
-          // compare only date portion (not time)
           const dUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
           const tUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-          if (!isNaN(dUTC) && dUTC < tUTC) acc.overdue += 1;
+          if (dUTC < tUTC) acc.overdue++;
         }
-        return acc;
-      },
-      { total: 0, pending: 0, inProgress: 0, onHold: 0, completed: 0, overdue: 0 }
-    );
+      }
+      return acc;
+    }, { total: 0, pending: 0, inProgress: 0, onHold: 0, completed: 0, overdue: 0 });
 
-    // optional: find nextTaskId suggestion (if you have T### scheme)
-    // find max numeric suffix of IDs starting with T
+    // compute nextTaskId if T### scheme exists
     let nextTaskId = null;
     try {
       const nums = tasks
@@ -189,17 +215,16 @@ module.exports = async (req, res) => {
       // ignore
     }
 
-    // Debug sample log (first 6 statuses) — check Vercel logs to verify normalization
-    console.log('tasks-sample-statuses:', tasks.slice(0, 6).map(t => ({ id: t.id, status: t.status, row: t._rowIndex })));
-
-    // Return response
+    // Log a small sample to help diagnosis in Vercel logs
+    console.log('api/tasks sample:', tasks.slice(0,8).map(t => ({ id: t.id, status: t.status, row: t._sheetRow })));
+    // Return
     return res.json({
       ok: true,
       sheet: SHEET_TAB,
+      fetchedAt: new Date().toISOString(),
       counts,
       nextTaskId,
       tasks,
-      fetchedAt: new Date().toISOString(),
     });
   } catch (err) {
     console.error('api/tasks error:', err && err.stack ? err.stack : err);
