@@ -1,636 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thaiba Garden - Media Task Manager</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .priority-high {
-            background-color: rgba(239, 68, 68, 0.1);
-            border-left: 4px solid var(--danger);
-        }
-        .priority-medium {
-            background-color: rgba(245, 158, 11, 0.1);
-            border-left: 4px solid var(--warning);
-        }
-        .priority-low {
-            background-color: rgba(16, 185, 129, 0.1);
-            border-left: 4px solid var(--secondary);
-        }
-        .status-pending {
-            color: #6b7280;
-        }
-        .status-in-progress {
-            color: #3b82f6;
-        }
-        .status-completed {
-            color: #10b981;
-        }
-        .status-on-hold {
-            color: #f59e0b;
-        }
-        .overdue {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
-        }
-        .kanban-column {
-            min-height: 500px;
-        }
-        .task-card {
-            transition: all 0.3s ease;
-        }
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thaiba Garden - Media Task Manager</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --secondary: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    .priority-high { background-color: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); }
+    .priority-medium { background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning); }
+    .priority-low { background-color: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--secondary); }
+    .status-pending { color: #6b7280; }
+    .status-in-progress { color: #3b82f6; }
+    .status-completed { color: #10b981; }
+    .status-on-hold { color: #f59e0b; }
+    .overdue { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .kanban-column { min-height: 500px; }
+    .task-card { transition: all 0.3s ease; }
+    .task-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+  </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <img class="h-8 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
-                        <span class="ml-2 text-xl font-semibold text-gray-900">Media Task Manager</span>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="hidden md:ml-4 md:flex md:items-center">
-                        <button class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i data-feather="bell"></i>
-                        </button>
-                        <div class="ml-3 relative">
-                            <div>
-                                <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu" aria-expanded="false" aria-haspopup="true">
-                                    <span class="sr-only">Open user menu</span>
-                                    <img class="h-8 w-8 rounded-full" src="http://static.photos/people/200x200/10" alt="User profile">
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <img class="h-8 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
+            <span class="ml-2 text-xl font-semibold text-gray-900">Media Task Manager</span>
+          </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <!-- Dashboard Header -->
-        <div class="mb-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Task Dashboard</h1>
-                    <p class="mt-1 text-sm text-gray-500">Media Department - Thaiba Garden Group</p>
-                </div>
-                <div class="mt-4 md:mt-0 flex space-x-3">
-                    <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i data-feather="plus" class="mr-2"></i> New Task
-                    </button>
-                    <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i data-feather="refresh-cw" class="mr-2"></i> Sync Now
-                    </button>
-                </div>
+        <div class="flex items-center">
+          <div class="hidden md:ml-4 md:flex md:items-center">
+            <button class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i data-feather="bell"></i>
+            </button>
+            <div class="ml-3 relative">
+              <div>
+                <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu">
+                  <img class="h-8 w-8 rounded-full" src="http://static.photos/people/200x200/10" alt="User profile">
+                </button>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </nav>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                            <i data-feather="inbox" class="text-white"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Tasks</dt>
-                                <dd>
-                                    <div class="text-lg font-medium text-gray-900">124</div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
-                            <i data-feather="alert-circle" class="text-white"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Overdue</dt>
-                                <dd>
-                                    <div class="text-lg font-medium text-gray-900">8</div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                            <i data-feather="clock" class="text-white"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">In Progress</dt>
-                                <dd>
-                                    <div class="text-lg font-medium text-gray-900">42</div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                            <i data-feather="check-circle" class="text-white"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Completed</dt>
-                                <dd>
-                                    <div class="text-lg font-medium text-gray-900">74</div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filters and Views -->
-        <div class="mb-6 bg-white shadow rounded-lg p-4">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                    <div>
-                        <label for="status-filter" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="status-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option selected>All Statuses</option>
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                            <option>On Hold</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="priority-filter" class="block text-sm font-medium text-gray-700">Priority</label>
-                        <select id="priority-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option selected>All Priorities</option>
-                            <option>High</option>
-                            <option>Medium</option>
-                            <option>Low</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="assignee-filter" class="block text-sm font-medium text-gray-700">Assignee</label>
-                        <select id="assignee-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option selected>All Team Members</option>
-                            <option>John Doe</option>
-                            <option>Jane Smith</option>
-                            <option>Robert Johnson</option>
-                            <option>Emily Davis</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i data-feather="list" class="mr-1"></i> Table
-                    </button>
-                    <button class="px-3 py-2 border border-indigo-500 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i data-feather="grid" class="mr-1"></i> Kanban
-                    </button>
-                    <button class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i data-feather="bar-chart-2" class="mr-1"></i> Charts
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Kanban Board -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Pending Column -->
-            <div class="kanban-column bg-gray-50 rounded-lg p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-700">Pending</h3>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">24</span>
-                </div>
-                <div class="space-y-4">
-                    <!-- Task Card -->
-                    <div class="task-card bg-white rounded-lg shadow p-4 priority-high">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium text-gray-900">Social Media Campaign - Summer Promotion</h4>
-                                <p class="mt-1 text-sm text-gray-500">Requested by: Marketing Dept</p>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">High</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center text-sm text-gray-500">
-                            <i data-feather="user" class="mr-1 h-4 w-4"></i>
-                            <span>Assigned to: Jane Smith</span>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500">
-                            <i data-feather="calendar" class="mr-1 h-4 w-4"></i>
-                            <span>Due: Today, 5:00 PM</span>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <span class="text-sm status-pending">
-                                <i data-feather="clock" class="mr-1 h-4 w-4"></i> Pending
-                            </span>
-                            <div class="flex space-x-2">
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="edit" class="h-4 w-4"></i>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="more-vertical" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Task Card -->
-                    <div class="task-card bg-white rounded-lg shadow p-4 priority-medium overdue">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium text-gray-900">Website Banner Update</h4>
-                                <p class="mt-1 text-sm text-gray-500">Requested by: Admissions</p>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Medium</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center text-sm text-gray-500">
-                            <i data-feather="user" class="mr-1 h-4 w-4"></i>
-                            <span>Assigned to: Robert Johnson</span>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500">
-                            <i data-feather="calendar" class="mr-1 h-4 w-4"></i>
-                            <span class="text-red-500">Overdue: Yesterday</span>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <span class="text-sm status-pending">
-                                <i data-feather="clock" class="mr-1 h-4 w-4"></i> Pending
-                            </span>
-                            <div class="flex space-x-2">
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="edit" class="h-4 w-4"></i>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="more-vertical" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- In Progress Column -->
-            <div class="kanban-column bg-gray-50 rounded-lg p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-700">In Progress</h3>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">18</span>
-                </div>
-                <div class="space-y-4">
-                    <!-- Task Card -->
-                    <div class="task-card bg-white rounded-lg shadow p-4 priority-high">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium text-gray-900">Event Photography - Graduation</h4>
-                                <p class="mt-1 text-sm text-gray-500">Requested by: Events Team</p>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">High</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center text-sm text-gray-500">
-                            <i data-feather="user" class="mr-1 h-4 w-4"></i>
-                            <span>Assigned to: John Doe</span>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500">
-                            <i data-feather="calendar" class="mr-1 h-4 w-4"></i>
-                            <span>Due: Tomorrow, 10:00 AM</span>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <span class="text-sm status-in-progress">
-                                <i data-feather="activity" class="mr-1 h-4 w-4"></i> In Progress
-                            </span>
-                            <div class="flex space-x-2">
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="edit" class="h-4 w-4"></i>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="more-vertical" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- On Hold Column -->
-            <div class="kanban-column bg-gray-50 rounded-lg p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-700">On Hold</h3>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">6</span>
-                </div>
-                <div class="space-y-4">
-                    <!-- Task Card -->
-                    <div class="task-card bg-white rounded-lg shadow p-4 priority-low">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium text-gray-900">Brochure Redesign</h4>
-                                <p class="mt-1 text-sm text-gray-500">Requested by: Marketing Dept</p>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Low</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center text-sm text-gray-500">
-                            <i data-feather="user" class="mr-1 h-4 w-4"></i>
-                            <span>Assigned to: Emily Davis</span>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500">
-                            <i data-feather="calendar" class="mr-1 h-4 w-4"></i>
-                            <span>Due: Next Week</span>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <span class="text-sm status-on-hold">
-                                <i data-feather="pause" class="mr-1 h-4 w-4"></i> On Hold
-                            </span>
-                            <div class="flex space-x-2">
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="edit" class="h-4 w-4"></i>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="more-vertical" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Completed Column -->
-            <div class="kanban-column bg-gray-50 rounded-lg p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-700">Completed</h3>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">76</span>
-                </div>
-                <div class="space-y-4">
-                    <!-- Task Card -->
-                    <div class="task-card bg-white rounded-lg shadow p-4 priority-medium">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-medium text-gray-900">Facebook Ad Creation</h4>
-                                <p class="mt-1 text-sm text-gray-500">Requested by: Admissions</p>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Medium</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center text-sm text-gray-500">
-                            <i data-feather="user" class="mr-1 h-4 w-4"></i>
-                            <span>Assigned to: Jane Smith</span>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500">
-                            <i data-feather="calendar" class="mr-1 h-4 w-4"></i>
-                            <span>Completed: Today, 11:30 AM</span>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <span class="text-sm status-completed">
-                                <i data-feather="check-circle" class="mr-1 h-4 w-4"></i> Completed
-                            </span>
-                            <div class="flex space-x-2">
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="edit" class="h-4 w-4"></i>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-500">
-                                    <i data-feather="more-vertical" class="h-4 w-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- New Task Modal (Hidden by default) -->
-        <div class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true" id="task-modal">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-                    <div>
-                        <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                New Task
-                            </h3>
-                            <div class="mt-2">
-                                <form class="space-y-4">
-                                    <div>
-                                        <label for="task-description" class="block text-sm font-medium text-gray-700">Task Description</label>
-                                        <input type="text" name="task-description" id="task-description" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <label for="requested-by" class="block text-sm font-medium text-gray-700">Requested By</label>
-                                            <select id="requested-by" name="requested-by" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option>Marketing Department</option>
-                                                <option>Admissions</option>
-                                                <option>Events Team</option>
-                                                <option>Academic Department</option>
-                                                <option>Administration</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label for="assigned-to" class="block text-sm font-medium text-gray-700">Assigned To</label>
-                                            <select id="assigned-to" name="assigned-to" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option>John Doe</option>
-                                                <option>Jane Smith</option>
-                                                <option>Robert Johnson</option>
-                                                <option>Emily Davis</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                        <div>
-                                            <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
-                                            <select id="priority" name="priority" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option>High</option>
-                                                <option selected>Medium</option>
-                                                <option>Low</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label for="deadline" class="block text-sm font-medium text-gray-700">Deadline</label>
-                                            <input type="date" name="deadline" id="deadline" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                        </div>
-                                        <div>
-                                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                                            <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option selected>Pending</option>
-                                                <option>In Progress</option>
-                                                <option>Completed</option>
-                                                <option>On Hold</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <label for="start-time" class="block text-sm font-medium text-gray-700">Start Time</label>
-                                            <input type="time" name="start-time" id="start-time" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                        </div>
-                                        <div>
-                                            <label for="end-time" class="block text-sm font-medium text-gray-700">End Time</label>
-                                            <input type="time" name="end-time" id="end-time" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks/Notes</label>
-                                        <textarea id="remarks" name="remarks" rows="3" class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"></textarea>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Create Task
-                        </button>
-                        <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm" id="cancel-modal">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Dashboard Header -->
+    <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Task Dashboard</h1>
+        <p class="mt-1 text-sm text-gray-500">Media Department - Thaiba Garden Group</p>
+      </div>
+      <div class="mt-4 md:mt-0 flex space-x-3">
+        <button id="new-task-btn" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+          <i data-feather="plus" class="mr-2"></i> New Task
+        </button>
+        <button id="sync-btn" class="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+          <i data-feather="refresh-cw" class="mr-2"></i> Sync Now
+        </button>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center">
-                    <img class="h-6 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
-                    <span class="ml-2 text-sm text-gray-500">© 2023 Thaiba Garden Group. All rights reserved.</span>
-                </div>
-                <div class="mt-4 md:mt-0">
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Google Sheets</span>
-                            <i data-feather="file-text"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Microsoft To Do</span>
-                            <i data-feather="check-square"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">WhatsApp</span>
-                            <i data-feather="message-square"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Email</span>
-                            <i data-feather="mail"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- Stats -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8" id="stats-cards">
+      <!-- Will be populated dynamically -->
+    </div>
 
-    <script>
-        // Initialize AOS animations
-        AOS.init();
-        
-        // Initialize Feather Icons
-        feather.replace();
-        
-        // Modal toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('task-modal');
-            const newTaskBtn = document.querySelector('button:has(i[data-feather="plus"])');
-            const cancelBtn = document.getElementById('cancel-modal');
-            
-            newTaskBtn.addEventListener('click', function() {
-                modal.classList.remove('hidden');
-            });
-            
-            cancelBtn.addEventListener('click', function() {
-                modal.classList.add('hidden');
-            });
-            
-            // Close modal when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-            
-            // Sync button functionality
-            const syncBtn = document.querySelector('button:has(i[data-feather="refresh-cw"])');
-            syncBtn.addEventListener('click', function() {
-                syncBtn.innerHTML = '<i data-feather="refresh-cw" class="animate-spin mr-2"></i> Syncing...';
-                feather.replace();
-                
-                // Simulate sync delay
-                setTimeout(function() {
-                    syncBtn.innerHTML = '<i data-feather="refresh-cw" class="mr-2"></i> Sync Now';
-                    feather.replace();
-                    
-                    // Show sync success notification
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center';
-                    notification.innerHTML = '<i data-feather="check-circle" class="mr-2"></i> Sync completed successfully!';
-                    document.body.appendChild(notification);
-                    feather.replace();
-                    
-                    setTimeout(function() {
-                        notification.remove();
-                    }, 3000);
-                }, 2000);
-            });
+    <!-- Filters -->
+    <div class="mb-6 bg-white shadow rounded-lg p-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+          <label class="block text-sm font-medium text-gray-700">Status</label>
+          <select id="status-filter" class="mt-1 block pl-3 pr-10 py-2 border-gray-300 rounded-md">
+            <option>All</option>
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>On Hold</option>
+            <option>Completed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
+  </div>
+
+  <footer class="bg-white border-t border-gray-200 mt-12">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <div class="flex items-center">
+        <img class="h-6 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
+        <span class="ml-2 text-sm text-gray-500">© 2025 Thaiba Garden Group. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    AOS.init(); feather.replace();
+
+    async function loadTasks() {
+      const board = document.getElementById('kanban-board');
+      board.innerHTML = '<p>Loading tasks…</p>';
+      try {
+        const res = await fetch('/api/tasks');
+        const body = await res.json();
+        if (!body.ok) throw new Error(body.error || 'Failed');
+
+        const tasks = body.tasks;
+        const statuses = ['Pending', 'In Progress', 'On Hold', 'Completed'];
+        let html = '';
+        statuses.forEach(status => {
+          const colTasks = tasks.filter(t => (t.Status || '').toLowerCase() === status.toLowerCase());
+          html += `<div class="kanban-column bg-gray-50 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium text-gray-700">${status}</h3>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">${colTasks.length}</span>
+            </div>
+            <div class="space-y-4">`;
+          colTasks.forEach(task => {
+            const priorityClass = task.Priority?.toLowerCase() === 'high' ? 'priority-high'
+              : task.Priority?.toLowerCase() === 'medium' ? 'priority-medium' : 'priority-low';
+            html += `<div class="task-card bg-white rounded-lg shadow p-4 ${priorityClass}">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium text-gray-900">${task['Task Description'] || 'No Title'}</h4>
+                  <p class="mt-1 text-sm text-gray-500">Requested by: ${task['Requested By'] || '-'}</p>
+                </div>
+                <div><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium">${task.Priority || ''}</span></div>
+              </div>
+              <div class="mt-3 flex items-center text-sm text-gray-500">
+                <i data-feather="user" class="mr-1 h-4 w-4"></i><span>${task['Assigned To'] || '-'}</span>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-gray-500">
+                <i data-feather="calendar" class="mr-1 h-4 w-4"></i><span>${task.Deadline || '-'}</span>
+              </div>
+              <div class="mt-3 text-sm"><i data-feather="clock" class="mr-1 h-4 w-4"></i>${status}</div>
+            </div>`;
+          });
+          html += '</div></div>';
         });
-    </script>
+        board.innerHTML = html;
+        feather.replace();
+      } catch (e) {
+        board.innerHTML = `<p class="text-red-600">Error loading tasks: ${e.message}</p>`;
+      }
+    }
+    loadTasks();
+  </script>
 </body>
 </html>
