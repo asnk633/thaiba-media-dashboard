@@ -1,16 +1,18 @@
 // api/sync.js
-// Vercel serverless function: append a task to Google Sheets according to the user's Sheet1 header order.
+// Vercel serverless function: append a task to a configurable Google Sheets tab.
 // Expects env vars:
 // - SECRET_KEY
 // - SPREADSHEET_ID
 // - GOOGLE_SHEETS_CLIENT_EMAIL
 // - GOOGLE_SHEETS_PRIVATE_KEY  (multiline or \n-escaped — both supported)
+// - SHEET_TAB  (optional, defaults to "Sheet1")
 
 const { google } = require('googleapis');
 
 const SECRET = process.env.SECRET_KEY;
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
+const sheetTab = (process.env.SHEET_TAB || 'Sheet1').trim();
 
 // Robust private key parsing: accept multiline, or '\n' escaped, and strip accidental surrounding quotes.
 let PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY || '';
@@ -78,10 +80,12 @@ module.exports = async (req, res) => {
       task.notes || ''
     ];
 
-    // Append only — do not update any existing cell to avoid protected-cell errors.
+    // Use configurable sheet tab name
+    const range = `${sheetTab}!A:H`;
+
     const appendResult = await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A:H',
+      range,
       valueInputOption: 'RAW',
       insertDataOption: 'INSERT_ROWS',
       resource: { values: [row] },
@@ -91,11 +95,13 @@ module.exports = async (req, res) => {
     const updatedRange = updates.updatedRange || null;
     let appendedRowNumber = null;
     if (updatedRange) {
+      // example updatedRange: "Sheet1!A2:H2" -> capture the row number
       const m = updatedRange.match(/!(?:[A-Z]+)(\d+):/);
       if (m && m[1]) appendedRowNumber = parseInt(m[1], 10);
     }
 
-    return res.status(200).json({ ok: true, appended_row: appendedRowNumber });
+    // We do NOT update any existing cells (to avoid protected-cell errors).
+    return res.status(200).json({ ok: true, appended_row: appendedRowNumber, sheet: sheetTab });
   } catch (err) {
     console.error('sync error:', err && (err.stack || err.message || err));
     return res.status(500).json({ error: 'Internal Server Error', details: err.message || String(err) });
