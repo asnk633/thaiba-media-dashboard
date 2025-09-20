@@ -1,0 +1,7 @@
+{
+  "name": "thaiba-media-dashboard",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^118.0.0"
+  }
+}
