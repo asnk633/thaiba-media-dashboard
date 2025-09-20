@@ -11,6 +11,7 @@
     input, textarea, select { width:100%; padding:8px 10px; margin-top:6px; border-radius:6px; border:1px solid #263446; background:#071226; color:#e6eef8 }
     button { margin-top:14px; padding:10px 14px; border-radius:8px; background:#06b6d4; color:#042027; border:0; cursor:pointer; font-weight:700 }
     .msg { margin-top:12px; padding:10px; border-radius:6px; background:#071a22; color:#cfe3ff; font-size:14px }
+    .error { background:#6b1111; color:#fff; padding:10px; border-radius:6px; margin-top:12px; }
   </style>
 </head>
 <body>
@@ -62,11 +63,13 @@
     </form>
 
     <div id="result" class="msg" style="display:none"></div>
+    <div id="rawError" class="error" style="display:none; white-space:pre-wrap;"></div>
   </div>
 
   <script>
     const form = document.getElementById('taskForm');
     const result = document.getElementById('result');
+    const rawError = document.getElementById('rawError');
     const assignedSelect = document.getElementById('assigned_to');
     const requestedSelect = document.getElementById('requested_by');
     const taskIdInput = document.getElementById('task_id');
@@ -116,6 +119,7 @@
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       result.style.display = 'none';
+      rawError.style.display = 'none';
       submitBtn.disabled = true;
 
       const data = new FormData(form);
@@ -125,31 +129,38 @@
 
       try {
         const headers = { 'Content-Type': 'application/json' };
-        const res = await fetch('/api/create-task', {
+        const resp = await fetch('/api/sync', {
           method: 'POST',
           headers,
           body: JSON.stringify({ task })
         });
 
-        const json = await res.json();
-        if (!res.ok) {
+        // read raw response text to avoid JSON parse errors for HTML/error pages
+        const text = await resp.text();
+        let json = null;
+        try { json = JSON.parse(text); } catch(e) { json = null; }
+
+        if (!resp.ok) {
+          // show a friendly message and the raw server text for debugging
           result.style.display = 'block';
-          result.textContent = `Error: ${json && (json.error || json.details || json.message) || res.statusText}`;
-          result.style.background = '#3a0f12';
+          result.style.background = '#6b1111';
+          result.textContent = 'Server returned an error — see details below';
+          rawError.style.display = 'block';
+          rawError.textContent = text;
           submitBtn.disabled = false;
           return;
         }
 
+        // success
         result.style.display = 'block';
         result.style.background = '#052e2a';
-        result.textContent = `Task created — appended_row=${json.appended_row || 'unknown'} (sheet: ${json.sheet || 'unknown'})`;
+        result.textContent = `Task created — appended_row=${json && (json.appended_row || 'unknown') || 'unknown'} (sheet: ${json && (json.sheet || 'unknown') || 'unknown'})`;
         await loadMetadata();
         form.reset();
-        taskIdInput.value = json.nextTaskId || taskIdInput.value;
+        taskIdInput.value = json && json.nextTaskId || taskIdInput.value;
       } catch (err) {
-        result.style.display = 'block';
-        result.style.background = '#3a0f12';
-        result.textContent = 'Network error: ' + (err.message || err);
+        rawError.style.display = 'block';
+        rawError.textContent = 'Network error: ' + (err.message || err);
       } finally {
         submitBtn.disabled = false;
       }
