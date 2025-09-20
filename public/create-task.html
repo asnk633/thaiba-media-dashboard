@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Create Task — Thaiba Media</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 28px; background:#0f1724; color:#e6eef8; }
+    .card { max-width:720px; margin:0 auto; background:#0b1220; padding:20px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,.6); }
+    label { display:block; margin-top:12px; font-weight:600; color:#cfe3ff }
+    input, textarea, select { width:100%; padding:8px 10px; margin-top:6px; border-radius:6px; border:1px solid #263446; background:#071226; color:#e6eef8 }
+    button { margin-top:14px; padding:10px 14px; border-radius:8px; background:#06b6d4; color:#042027; border:0; cursor:pointer; font-weight:700 }
+    .msg { margin-top:12px; padding:10px; border-radius:6px; background:#071a22; color:#cfe3ff; font-size:14px }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Create Task</h2>
+    <form id="taskForm">
+      <label>Task ID<input name="task_id" required placeholder="T001"></label>
+      <label>Task Description<textarea name="description" rows="3" placeholder="Describe the task"></textarea></label>
+      <label>Assigned To<input name="assigned_to" placeholder="Name or role"></label>
+      <label>Priority
+        <select name="priority">
+          <option>Normal</option>
+          <option selected>High</option>
+          <option>Low</option>
+        </select>
+      </label>
+      <label>Status
+        <select name="status">
+          <option selected>Pending</option>
+          <option>In Progress</option>
+          <option>Done</option>
+        </select>
+      </label>
+      <label>Requested By<input name="requested_by" placeholder="Requester"></label>
+      <label>Deadline<input name="deadline" type="date"></label>
+      <label>Notes<textarea name="notes" rows="2"></textarea></label>
+
+      <button type="submit">Create Task</button>
+    </form>
+
+    <div id="result" class="msg" style="display:none"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('taskForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      result.style.display = 'none';
+      const data = new FormData(form);
+      const task = Object.fromEntries(data.entries());
+
+      // optional: convert empty strings to undefined for nicer sheet cells
+      for (const k in task) if (task[k] === '') task[k] = '';
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        // If you use FRONTEND_KEY guard, add header here:
+        // headers['x-frontend-key'] = 'YOUR_FRONTEND_KEY_IF_SET';
+
+        const res = await fetch('/api/create-task', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ task })
+        });
+
+        const json = await res.json();
+        if (!res.ok) {
+          result.style.display = 'block';
+          result.textContent = `Error: ${json && (json.error || JSON.details || JSON.message) || res.statusText}`;
+          result.style.background = '#3a0f12';
+          return;
+        }
+
+        result.style.display = 'block';
+        result.style.background = '#052e2a';
+        result.textContent = `Task created — appended_row=${json.appended_row || 'unknown'} (sheet: ${json.sheet || 'unknown'})`;
+        form.reset();
+      } catch (err) {
+        result.style.display = 'block';
+        result.style.background = '#3a0f12';
+        result.textContent = 'Network error: ' + (err.message || err);
+      }
+    });
+  </script>
+</body>
+</html>
+
