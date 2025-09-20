@@ -5,42 +5,64 @@
   <title>Create Task — Thaiba Media</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* Simple dark card UI */
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 28px; background:#071022; color:#e6eef8; }
-    .wrap { max-width:820px; margin:0 auto; }
-    .card { background:#071226; padding:28px; border-radius:12px; box-shadow:0 14px 40px rgba(0,0,0,.6); }
-    h1 { margin-top:0; font-size:30px; color:#fff; }
-    label { display:block; margin-top:14px; font-weight:600; color:#cfe3ff }
-    input, textarea, select { width:100%; padding:10px 12px; margin-top:8px; border-radius:8px; border:1px solid #263446; background:#041425; color:#e6eef8; box-sizing:border-box }
-    textarea { min-height:100px; resize:vertical; }
-    .row { display:flex; gap:12px; align-items:center; }
-    .col { flex:1; }
-    button { margin-top:18px; padding:12px 16px; border-radius:10px; background:#06b6d4; color:#042027; border:0; cursor:pointer; font-weight:700 }
-    .msg { margin-top:12px; padding:12px; border-radius:8px; background:#071a22; color:#cfe3ff; font-size:14px }
-    .err { background:#6b1414; color:#ffecec; }
-    .success { background:#163f2b; color:#bff1d6; }
-    .small { font-size:13px; color:#96b6d1; margin-top:8px; }
-    #g_id_signin { margin-top:10px; }
-    .signed { margin-top:8px; color:#bfe9ff; font-weight:600; }
+    :root {
+      --bg: #071226;
+      --card: #071226;
+      --muted: #9fb8d6;
+      --accent: #06b6d4;
+      --panel: #071226;
+      --input-bg: #061425;
+      --text: #e6eef8;
+      --card-shadow: rgba(0,0,0,.5);
+    }
+    html,body{height:100%;margin:0;background:#061427;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    .wrap{max-width:880px;margin:40px auto;padding:26px;}
+    .card{background:linear-gradient(180deg,#061226 0%, #071427 100%);padding:28px;border-radius:12px;box-shadow:0 10px 40px var(--card-shadow);color:var(--text)}
+    h1{margin:0 0 14px;font-size:32px}
+    label{display:block;margin-top:16px;font-weight:600;color:#bfe3ff}
+    input[type="text"], input[type="email"], input[type="date"], textarea, select {
+      width:100%; padding:12px 14px; margin-top:8px; border-radius:8px;
+      background:var(--input-bg); border:1px solid #213246; color:var(--text); font-size:15px;
+      box-sizing:border-box;
+    }
+    textarea{min-height:110px; resize:vertical}
+    button { background:var(--accent); color:#042027; border:0; padding:10px 16px; border-radius:10px; font-weight:700; cursor:pointer; margin-top:18px;}
+    .row { display:flex; gap:18px; align-items:flex-start; }
+    .col-half { flex:1; }
+    .muted { color:#9fb8d6; margin-top:8px; font-size:14px; }
+    .error, .ok { margin-top:14px; padding:12px; border-radius:8px; color:#fff; }
+    .error { background: #7a1515; }
+    .ok { background: #083a2f; }
+    #gSign { display:inline-block; margin-top:8px; }
+    #signedIn { margin-top:10px; color:#bfe3ff; font-weight:600; }
+    .two-col { display:flex; gap:18px; }
+    .two-col > * { flex:1; }
   </style>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
       <h1>Create Task</h1>
-      <div id="authArea" class="small">Google client ID not configured — sign-in disabled. Replace GOOGLE_OAUTH_CLIENT_ID in the file.</div>
 
-      <!-- sign-in button & signed-in banner -->
-      <div id="g_id_signin"></div>
-      <div id="signedAs" class="signed" style="display:none">Signed in as <span id="signedEmail"></span> — <a href="#" id="signoutLink" style="color:#9feefb">Sign out</a></div>
+      <div id="authArea">
+        <div id="gSign"></div>
+        <div id="signedIn" aria-live="polite"></div>
+        <div id="signinHelp" class="muted">Sign in with Google to create tasks (we will verify your email).</div>
+        <div id="emailFallback" style="display:none; margin-top:8px;">
+          <label for="requested_by_input">Your email (if you prefer not to sign in)</label>
+          <input id="requested_by_input" type="email" placeholder="name@example.com" />
+        </div>
+      </div>
 
-      <form id="taskForm" onsubmit="return false;">
+      <form id="taskForm">
         <label>Task ID
           <input id="task_id" name="task_id" required placeholder="Auto-generated" readonly>
         </label>
 
         <label>Task Description
-          <textarea id="description" name="description" rows="4" placeholder="Describe the task"></textarea>
+          <textarea name="description" placeholder="Describe the task"></textarea>
         </label>
 
         <label>Assigned To
@@ -49,8 +71,8 @@
           </select>
         </label>
 
-        <div class="row">
-          <div class="col">
+        <div class="two-col">
+          <div>
             <label>Priority
               <select id="priority" name="priority">
                 <option>Urgent</option>
@@ -60,272 +82,221 @@
               </select>
             </label>
           </div>
-
-          <div class="col">
+          <div>
             <label>Status
               <select id="status" name="status">
-                <option>Pending</option>
+                <option selected>Pending</option>
                 <option>In Progress</option>
-                <option>Completed</option>
                 <option>Blocked</option>
+                <option>Completed</option>
               </select>
             </label>
           </div>
         </div>
 
         <label>Requested By
-          <select id="requested_by" name="requested_by">
+          <select id="requested_by_select" style="display:block; margin-top:8px;">
             <option value="">-- choose institution --</option>
           </select>
         </label>
 
-        <label>Deadline
-          <!-- we'll use input[type=date] but send DD/MM/YYYY to the API -->
-          <input id="deadline" name="deadline" type="date" placeholder="DD/MM/YYYY">
+        <label>Deadline (will be saved as DD/MM/YYYY)
+          <input id="deadline" type="date" placeholder="DD/MM/YYYY" />
         </label>
 
         <label>Notes
-          <textarea id="notes" name="notes" rows="3" placeholder="Optional notes"></textarea>
+          <textarea name="notes" placeholder="Optional notes"></textarea>
         </label>
 
-        <button id="createBtn" type="button">Create Task</button>
+        <button type="submit">Create Task</button>
 
-        <div id="result" class="msg" style="display:none"></div>
+        <div id="message" aria-live="polite"></div>
       </form>
     </div>
   </div>
 
-  <!-- ============================
-       ===  CONFIGURATION  ===
-       Insert your Google OAuth client id below (already provided) 
-       ========================================================= -->
-  <script>
-    // <-- RED LINE: your Client ID is set here (already inserted) -->
-    const GOOGLE_OAUTH_CLIENT_ID = "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com";
-    // =========================================================
-  </script>
+<script>
+/*
+  FULL FRONTEND FILE
+  The Google Client ID (inserted below) is already set.
+  Client ID used (your supplied one):
+  498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com
+*/
 
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+const GOOGLE_CLIENT_ID = "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com";
 
-  <script>
-  // small helper to decode JWT payload (base64url)
-  function decodeJwtPayload(token) {
-    try {
-      const parts = token.split('.');
-      if (parts.length < 2) return null;
-      const base64Url = parts[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const json = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(json);
-    } catch (e) {
-      return null;
-    }
+// state
+let idToken = null;
+let currentUser = null;
+
+// helper: parse JWT payload (for quick display only)
+function parseJwt(token){
+  try {
+    const b = token.split('.')[1];
+    const json = atob(b.replace(/-/g,'+').replace(/_/g,'/'));
+    return JSON.parse(json);
+  } catch(e){ return {}; }
+}
+
+function showMessage(type, text){
+  const el = document.getElementById('message');
+  el.innerHTML = '';
+  if(!text) return;
+  const div = document.createElement('div');
+  div.className = (type === 'ok') ? 'ok' : 'error';
+  div.textContent = text;
+  el.appendChild(div);
+}
+
+// render Google sign-in button and initialize identity
+window.addEventListener('DOMContentLoaded', () => {
+  if(!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('GOOGLE_OAUTH_CLIENT_ID')) {
+    document.getElementById('signinHelp').textContent = 'Google client ID not configured — sign-in disabled.';
+    return;
   }
 
-  // UI elements
-  const authArea = document.getElementById('authArea');
-  const signedAs = document.getElementById('signedAs');
-  const signedEmail = document.getElementById('signedEmail');
-  const signoutLink = document.getElementById('signoutLink');
-  const assignedSel = document.getElementById('assigned_to');
-  const requestedSel = document.getElementById('requested_by');
-  const taskIdInput = document.getElementById('task_id');
-  const createBtn = document.getElementById('createBtn');
-  const resultBox = document.getElementById('result');
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+    auto_select: false
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('gSign'),
+    { theme: 'outline', size: 'large' }
+  );
+  // prompt optional:
+  // google.accounts.id.prompt();
+});
 
-  let idToken = null; // will hold the google id_token after sign-in
+// when Google returns credential
+function handleCredentialResponse(response) {
+  if(!response || !response.credential) return;
+  idToken = response.credential;
+  const payload = parseJwt(idToken);
+  currentUser = payload;
+  document.getElementById('signedIn').textContent = "Signed in as " + (payload.name || payload.email || 'Unknown');
+  // hide sign-in and fallback email
+  document.getElementById('gSign').style.display = 'none';
+  document.getElementById('emailFallback').style.display = 'none';
+}
 
-  // If client id empty, keep sign-in disabled
-  function initGoogleSignIn() {
-    if (!GOOGLE_OAUTH_CLIENT_ID || GOOGLE_OAUTH_CLIENT_ID.includes('GOOGLE_OAUTH_CLIENT_ID')) {
-      authArea.textContent = 'Google client ID not configured — sign-in disabled. Replace GOOGLE_OAUTH_CLIENT_ID in the file.';
+// populate metadata (assignedTo, institutions, nextTaskId)
+async function loadMetadata(){
+  try {
+    const res = await fetch('/api/get-metadata');
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch(e) { json = null; }
+    if(!res.ok) {
+      showMessage('error', 'Failed to load metadata: ' + (json && json.error ? json.error : text));
+      return;
+    }
+    if(!json) {
+      showMessage('error', 'Invalid metadata response.');
       return;
     }
 
-    authArea.textContent = 'Sign in with Google to create tasks (we will verify your email).';
-    // initialize Google Identity Services
-    window.google?.accounts?.id?.initialize({
-      client_id: GOOGLE_OAUTH_CLIENT_ID,
-      callback: handleCredentialResponse,
+    // populate assignedTo
+    const aSel = document.getElementById('assigned_to');
+    aSel.innerHTML = '<option value="">-- choose --</option>';
+    (json.assignedTo || []).forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      aSel.appendChild(opt);
     });
 
-    // render standard Google button
-    window.google?.accounts?.id?.renderButton(
-      document.getElementById('g_id_signin'),
-      { theme: 'outline', size: 'medium' }
-    );
+    // populate institutions
+    const rSel = document.getElementById('requested_by_select');
+    rSel.innerHTML = '<option value="">-- choose institution --</option>';
+    (json.institutions || []).forEach(inst => {
+      const opt = document.createElement('option');
+      opt.value = inst;
+      opt.textContent = inst;
+      rSel.appendChild(opt);
+    });
+
+    // set nextTaskId
+    if(json.nextTaskId) document.getElementById('task_id').value = json.nextTaskId;
+  } catch(err) {
+    console.error('metadata fetch error', err);
+    showMessage('error', 'Error loading metadata: ' + err.message);
+  }
+}
+
+function formatDateToDDMMYYYY(isoDate) {
+  if(!isoDate) return '';
+  // isoDate expected like "YYYY-MM-DD"
+  const parts = isoDate.split('-');
+  if(parts.length !== 3) return isoDate;
+  return parts[2].padStart(2,'0') + '/' + parts[1].padStart(2,'0') + '/' + parts[0];
+}
+
+// submit handler
+document.getElementById('taskForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  showMessage(null, '');
+
+  const task = {
+    task_id: document.getElementById('task_id').value,
+    description: document.querySelector('textarea[name="description"]').value.trim(),
+    assigned_to: document.getElementById('assigned_to').value || '',
+    priority: document.getElementById('priority').value || 'High',
+    status: document.getElementById('status').value || 'Pending',
+    requested_by: document.getElementById('requested_by_select').value || (document.getElementById('requested_by_input') ? document.getElementById('requested_by_input').value : ''),
+    deadline: formatDateToDDMMYYYY(document.getElementById('deadline').value),
+    notes: document.querySelector('textarea[name="notes"]').value || ''
+  };
+
+  // basic validation
+  if(!task.description) {
+    showMessage('error', 'Please enter a task description.');
+    return;
+  }
+  if(!task.requested_by) {
+    showMessage('error', 'Please choose or enter Requested By (institution or your email).');
+    return;
   }
 
-  function handleCredentialResponse(response) {
-    // response.credential is an ID token (JWT)
-    if (!response || !response.credential) return;
-    idToken = response.credential;
-    const payload = decodeJwtPayload(idToken);
-    if (payload && payload.email) {
-      signedEmail.textContent = payload.email;
-      signedAs.style.display = 'block';
-      // optionally hide the button after login
-      document.getElementById('g_id_signin').style.display = 'none';
-      authArea.textContent = 'You are signed in';
-    } else {
-      signedAs.style.display = 'none';
-    }
-  }
+  let headers = { 'Content-Type': 'application/json' };
+  if(idToken) headers.Authorization = 'Bearer ' + idToken;
 
-  signoutLink.addEventListener('click', function(e){
-    e.preventDefault();
-    idToken = null;
-    signedAs.style.display = 'none';
-    document.getElementById('g_id_signin').style.display = 'block';
-    window.google?.accounts?.id?.cancel();
-    authArea.textContent = 'Signed out. Please sign in to authenticate.';
-  });
+  try {
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ task })
+    });
+    const text = await res.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch(e){ json = null; }
 
-  // fetch metadata (assignedTo list, institutions, nextTaskId)
-  async function loadMetadata() {
-    try {
-      const res = await fetch('/api/get-metadata');
-      if (!res.ok) {
-        const text = await res.text();
-        console.warn('metadata fetch failed', res.status, text);
-        taskIdInput.value = '';
-        authArea.textContent = 'Failed to load metadata — check server logs.';
-        return;
-      }
-      const json = await res.json();
-      // expected shape: { assignedTo: [..], institutions: [..], nextTaskId: "T132", sheet: "Sheet1" }
-      const assigned = json.assignedTo || json.assigned || [];
-      const inst = json.institutions || json.institutions || [];
-      const nextId = json.nextTaskId || json.nextTaskId || '';
-
-      // populate Assigned To
-      assignedSel.innerHTML = '<option value="">-- choose --</option>';
-      assigned.forEach(name => {
-        const o = document.createElement('option');
-        o.value = name;
-        o.textContent = name;
-        assignedSel.appendChild(o);
-      });
-
-      // populate Requested By (institutions)
-      requestedSel.innerHTML = '<option value="">-- choose institution --</option>';
-      inst.forEach(name => {
-        const o = document.createElement('option');
-        o.value = name;
-        o.textContent = name;
-        requestedSel.appendChild(o);
-      });
-
-      // set task id
-      if (nextId) taskIdInput.value = nextId;
-    } catch (err) {
-      console.error('metadata error', err);
-      authArea.textContent = 'Unable to load metadata. Check server/env.';
-    }
-  }
-
-  // convert YYYY-MM-DD (from input[type=date]) to DD/MM/YYYY string
-  function formatDateToDDMMYYYY(value) {
-    if (!value) return '';
-    // value is like "2025-09-20"
-    const [y,m,d] = value.split('-');
-    if (!y) return value;
-    return `${d}/${m}/${y}`;
-  }
-
-  // submit the form payload to /api/sync (server expects JSON { task: { ... } })
-  async function submitTask() {
-    resultBox.style.display = 'none';
-    resultBox.className = 'msg';
-
-    // basic validation
-    if (!taskIdInput.value) { showError('Missing Task ID'); return; }
-    if (!document.getElementById('description').value.trim()) { showError('Please add a task description'); return; }
-    if (!document.getElementById('assigned_to').value) { showError('Please choose an assignee'); return; }
-    if (!document.getElementById('requested_by').value) { showError('Please choose the requesting institution'); return; }
-
-    // build body
-    const body = {
-      task: {
-        task_id: taskIdInput.value,
-        description: document.getElementById('description').value.trim(),
-        assigned_to: document.getElementById('assigned_to').value,
-        priority: document.getElementById('priority').value,
-        status: document.getElementById('status').value,
-        requested_by: document.getElementById('requested_by').value,
-        deadline: formatDateToDDMMYYYY(document.getElementById('deadline').value),
-        notes: document.getElementById('notes').value.trim()
-      }
-    };
-
-    // headers
-    const headers = { 'Content-Type': 'application/json' };
-    if (idToken) {
-      headers['Authorization'] = 'Bearer ' + idToken;
-    } else {
-      // sign-in required by the server for verification in current setup.
-      showError('You must sign in with Google before creating a task.');
+    if(!res.ok) {
+      const errText = (json && json.error) ? JSON.stringify(json) : text;
+      showMessage('error', 'Server returned an error: ' + errText);
       return;
     }
 
-    createBtn.disabled = true;
-    createBtn.textContent = 'Creating...';
-
-    try {
-      const res = await fetch('/api/sync', { method: 'POST', headers, body: JSON.stringify(body) });
-      const text = await res.text();
-      let json = null;
-      try { json = JSON.parse(text); } catch(e) { json = null; }
-
-      if (!res.ok) {
-        // show server message if present
-        let msg = text || `Server returned ${res.status}`;
-        try {
-          if (json && json.error) msg = JSON.stringify(json);
-        } catch(e){}
-        showError(msg);
-      } else {
-        // success — server typically returns appended_row or similar
-        showSuccess(json || text || 'ok appended_row');
-        // update task id to next (if server returned new id)
-        if (json && json.nextTaskId) taskIdInput.value = json.nextTaskId;
-        // clear some fields (description, notes) but keep selects to speed repeated entries
-        document.getElementById('description').value = '';
-        document.getElementById('notes').value = '';
-      }
-    } catch (err) {
-      console.error('submit error', err);
-      showError('Network or server error — see console.');
-    } finally {
-      createBtn.disabled = false;
-      createBtn.textContent = 'Create Task';
-    }
-  }
-
-  function showError(msg) {
-    resultBox.style.display = 'block';
-    resultBox.className = 'msg err';
-    resultBox.textContent = (typeof msg === 'string') ? msg : JSON.stringify(msg);
-  }
-  function showSuccess(msg) {
-    resultBox.style.display = 'block';
-    resultBox.className = 'msg success';
-    resultBox.textContent = (typeof msg === 'string') ? msg : JSON.stringify(msg);
-  }
-
-  // wire up events
-  createBtn.addEventListener('click', submitTask);
-
-  // initialize flow
-  window.addEventListener('DOMContentLoaded', async () => {
-    initGoogleSignIn();
+    // success
+    showMessage('ok', 'Task created successfully.');
+    // refresh nextTaskId from server metadata (or increment locally)
     await loadMetadata();
-    // set default status to Pending explicitly
+    // reset form fields except task_id
+    document.querySelector('textarea[name="description"]').value = '';
+    document.getElementById('assigned_to').value = '';
+    document.getElementById('priority').value = 'High';
     document.getElementById('status').value = 'Pending';
-  });
-  </script>
+    document.getElementById('requested_by_select').value = '';
+    document.getElementById('deadline').value = '';
+    document.querySelector('textarea[name="notes"]').value = '';
+  } catch(err) {
+    console.error('submit error', err);
+    showMessage('error', 'Network or server error: ' + err.message);
+  }
+});
+
+// initialize
+loadMetadata();
+</script>
 </body>
 </html>
