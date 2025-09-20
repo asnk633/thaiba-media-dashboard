@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
 
     let maxNum = 0;
     existingIds.forEach(id => {
-      const m = id.match(/(\\d+)$/);
+      const m = id.match(/(\d+)$/);
       if (m && m[1]) {
         const n = parseInt(m[1], 10);
         if (!isNaN(n) && n > maxNum) maxNum = n;
