@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Thaiba Media — Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--bg:#f6f8fb;--panel:#ffffff;--muted:#6b7280;--accent:#4f46e5}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:#0f1724}
+    .wrap{max-width:1200px;margin:18px auto;padding:16px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+    .row{display:flex;gap:12px;align-items:center}
+    .grid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+    .panel{background:var(--panel);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid #eef2f7;text-align:left}
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:13px;color:var(--muted)}
+    .link{color:var(--accent);cursor:pointer;text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h2>Admin dashboard — Thaiba Media</h2>
+        <div class="muted small">Full access: tasks, users, exports & master data</div>
+      </div>
+      <div class="row">
+        <button id="btnSync" class="btn">Sync Now</button>
+        <button id="btnExport" class="btn" style="background:#06b6d4">Export CSV</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="panel">
+          <h3>Tasks</h3>
+          <div class="small muted">Shows all tasks. You can edit and bulk export from here.</div>
+          <div id="tasksArea" style="margin-top:12px">Loading tasks…</div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h3>Activity / Logs</h3>
+          <div class="muted small">Recent changes will appear here (future: audit log)</div>
+          <div id="logArea" style="margin-top:8px">No logs yet.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h3>Team Members</h3>
+          <div id="usersArea" style="margin-top:8px">Loading members…</div>
+          <div style="margin-top:10px">
+            <button id="btnAddUser" class="btn" style="background:#10b981">+ Add Member</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h3>Quick actions</h3>
+          <div style="margin-top:8px">
+            <div><button id="btnTemplates" class="btn">Manage Templates</button></div>
+            <div style="margin-top:8px"><button id="btnReports" class="btn">Open Reports</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:40px"></div>
+    <footer class="small muted">Tip: Team members should use the team view. Institutions use the create-task form.</footer>
+  </div>
+
+  <script>
+    const API = '/api/tasks'; // admin uses same endpoint; we rely on server to verify permissions
+    const USERS_API = '/api/users';
+
+    // safe JSON fetch wrapper
+    async function jf(url, opts){ const r = await fetch(url, opts); if(!r.ok) throw new Error('Fetch error ' + r.status); return r.json(); }
+
+    async function loadTasks(){
+      try {
+        const area = document.getElementById('tasksArea');
+        area.innerText = 'Loading tasks…';
+        const data = await jf(API);
+        const tasks = data.tasks || data || [];
+        if(!Array.isArray(tasks)){ area.innerText = 'No tasks returned.'; return; }
+        // build simple table
+        const tbl = document.createElement('table');
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr><th>ID</th><th>Description</th><th>Assigned</th><th>Priority</th><th>Status</th><th>Deadline</th></tr>';
+        tbl.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        tasks.forEach(t=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${t.id || t._sheetRow || ''}</td>
+                          <td>${escapeHtml(t.description || t.TaskDescription || '')}</td>
+                          <td>${escapeHtml(t.assignedTo || t.AssignedTo || '')}</td>
+                          <td>${escapeHtml(t.priority || t.Priority || '')}</td>
+                          <td>${escapeHtml(t.status || t.Status || '')}</td>
+                          <td>${escapeHtml(t.deadline || t.Deadline || '')}</td>`;
+          tbody.appendChild(tr);
+        });
+        tbl.appendChild(tbody);
+        area.innerHTML = '';
+        area.appendChild(tbl);
+      } catch(e){
+        document.getElementById('tasksArea').innerText = 'Failed to load tasks — ' + e.message;
+      }
+    }
+
+    async function loadUsers(){
+      try {
+        const area = document.getElementById('usersArea');
+        area.innerText = 'Loading…';
+        const data = await jf(USERS_API);
+        const members = data.users || [];
+        const ul = document.createElement('ul');
+        members.forEach(m => {
+          const li = document.createElement('li');
+          li.innerHTML = `${escapeHtml(m)} <span class="link" onclick="alert('Edit member in next step')">edit</span>`;
+          ul.appendChild(li);
+        });
+        area.innerHTML = '';
+        area.appendChild(ul);
+      } catch(e){
+        document.getElementById('usersArea').innerText = 'Failed to load members — ' + e.message;
+      }
+    }
+
+    function escapeHtml(t){ if(!t) return ''; return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    document.getElementById('btnSync').addEventListener('click', ()=> loadTasks());
+    document.getElementById('btnExport').addEventListener('click', ()=> alert('Export will generate CSV (coming soon).'));
+    document.getElementById('btnAddUser').addEventListener('click', ()=> alert('Add user modal coming soon.'));
+    loadTasks();
+    loadUsers();
+  </script>
+</body>
+</html>

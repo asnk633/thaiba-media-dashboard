@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Thaiba Media — Team</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--bg:#f7fafc;--muted:#6b7280;--accent:#4f46e5}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:#0f1724}
+    .wrap{max-width:900px;margin:18px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    .card{background:white;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+    .task{padding:10px;border-radius:8px;margin-bottom:8px;border-left:6px solid #ddd;background:#fff}
+    .task h4{margin:0}
+    .small{font-size:13px;color:var(--muted)}
+    .btn{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h2>My Tasks</h2>
+        <div class="small">Priority tasks & quick actions</div>
+      </div>
+      <div>
+        <button id="btnAdd" class="btn">+ Add Task</button>
+      </div>
+    </header>
+
+    <section style="margin-top:12px">
+      <div class="card">
+        <div id="myTasksArea">Loading your tasks…</div>
+      </div>
+    </section>
+
+    <section style="margin-top:12px">
+      <div class="card">
+        <h3 style="margin-top:0">Quick stats</h3>
+        <div class="small" id="myStats">Loading…</div>
+      </div>
+    </section>
+
+    <footer style="margin-top:16px" class="small">Tips: Use the Add Task button to quickly open the request portal. Completed tasks are hidden by default.</footer>
+  </div>
+
+  <script>
+    // This team page assumes the server knows who "me" is; for demo we call /api/tasks?assignedTo=me
+    const API = '/api/tasks?assignedTo=me';
+
+    function escapeHtml(t){ if(!t) return ''; return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function loadMyTasks(){
+      const area = document.getElementById('myTasksArea');
+      area.innerText = 'Loading…';
+      try {
+        const res = await fetch(API, {cache:'no-store'});
+        if(!res.ok) throw new Error('API ' + res.status);
+        const payload = await res.json();
+        const tasks = payload.tasks || [];
+        // filter out completed by default
+        const visible = tasks.filter(t => {
+          const s = (t.status || t.Status || '').toString().toLowerCase();
+          return !(s === 'completed' || s === 'done');
+        });
+        if(visible.length === 0){ area.innerHTML = '<div class="small">No pending tasks — enjoy your time!</div>'; return; }
+        area.innerHTML = '';
+        visible.forEach(t => {
+          const div = document.createElement('div');
+          div.className = 'task';
+          div.innerHTML = `<h4>${escapeHtml(t.description || t.TaskDescription || '')}</h4>
+                           <div class="small">Requested by: ${escapeHtml(t.requestedBy||t.RequestedBy||'')}</div>
+                           <div class="small">Deadline: ${escapeHtml(t.deadline || t.Deadline || '')}</div>
+                           <div style="margin-top:8px"><button class="btn" onclick="markInProgress('${t.id||t._sheetRow||''}')">Start / In Progress</button>
+                           <button style="margin-left:8px" onclick="markComplete('${t.id||t._sheetRow||''}')">Mark Complete</button></div>`;
+          area.appendChild(div);
+        });
+
+        // quick stats
+        const stats = `Total tasks: ${tasks.length} — Pending: ${visible.length}`;
+        document.getElementById('myStats').innerText = stats;
+      } catch(e){
+        area.innerText = 'Failed to load tasks — ' + e.message;
+      }
+    }
+
+    async function markInProgress(id){
+      alert('This will update status to In Progress. Server endpoint PATCH /api/tasks/:id required.');
+      // Example (uncomment when server endpoint exists):
+      // await fetch('/api/tasks/'+id, {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status:'In Progress'})});
+      // loadMyTasks();
+    }
+
+    async function markComplete(id){
+      alert('This will update status to Completed. Server endpoint PATCH /api/tasks/:id required.');
+    }
+
+    document.getElementById('btnAdd').addEventListener('click', ()=> window.location.href = '/create-task.html');
+
+    loadMyTasks();
+    setInterval(loadMyTasks, 1000*60*3); // refresh every 3 minutes
+  </script>
+</body>
+</html>
