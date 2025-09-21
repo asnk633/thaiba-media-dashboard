@@ -1,2 +1,5 @@
-node_modules/
-served.html
+node_modules
+.next
+.env.local
+.env
+sa.json

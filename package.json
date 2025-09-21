@@ -1,16 +1,42 @@
 {
-  "name": "thaiba-media-dashboard",
+  "name": "google-sheets-nextjs-app",
   "version": "1.0.0",
-  "description": "Thaiba Media Task Manager",
-  "type": "module",
-  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "node server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test-apis": "BASE_URL=http://localhost:3000 node testApis.js"
   },
-  "author": "Thaiba Media",
-  "license": "MIT",
   "dependencies": {
-    "googleapis": "^121.0.0"
+    "@radix-ui/react-dialog": "1.1.15",
+    "@radix-ui/react-popover": "1.1.15",
+    "@radix-ui/react-progress": "1.1.7",
+    "@radix-ui/react-select": "2.2.6",
+    "@supabase/ssr": "0.7.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "components": "0.1.0",
+    "date-fns": "4.1.0",
+    "dotenv": "^17.2.2",
+    "google-auth-library": "^9.0.0",
+    "google-spreadsheet": "^4.1.0",
+    "googleapis": "160.0.0",
+    "http": "0.0.1-security",
+    "https": "1.0.0",
+    "lucide-react": "0.544.0",
+    "next": "^14.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tailwind-merge": "3.3.1",
+    "tailwindcss-animate": "1.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "24.5.2",
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9",
+    "node-fetch": "^2.6.7",
+    "postcss": "8.5.6",
+    "tailwindcss": "^4.1.9",
+    "typescript": "5.9.2"
   }
 }
