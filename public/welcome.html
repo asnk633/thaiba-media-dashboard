@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thaiba Media — Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      backdrop-filter: blur(4px);
+    }
+    .card {
+      background: var(--card);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    img.logo {
+      width: 80px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 20px;
+      color: #111827;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .muted {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="https://thaibagarden.org/logo.png" alt="Thaiba Garden Logo" class="logo">
+    <h1>Welcome to Thaiba Media</h1>
+    <form id="loginForm">
+      <input type="text" id="name" placeholder="Your Name" required />
+      <input type="email" id="email" placeholder="Your Email" required />
+      <button type="submit">Continue</button>
+    </form>
+    <div class="muted">Powered by Thaiba Garden Group of Institutions</div>
+  </div>
+
+  <script>
+    const ADMIN_USERS = ["media@thaibagarden.com"];
+    const TEAM_MEMBERS = [
+      "anwar@thaibagarden.com",
+      "sabith@thaibagarden.com",
+      "sidheeq@thaibagarden.com",
+      "shukoor@thaibagarden.com"
+    ];
+
+    document.getElementById("loginForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+
+      if (ADMIN_USERS.includes(email)) {
+        window.location.href = "/admin.html";
+      } else if (TEAM_MEMBERS.includes(email)) {
+        window.location.href = "/team.html";
+      } else {
+        window.location.href = "/request.html";
+      }
+    });
+  </script>
+</body>
+</html>
