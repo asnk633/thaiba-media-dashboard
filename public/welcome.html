@@ -2,261 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Welcome — Thaiba Media Dashboard</title>
+  <title>Welcome — Thaiba Media</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root{
-      --panel-bg: rgba(6,10,14,0.86);
-      --muted: rgba(255,255,255,0.78);
-      --accent-start: #00c2d8;
-      --accent-end: #00a2cf;
-      --glass: rgba(255,255,255,0.04);
-      --radius: 14px;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color: #fff;
-    }
-    html,body{height:100%;margin:0}
-    body{
-      background: #0b0f12 url('/static/background-image.webp') center/cover no-repeat fixed;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:48px 20px;
-    }
-
-    /* dim the background slightly and keep centered panel */
-    .backdrop {
-      position:fixed;inset:0;
-      background:linear-gradient(to bottom, rgba(2,6,10,0.45), rgba(2,6,10,0.65));
-      z-index:0;
-    }
-
-    .welcome-panel {
-      position:relative;
-      z-index:2;
-      width:100%;
-      max-width:980px;
-      background:var(--panel-bg);
-      border-radius:var(--radius);
-      padding:32px 36px;
-      box-shadow: 0 40px 80px rgba(2,6,23,0.6);
-      display:flex;
-      gap:28px;
-      align-items:flex-start;
-      color:white;
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-
-    /* left column (brand + intro) */
-    .left {
-      flex:1;
-      min-width:360px;
-    }
-    .brand-row{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-    .brand-logo{
-      width:72px;
-      height:72px;
-      object-fit:contain;
-      display:inline-block;
-      border-radius:10px;
-      background:transparent;
-    }
-    .brand-text {line-height:1}
-    .brand-title{font-weight:700;font-size:18px;margin:0}
-    .brand-sub{font-size:13px;color:var(--muted);margin-top:6px}
-
-    h1{margin:6px 0 12px;font-size:32px;line-height:1.05}
-    p.lead{margin:0;color:var(--muted);max-width:640px}
-
-    .right {
-      width:360px;
-      min-width:260px;
-      align-self:center;
-    }
-    .form-card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      padding:18px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
-    }
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type="text"], input[type="email"]{
-      width:100%;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
-      color:#fff;
-      box-sizing:border-box;
-      outline:none;
-      font-size:14px;
-    }
-    input::placeholder { color: rgba(255,255,255,0.35) }
-
-    .actions{display:flex;gap:12px;margin-top:12px;align-items:center}
-    .btn {
-      padding:10px 18px;border-radius:8px;border:0;cursor:pointer;font-weight:700;
-      box-shadow: 0 8px 20px rgba(2,6,23,0.4);
-    }
-    .btn-primary{
-      background: linear-gradient(180deg, var(--accent-start), var(--accent-end));
-      color:#042026;
-    }
-    .btn-ghost {
-      background: transparent;
-      color: #fff;
-      border:1px solid rgba(255,255,255,0.12);
-      font-weight:600;
-    }
-
-    .small-muted{font-size:13px;color:var(--muted);margin-top:14px}
-
-    footer{width:100%;text-align:center;color:rgba(255,255,255,0.5);font-size:13px;margin-top:22px}
-
-    /* responsive */
-    @media (max-width:900px){
-      .welcome-panel{flex-direction:column;max-width:760px;padding:20px}
-      .right{width:100%}
-      .left{min-width:unset}
-    }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#071229; color:#e6eef8; display:flex; align-items:center; justify-content:center; height:100vh; }
+    .card { width:100%; max-width:720px; background: rgba(7,18,38,0.55); padding:28px; border-radius:12px; box-shadow:0 8px 40px rgba(2,6,23,0.6); backdrop-filter: blur(6px); }
+    h1 { margin:0 0 8px; font-size:22px }
+    p { margin:0 0 18px; color:#cfe3ff }
+    label { display:block; margin-top:12px; color:#cfe3ff; font-weight:600 }
+    input { width:100%; padding:10px 12px; margin-top:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:#e6eef8 }
+    .row { display:flex; gap:8px; margin-top:16px }
+    button { padding:10px 14px; border-radius:8px; border:0; cursor:pointer; font-weight:700 }
+    .btn-primary { background:#06b6d4; color:#02282b }
+    .btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#e6eef8 }
+    .muted { color:#a9c7e6; font-size:13px; margin-top:8px }
+    .error { margin-top:12px; padding:10px; border-radius:8px; background:#581515; color:#ffd6d6 }
   </style>
 </head>
 <body>
-  <div class="backdrop" aria-hidden="true"></div>
+  <div class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Welcome — Thaiba Media</h1>
+    <p>Sign in once with your name and email. We’ll remember you on this device until you log out.</p>
 
-  <main class="welcome-panel" role="main" aria-labelledby="welcome-heading">
-    <section class="left" aria-label="Intro">
-      <div class="brand-row">
-        <!-- Square transparent logo - replace file at /public/static/logo.png -->
-        <img src="/static/logo.png" alt="Thaiba Garden logo" class="brand-logo" />
-        <div class="brand-text">
-          <div class="brand-title">Thaiba Media Department</div>
-          <div class="brand-sub">Thaiba Garden Group of Institutions</div>
-        </div>
+    <form id="loginForm" autocomplete="off">
+      <label for="name">Your name</label>
+      <input id="name" name="name" type="text" placeholder="e.g. Abdul Shukoor" required>
+
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+      <div class="row">
+        <button id="continueBtn" class="btn-primary" type="submit">Continue</button>
+        <button id="clearBtn" type="button" class="btn-ghost">Clear saved session</button>
       </div>
 
-      <h1 id="welcome-heading">Welcome to Thaiba Media Dashboard</h1>
-      <p class="lead">Sign in once with your name and email. You'll be redirected to the view appropriate for your role (Admin / Team member / Institution requester). Close this window after successful sign-in if needed.</p>
-
-      <p class="small-muted">We keep the UI stable — once you confirm this view it won't be changed unexpectedly.</p>
-    </section>
-
-    <aside class="right" aria-label="Sign in">
-      <div class="form-card" role="form" aria-labelledby="form-title">
-        <div id="form-title" style="font-weight:700;margin-bottom:8px">Sign in</div>
-
-        <label for="fullname">Full name</label>
-        <input id="fullname" type="text" placeholder="Your full name" autocomplete="name" />
-
-        <label for="email" style="margin-top:10px">Email</label>
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-
-        <div class="actions">
-          <button id="continueBtn" class="btn btn-primary">Continue</button>
-          <button id="guestBtn" class="btn btn-ghost">Guest (request only)</button>
-        </div>
-
-        <div id="status" style="margin-top:10px;color:rgba(255,255,255,0.7);font-size:13px"></div>
-
-        <div class="small-muted" style="margin-top:12px">Signing in saves your name & email to this browser so we can show the right dashboard next time.</div>
-      </div>
-
-      <footer aria-hidden="true">© Thaiba Garden Group of Institutions</footer>
-    </aside>
-  </main>
+      <div id="message" class="muted">If you are a team member or admin, use the same email you provided earlier so role checks work.</div>
+      <div id="error" class="error" style="display:none"></div>
+    </form>
+  </div>
 
   <script>
-    const continueBtn = document.getElementById('continueBtn');
-    const guestBtn = document.getElementById('guestBtn');
-    const fullnameEl = document.getElementById('fullname');
-    const emailEl = document.getElementById('email');
-    const status = document.getElementById('status');
-
-    function showStatus(msg, isError=false){
-      status.textContent = msg;
-      status.style.color = isError ? '#ffb3b3' : 'rgba(255,255,255,0.85)';
+    // Helpers
+    function e(q){ return document.querySelector(q); }
+    function parseRoleEntry(raw){
+      // Accept formats like "Name <email@x.com>" or "<email@x.com>" or "email@x.com"
+      if(!raw) return '';
+      try {
+        raw = String(raw);
+        // decode \u003c and similar if present
+        raw = raw.replace(/\\u003c/g,'<').replace(/\\u003e/g,'>').trim();
+        const m = raw.match(/<([^>]+)>/);
+        if(m && m[1]) return m[1].trim().toLowerCase();
+        // if it's simple email-like
+        if(raw.includes('@')) return raw.trim().toLowerCase();
+        return raw.trim().toLowerCase();
+      } catch(e){ return String(raw).toLowerCase(); }
     }
 
-    // Try to detect role by calling /api/roles (server-side)
-    async function detectRoleByEmail(email){
+    // Save session object to localStorage
+    function saveSession(session){
+      localStorage.setItem('thaiba_session', JSON.stringify(session));
+    }
+    function loadSession(){
+      try { return JSON.parse(localStorage.getItem('thaiba_session') || 'null'); } catch(e){ return null; }
+    }
+    function clearSession(){
+      localStorage.removeItem('thaiba_session');
+    }
+
+    // UX helpers
+    function setError(msg){
+      if(!msg){ e('#error').style.display='none'; e('#error').textContent=''; return; }
+      e('#error').style.display='block'; e('#error').textContent = msg;
+    }
+
+    // On load, if session exists redirect to the right page immediately
+    (function preflightRedirect(){
+      const s = loadSession();
+      if(s && s.email){
+        // Already signed in — route by role (admin/team/institution)
+        if(s.role === 'admin') { location.href = '/admin.html'; return; }
+        if(s.role === 'team') { location.href = '/team.html'; return; }
+        location.href = '/institution.html';
+      }
+    })();
+
+    // Login flow
+    e('#loginForm').addEventListener('submit', async function(evt){
+      evt.preventDefault();
+      setError(null);
+      const name = e('#name').value.trim();
+      const email = e('#email').value.trim().toLowerCase();
+
+      if(!name || !email){
+        setError('Please enter both name and email.');
+        return;
+      }
+
+      // call /api/roles to determine role
       try {
         const r = await fetch('/api/roles', { cache: 'no-store' });
-        if(!r.ok) throw new Error('roles API not available');
-        const js = await r.json();
-        const admins = (js.admins||[]).map(s=>String(s).toLowerCase());
-        const team = (js.team||js.members||js.users||[]).map(s=>String(s).toLowerCase());
-        const e = email.toLowerCase();
-        if(admins.includes(e)) return 'admin';
-        if(team.includes(e)) return 'team';
-        return 'institution';
-      } catch (err){
-        // fallback heuristic:
-        const e = email.toLowerCase();
-        if(e === 'media@thaibagarden.com') return 'admin';
-        if(e.endsWith('@thaibagarden.com')) return 'team';
-        return 'institution';
-      }
-    }
+        if(!r.ok) throw new Error('roles endpoint returned ' + r.status);
+        const j = await r.json();
+        const adminsRaw = j.admins || [];
+        const teamRaw = j.team || [];
 
-    function saveProfile(name,email,role){
-      try {
-        localStorage.setItem('thaiba_profile', JSON.stringify({name,email,role,ts:Date.now()}));
-      } catch(e){}
-    }
+        const admins = adminsRaw.map(parseRoleEntry);
+        const team = teamRaw.map(parseRoleEntry);
 
-    function redirectForRole(role){
-      if(role === 'admin') location.href = '/admin.html';
-      else if(role === 'team') location.href = '/team.html';
-      else location.href = '/create-task.html';
-    }
+        let role = 'institution';
+        if(admins.includes(email)) role = 'admin';
+        else if(team.includes(email)) role = 'team';
 
-    continueBtn.addEventListener('click', async ()=>{
-      const name = fullnameEl.value.trim();
-      const email = emailEl.value.trim();
-      if(!name) return showStatus('Please enter your full name', true);
-      if(!email || !email.includes('@')) return showStatus('Please enter a valid email', true);
+        const session = { name, email, role, loggedAt: new Date().toISOString() };
+        saveSession(session);
 
-      showStatus('Detecting role — please wait…');
-      continueBtn.disabled = true;
-      guestBtn.disabled = true;
+        // Redirect by role
+        if(role === 'admin') location.href = '/admin.html';
+        else if(role === 'team') location.href = '/team.html';
+        else location.href = '/institution.html';
 
-      try {
-        const role = await detectRoleByEmail(email);
-        saveProfile(name,email,role);
-        showStatus('Signed in as ' + role + '. Redirecting…');
-        setTimeout(()=> redirectForRole(role), 400);
-      } catch (err){
-        console.error(err);
-        showStatus('Failed to detect role — continuing as guest', true);
-        saveProfile(name,email,'institution');
-        setTimeout(()=> redirectForRole('institution'), 800);
-      } finally {
-        continueBtn.disabled = false;
-        guestBtn.disabled = false;
+      } catch(err){
+        console.error('roles error', err);
+        setError('Failed to check roles: ' + (err.message||err));
       }
     });
 
-    // special: guest (request only)
-    guestBtn.addEventListener('click', ()=>{
-      const name = fullnameEl.value.trim() || 'Guest';
-      const email = emailEl.value.trim() || '';
-      saveProfile(name,email,'institution');
-      redirectForRole('institution');
+    // Clear saved session (for troubleshooting)
+    e('#clearBtn').addEventListener('click', function(){
+      clearSession();
+      setError(null);
+      alert('Local session cleared. You can sign in again.');
     });
-
-    // if a profile already exists, forward them to their view immediately
-    (function autoRedirectIfKnown(){
-      try {
-        const v = localStorage.getItem('thaiba_profile');
-        if(!v) return;
-        const p = JSON.parse(v);
-        if(p && p.role) {
-          // small delay so user sees where we landed
-          setTimeout(()=> redirectForRole(p.role), 200);
-        }
-      } catch(e){}
-    })();
   </script>
 </body>
 </html>
