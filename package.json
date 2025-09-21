@@ -1,7 +1,12 @@
 {
   "name": "thaiba-media-dashboard",
-  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build"
+  },
   "dependencies": {
-    "googleapis": "^118.0.0"
+    ...
   }
 }
