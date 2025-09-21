@@ -4,105 +4,119 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Thaiba Media — Welcome</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/static/logo.png" type="image/png">
+
   <style>
-    :root {
-      --primary: #2563eb;
-      --bg: #f9fafb;
-      --card: #ffffff;
-      --muted: #6b7280;
-      --shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
+    /* Reset */
+    body, h1, p { margin:0; padding:0; }
     body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      backdrop-filter: blur(4px);
-    }
-    .card {
-      background: var(--card);
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    img.logo {
-      width: 80px;
-      margin-bottom: 16px;
-    }
-    h1 {
-      font-size: 20px;
-      margin: 0 0 20px;
-      color: #111827;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    button {
-      width: 100%;
-      background: var(--primary);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      line-height: 1.5;
       color: #fff;
-      border: none;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
+      background: #0b1120;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    button:hover {
-      background: #1d4ed8;
+
+    /* hero */
+    .welcome-hero {
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding: 60px 20px;
+      background-image: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65)), url('/static/welcome-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
-    .muted {
-      margin-top: 14px;
-      font-size: 13px;
-      color: var(--muted);
+
+    .welcome-inner {
+      max-width: 800px;
+      background: rgba(15,23,42,0.7);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px auto;
+    }
+    .logo img {
+      width: 100%;
+      height: auto;
+      display:block;
+      border-radius:12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    p.sub {
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 32px;
+    }
+
+    .btn-group {
+      display:flex;
+      flex-wrap: wrap;
+      justify-content:center;
+      gap:16px;
+    }
+    .btn {
+      padding:12px 24px;
+      border-radius:8px;
+      border:none;
+      font-weight:600;
+      cursor:pointer;
+      background:#06b6d4;
+      color:#fff;
+      transition: all 0.2s;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn:hover {
+      background:#0891b2;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align:center;
+      font-size:0.85rem;
+      color:rgba(255,255,255,0.6);
+      padding: 16px;
+    }
+
+    @media (max-width:640px){
+      h1{ font-size:1.5rem; }
+      .welcome-inner{ padding:24px; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="https://thaibagarden.org/logo.png" alt="Thaiba Garden Logo" class="logo">
-    <h1>Welcome to Thaiba Media</h1>
-    <form id="loginForm">
-      <input type="text" id="name" placeholder="Your Name" required />
-      <input type="email" id="email" placeholder="Your Email" required />
-      <button type="submit">Continue</button>
-    </form>
-    <div class="muted">Powered by Thaiba Garden Group of Institutions</div>
-  </div>
-
-  <script>
-    const ADMIN_USERS = ["media@thaibagarden.com"];
-    const TEAM_MEMBERS = [
-      "anwar@thaibagarden.com",
-      "sabith@thaibagarden.com",
-      "sidheeq@thaibagarden.com",
-      "shukoor@thaibagarden.com"
-    ];
-
-    document.getElementById("loginForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim().toLowerCase();
-
-      if (ADMIN_USERS.includes(email)) {
-        window.location.href = "/admin.html";
-      } else if (TEAM_MEMBERS.includes(email)) {
-        window.location.href = "/team.html";
-      } else {
-        window.location.href = "/request.html";
-      }
-    });
-  </script>
+  <section class="welcome-hero">
+    <div class="welcome-inner">
+      <div class="logo">
+        <img src="/static/logo.png" alt="Thaiba Garden logo">
+      </div>
+      <h1>Welcome to Thaiba Media Dashboard</h1>
+      <p class="sub">Please select your role to continue.</p>
+      <div class="btn-group">
+        <a href="/admin.html" class="btn">Admin</a>
+        <a href="/team.html" class="btn">Team Member</a>
+        <a href="/institution.html" class="btn">Institution / Requester</a>
+      </div>
+    </div>
+  </section>
+  <footer>
+    © Thaiba Garden Group of Institutions
+  </footer>
 </body>
 </html>
