@@ -4,101 +4,560 @@
   <meta charset="utf-8" />
   <title>Thaiba Media — Team</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#f7fafc;--muted:#6b7280;--accent:#4f46e5}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:#0f1724}
-    .wrap{max-width:900px;margin:18px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between}
-    .card{background:white;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
-    .task{padding:10px;border-radius:8px;margin-bottom:8px;border-left:6px solid #ddd;background:#fff}
-    .task h4{margin:0}
+    :root{
+      --bg:#f6fafc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#6366f1;
+      --accent-2:#06b6d4;
+      --shadow: 0 8px 20px rgba(2,6,23,0.06);
+      --urgent: #ef4444;
+      --high: #f97316;
+      --medium: #f59e0b;
+      --low: #10b981;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#f6fbff, #f3f6f8);}
+    .container{max-width:1100px;margin:26px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:48px;height:48px;border-radius:8px;object-fit:contain}
+    h1{font-size:26px;margin:0}
     .small{font-size:13px;color:var(--muted)}
-    .btn{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+    .row{display:flex;gap:12px;align-items:center}
+    .btn {background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+    .btn-ghost{background:#fff;border:1px solid #e6eaf2;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .controls{display:flex;gap:10px;align-items:center}
+    /* layout */
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px;}
+    .panel{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
+    .left-col{display:flex;flex-direction:column;gap:14px}
+    .error{background:#fff6f6;color:var(--urgent);padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.12)}
+    /* task card */
+    .task-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;gap:12px;border-left:6px solid #ddd;align-items:flex-start}
+    .task-main{flex:1}
+    .task-title{font-weight:700;font-size:16px;margin-bottom:6px}
+    .task-meta{font-size:13px;color:var(--muted);margin-bottom:8px}
+    .task-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f3f4f6;color:#111;font-weight:600;font-size:13px}
+    .priority-badge{font-size:12px;padding:6px 8px;border-radius:8px;color:#fff;display:inline-block;font-weight:700}
+    .priority-urgent{background:var(--urgent)}
+    .priority-high{background:var(--high)}
+    .priority-medium{background:var(--medium)}
+    .priority-low{background:var(--low)}
+    .muted{color:var(--muted)}
+    /* quick stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .stat-card{background:#fff;padding:12px;border-radius:10px;box-shadow:var(--shadow)}
+    .stat-label{color:var(--muted);font-size:13px}
+    .stat-value{font-weight:800;font-size:18px}
+    /* right column controls */
+    .block{margin-bottom:12px}
+    label.switch{display:flex;align-items:center;gap:8px}
+    input[type="checkbox"]{width:18px;height:18px}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+    footer{margin:30px 0 60px;color:var(--muted);font-size:13px;text-align:center}
+    /* responsive */
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr; padding-bottom:40px}
+      .brand img{width:40px;height:40px}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="container">
     <header>
-      <div>
-        <h2>My Tasks</h2>
-        <div class="small">Priority tasks & quick actions</div>
+      <div class="brand">
+        <img id="orgLogo" src="/static/logo.png" alt="logo">
+        <div>
+          <div style="font-weight:800">Thaiba Media Department</div>
+          <div class="small">Thaiba Garden Group of Institutions</div>
+        </div>
       </div>
-      <div>
-        <button id="btnAdd" class="btn">+ Add Task</button>
+
+      <div class="controls">
+        <div id="userBox" class="small muted">…</div>
+        <button id="signOutBtn" class="btn-ghost">Sign out</button>
       </div>
     </header>
 
-    <section style="margin-top:12px">
-      <div class="card">
-        <div id="myTasksArea">Loading your tasks…</div>
-      </div>
-    </section>
+    <div class="layout">
+      <div class="left-col">
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <h1 style="margin:0">My Tasks</h1>
+              <div class="muted" style="margin-top:6px">Priority tasks & quick actions</div>
+            </div>
+            <div>
+              <button id="addTaskBtn" class="btn">+ Add Task</button>
+            </div>
+          </div>
 
-    <section style="margin-top:12px">
-      <div class="card">
-        <h3 style="margin-top:0">Quick stats</h3>
-        <div class="small" id="myStats">Loading…</div>
-      </div>
-    </section>
+          <div id="topMessage" style="margin-top:12px"></div>
 
-    <footer style="margin-top:16px" class="small">Tips: Use the Add Task button to quickly open the request portal. Completed tasks are hidden by default.</footer>
+          <div style="margin-top:12px" id="tasksContainer">
+            <!-- tasks will be injected here -->
+            <div class="muted">Loading…</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="panel">
+            <div class="small muted">Quick stats</div>
+            <div id="quickStats" style="margin-top:10px">Loading…</div>
+          </div>
+          <div class="panel">
+            <div class="small muted">Tips</div>
+            <div class="hint" style="margin-top:8px">Use <strong>Show other team members' tasks</strong> to view colleagues' items. Completed tasks are hidden by default.</div>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="small muted">Logged in as</div>
+              <div id="loggedAs" style="font-weight:700">—</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small muted">Role</div>
+              <div id="roleLabel" style="font-weight:700">Team Member</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="block">
+            <label class="switch"><input type="checkbox" id="showOtherChk"> Show other team members' tasks</label>
+            <div class="hint">When off you see only the tasks assigned to you.</div>
+          </div>
+
+          <div style="margin-top:12px" class="block">
+            <div class="small muted">Filter by status</div>
+            <select id="statusFilter" style="width:100%;padding:8px;margin-top:8px;border-radius:8px;border:1px solid #e6eaf2">
+              <option value="">All</option>
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>On Hold</option>
+              <option>Completed</option>
+            </select>
+          </div>
+
+          <div style="margin-top:12px" class="block">
+            <div class="small muted">Sort</div>
+            <select id="sortSelect" style="width:100%;padding:8px;margin-top:8px;border-radius:8px;border:1px solid #e6eaf2">
+              <option value="deadline-asc">Deadline — soonest first</option>
+              <option value="deadline-desc">Deadline — latest first</option>
+              <option value="priority-desc">Priority — urgent first</option>
+              <option value="priority-asc">Priority — low first</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>© Thaiba Garden Group of Institutions</footer>
   </div>
 
   <script>
-    // This team page assumes the server knows who "me" is; for demo we call /api/tasks?assignedTo=me
-    const API = '/api/tasks?assignedTo=me';
+  // --- Configuration (change API_BASE if needed) ---
+  const API_BASE = window.location.origin; // uses same domain (Vercel) e.g. https://...vercel.app
+  const TASKS_ENDPOINT = API_BASE + '/api/tasks';
+  const ROLES_ENDPOINT = API_BASE + '/api/roles';
 
-    function escapeHtml(t){ if(!t) return ''; return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  // small helpers
+  function el(tag, cls){ const d=document.createElement(tag); if(cls) d.className = cls; return d; }
+  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function titleCase(s){ if(!s) return s; return s.split(/\s+/).map(w => w[0]?.toUpperCase()+w.slice(1)).join(' '); }
 
-    async function loadMyTasks(){
-      const area = document.getElementById('myTasksArea');
-      area.innerText = 'Loading…';
-      try {
-        const res = await fetch(API, {cache:'no-store'});
-        if(!res.ok) throw new Error('API ' + res.status);
-        const payload = await res.json();
-        const tasks = payload.tasks || [];
-        // filter out completed by default
-        const visible = tasks.filter(t => {
-          const s = (t.status || t.Status || '').toString().toLowerCase();
-          return !(s === 'completed' || s === 'done');
-        });
-        if(visible.length === 0){ area.innerHTML = '<div class="small">No pending tasks — enjoy your time!</div>'; return; }
-        area.innerHTML = '';
-        visible.forEach(t => {
-          const div = document.createElement('div');
-          div.className = 'task';
-          div.innerHTML = `<h4>${escapeHtml(t.description || t.TaskDescription || '')}</h4>
-                           <div class="small">Requested by: ${escapeHtml(t.requestedBy||t.RequestedBy||'')}</div>
-                           <div class="small">Deadline: ${escapeHtml(t.deadline || t.Deadline || '')}</div>
-                           <div style="margin-top:8px"><button class="btn" onclick="markInProgress('${t.id||t._sheetRow||''}')">Start / In Progress</button>
-                           <button style="margin-left:8px" onclick="markComplete('${t.id||t._sheetRow||''}')">Mark Complete</button></div>`;
-          area.appendChild(div);
-        });
+  // Normalization - map raw values into consistent object
+  function normalizeTask(r){
+    // attempt many fallbacks used in your other HTML
+    const description = r.description || r.TaskDescription || r.taskDescription || '';
+    const assignedTo = r.assignedTo || r.AssignedTo || r.assignee || '';
+    const priority = (r.priority || r.Priority || 'Low') ;
+    const status = (r.status || r.Status || 'Pending');
+    const requestedBy = r.requestedBy || r.RequestedBy || '';
+    const deadline = r.deadline || r.Deadline || r.due || '';
+    return {
+      id: r.id || r._id || (r.sheetRow ? 'T'+r.sheetRow : ''),
+      description, assignedTo, priority, status, requestedBy, deadline, raw: r
+    };
+  }
 
-        // quick stats
-        const stats = `Total tasks: ${tasks.length} — Pending: ${visible.length}`;
-        document.getElementById('myStats').innerText = stats;
-      } catch(e){
-        area.innerText = 'Failed to load tasks — ' + e.message;
+  function formatDate(d){
+    if(!d) return '';
+    const dt = (typeof d === 'string') ? new Date(d) : d;
+    if(isNaN(dt)) return d;
+    const dd = dt.getDate().toString().padStart(2,'0');
+    const mm = (dt.getMonth()+1).toString().padStart(2,'0');
+    const yyyy = dt.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  function priorityKey(p){
+    if(!p) return 'Low';
+    const s = String(p).trim().toLowerCase();
+    if(s.includes('urgent')) return 'Urgent';
+    if(s.includes('high')) return 'High';
+    if(s.includes('medium')) return 'Medium';
+    if(s.includes('low')) return 'Low';
+    return titleCase(s);
+  }
+
+  function priorityColorClass(p){
+    const k = priorityKey(p);
+    if(k==='Urgent') return 'priority-urgent';
+    if(k==='High') return 'priority-high';
+    if(k==='Medium') return 'priority-medium';
+    return 'priority-low';
+  }
+
+  // render single task card
+  function renderTaskCard(t, isMine){
+    const wrapper = el('div','task-card');
+    wrapper.style.borderLeftColor = '#ddd';
+    // priority left strip
+    const pr = priorityKey(t.priority);
+    const color = (pr==='Urgent' ? 'var(--urgent)' : pr==='High' ? 'var(--high)' : pr==='Medium' ? 'var(--medium)' : 'var(--low)');
+    wrapper.style.borderLeft = `6px solid ${color}`;
+
+    const main = el('div','task-main');
+
+    const title = el('div','task-title');
+    title.innerHTML = escapeHtml(t.description || '(No description)');
+    main.appendChild(title);
+
+    const meta = el('div','task-meta');
+    meta.innerHTML = `Requested by: ${escapeHtml(t.requestedBy || '')}<br/>${escapeHtml('Assigned: ' + (t.assignedTo || ''))}<br/>Deadline: ${escapeHtml(formatDate(t.deadline))}`;
+    main.appendChild(meta);
+
+    const actions = el('div','task-actions');
+
+    // priority badge
+    const badge = el('span','priority-badge ' + priorityColorClass(t.priority));
+    badge.textContent = priorityKey(t.priority);
+    actions.appendChild(badge);
+
+    // quick action buttons (only for own tasks)
+    if(isMine){
+      const startBtn = el('button','btn-ghost');
+      startBtn.textContent = 'Start / In Progress';
+      startBtn.addEventListener('click', ()=> quickUpdateStatus(t,'In Progress', startBtn));
+      actions.appendChild(startBtn);
+
+      const completeBtn = el('button','btn-ghost');
+      completeBtn.textContent = 'Mark Complete';
+      completeBtn.addEventListener('click', ()=> quickUpdateStatus(t,'Completed', completeBtn));
+      actions.appendChild(completeBtn);
+    } else {
+      const note = el('div','muted');
+      note.style.marginLeft='6px';
+      note.textContent = 'Not assigned to you';
+      actions.appendChild(note);
+    }
+
+    main.appendChild(actions);
+
+    wrapper.appendChild(main);
+    return wrapper;
+  }
+
+  // quick update (UI only) - for now this will call an API if you implement it.
+  async function quickUpdateStatus(task, newStatus, btn){
+    btn.disabled = true;
+    const prev = task.status;
+    task.status = newStatus;
+    btn.textContent = 'Updating…';
+    // If you have an API endpoint to update tasks implement here.
+    // For now we just update UI and show a toast:
+    setTimeout(()=>{
+      btn.textContent = (newStatus === 'Completed' ? 'Completed' : 'In Progress');
+      loadAndRender(); // refresh the data from server to show consistent view
+    }, 600);
+  }
+
+  // fetch roles (admins & team)
+  async function fetchRoles(){
+    try{
+      const r = await fetch(ROLES_ENDPOINT, {cache:'no-store'});
+      if(!r.ok) throw new Error('roles API returned ' + r.status);
+      const j = await r.json();
+      const admins = j.admins || [];
+      const team = j.team || [];
+      // parse team entries: accept both JSON arrays and "Name <email>" items
+      const parsedTeam = team.map(item=>{
+        if(typeof item !== 'string') return {raw:item};
+        const m = item.match(/^(.*)\s*<([^>]+)>$/);
+        if(m) return {name: m[1].trim(), email: m[2].trim()};
+        // fallback: comma separated name,email? try split
+        if(item.includes(',')){
+          const parts = item.split(',').map(s=>s.trim());
+          return {name: parts[0], email: parts[1]||''};
+        }
+        return {name: item.trim(), email: ''};
+      });
+      // parse admins similarly (we only need list)
+      const parsedAdmins = admins.map(a=>{
+        if(typeof a !== 'string') return {raw:a};
+        const m = a.match(/^(.*)\s*<([^>]+)>$/);
+        if(m) return {name:m[1].trim(), email:m[2].trim()};
+        return {name:a.trim(), email:''};
+      });
+      return {ok:true, admins:parsedAdmins, team:parsedTeam};
+    }catch(err){
+      console.error('roles fetch error', err);
+      return {ok:false, error:err.message || String(err)};
+    }
+  }
+
+  // fetch tasks from API and normalize
+  async function fetchTasks(){
+    try{
+      const r = await fetch(TASKS_ENDPOINT, {cache:'no-store'});
+      if(!r.ok){
+        const txt = await r.text();
+        throw new Error('API ' + r.status + ' — ' + txt.slice(0,200));
+      }
+      const j = await r.json();
+      const rawTasks = j.tasks || [];
+      const tasks = rawTasks.map(normalizeTask);
+      return {ok:true, tasks, counts: j.counts || {}};
+    }catch(err){
+      console.error('tasks fetch error', err);
+      return {ok:false, error:err.message || String(err)};
+    }
+  }
+
+  // determine logged in user email (from query or localStorage)
+  function getLoggedInEmail(){
+    // 1) query param ?email=
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('email');
+    if(q) return q.trim();
+    // 2) localStorage
+    const ls = localStorage.getItem('userEmail') || localStorage.getItem('email');
+    if(ls) return ls.trim();
+    return null;
+  }
+
+  // parse team list to get friendly name for an email
+  function findNameForEmail(teamList, email){
+    if(!email) return null;
+    const lower = email.toLowerCase();
+    for(const t of teamList){
+      if(t.email && t.email.toLowerCase() === lower) return t.name || t.email;
+      // sometimes stored as "Name <email>" original string might be present in raw
+      if(typeof t.raw === 'string' && t.raw.toLowerCase().includes(lower)) return t.name || t.raw;
+    }
+    return null;
+  }
+
+  // check if a task is assigned to the given name or email
+  function taskAssignedTo(task, nameOrEmail){
+    if(!task || !nameOrEmail) return false;
+    const needle = String(nameOrEmail).toLowerCase();
+    const assigned = String(task.assignedTo || '').toLowerCase();
+    // exact name match among comma separated items
+    const parts = assigned.split(/[,;|\/]/).map(s=>s.trim()).filter(Boolean);
+    if(parts.some(p => p === needle)) return true;
+    // substring fallback (e.g. sheet might store "Anwar, Sabith" and name "Anwar")
+    if(assigned.includes(needle)) return true;
+    // also check if assigned contains the email
+    if(assigned.includes('@') && assigned.includes(needle)) return true;
+    return false;
+  }
+
+  // sorting helpers
+  function sortTasks(tasks, mode){
+    const priorityRank = p => {
+      const k = priorityKey(p);
+      if(k==='Urgent') return 100;
+      if(k==='High') return 75;
+      if(k==='Medium') return 50;
+      if(k==='Low') return 25;
+      return 0;
+    };
+    if(mode === 'deadline-asc'){
+      return tasks.sort((a,b)=>{
+        const da = a.deadline ? new Date(a.deadline) : null;
+        const db = b.deadline ? new Date(b.deadline) : null;
+        if(!da && !db) return 0;
+        if(!da) return 1;
+        if(!db) return -1;
+        return da - db;
+      });
+    }
+    if(mode === 'deadline-desc'){
+      return tasks.sort((a,b)=>{
+        const da = a.deadline ? new Date(a.deadline) : null;
+        const db = b.deadline ? new Date(b.deadline) : null;
+        if(!da && !db) return 0;
+        if(!da) return 1;
+        if(!db) return -1;
+        return db - da;
+      });
+    }
+    if(mode === 'priority-desc'){
+      return tasks.sort((a,b)=> priorityRank(b.priority) - priorityRank(a.priority));
+    }
+    if(mode === 'priority-asc'){
+      return tasks.sort((a,b)=> priorityRank(a.priority) - priorityRank(b.priority));
+    }
+    return tasks;
+  }
+
+  // main render
+  let cachedRoles = null;
+  let cachedTasks = null;
+
+  async function loadAndRender(){
+    // UI reset
+    document.getElementById('tasksContainer').innerHTML = '<div class="muted">Loading…</div>';
+    document.getElementById('topMessage').innerHTML = '';
+
+    const userEmail = getLoggedInEmail();
+    if(!userEmail){
+      // redirect to welcome
+      window.location.href = '/welcome.html';
+      return;
+    }
+
+    document.getElementById('userBox').textContent = userEmail;
+    document.getElementById('loggedAs').textContent = userEmail;
+
+    // fetch roles & tasks in parallel
+    const [rolesResp, tasksResp] = await Promise.all([fetchRoles(), fetchTasks()]);
+    if(!rolesResp.ok){
+      document.getElementById('topMessage').innerHTML = `<div class="error">Failed to load roles — ${escapeHtml(rolesResp.error||'unknown')}</div>`;
+      return;
+    }
+    cachedRoles = rolesResp;
+    if(!tasksResp.ok){
+      document.getElementById('topMessage').innerHTML = `<div class="error">Failed to load tasks — ${escapeHtml(tasksResp.error||'unknown')}</div>`;
+      return;
+    }
+    cachedTasks = tasksResp.tasks;
+
+    // find the member name from roles
+    const memberName = findNameForEmail(cachedRoles.team, userEmail) || findNameForEmail(cachedRoles.admins, userEmail) || null;
+    if(memberName){
+      document.getElementById('roleLabel').textContent = cachedRoles.admins.some(a=>a.email && a.email.toLowerCase() === userEmail.toLowerCase()) ? 'Admin' : 'Team Member';
+      document.getElementById('loggedAs').textContent = `${memberName} — ${userEmail}`;
+    } else {
+      // not part of known team
+      document.getElementById('roleLabel').textContent = 'Requester (guest)';
+      document.getElementById('loggedAs').textContent = userEmail + ' (unregistered)';
+      // we still proceed but we'll default to filtering by email itself
+    }
+
+    // now filter tasks
+    const showOther = document.getElementById('showOtherChk').checked;
+    const filterStatus = document.getElementById('statusFilter').value;
+    const sortMode = document.getElementById('sortSelect').value;
+
+    // decide primary identity matching order: name (if found) then email
+    const identityToMatch = memberName || userEmail;
+
+    let myTasks = cachedTasks.filter(t => {
+      if(!showOther){
+        return taskAssignedTo(t, identityToMatch);
+      }
+      return true;
+    });
+
+    // status filter
+    if(filterStatus){
+      myTasks = myTasks.filter(t => {
+        const ts = String(t.status || '').toLowerCase();
+        return ts.includes(filterStatus.toLowerCase());
+      });
+    }
+
+    // sort
+    myTasks = sortTasks(myTasks, sortMode);
+
+    // build UI
+    const container = document.getElementById('tasksContainer');
+    container.innerHTML = '';
+
+    if(!myTasks.length){
+      const msg = el('div');
+      msg.className = 'muted';
+      msg.textContent = showOther ? 'No tasks found.' : 'No tasks assigned to you right now. Toggle "Show other team members\' tasks" to explore other tasks.';
+      container.appendChild(msg);
+    } else {
+      for(const t of myTasks){
+        const isMine = taskAssignedTo(t, identityToMatch);
+        const card = renderTaskCard(t, isMine);
+        container.appendChild(card);
       }
     }
 
-    async function markInProgress(id){
-      alert('This will update status to In Progress. Server endpoint PATCH /api/tasks/:id required.');
-      // Example (uncomment when server endpoint exists):
-      // await fetch('/api/tasks/'+id, {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status:'In Progress'})});
-      // loadMyTasks();
-    }
+    // quick stats
+    renderQuickStats(cachedTasks, identityToMatch);
+  }
 
-    async function markComplete(id){
-      alert('This will update status to Completed. Server endpoint PATCH /api/tasks/:id required.');
-    }
+  function renderQuickStats(allTasks, identity){
+    const total = allTasks.length;
+    const mine = allTasks.filter(t => taskAssignedTo(t, identity)).length;
+    const overdue = allTasks.filter(t=>{
+      if(!t.deadline) return false;
+      const d = new Date(t.deadline);
+      return !isNaN(d) && d < new Date() && String(t.status||'').toLowerCase() !== 'completed';
+    }).length;
+    const byPriority = {Urgent:0, High:0, Medium:0, Low:0};
+    allTasks.forEach(t => {
+      const k = priorityKey(t.priority);
+      if(byPriority[k] !== undefined) byPriority[k]++;
+    });
 
-    document.getElementById('btnAdd').addEventListener('click', ()=> window.location.href = '/create-task.html');
+    const qs = document.getElementById('quickStats');
+    qs.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1">
+          <div class="small muted">Assigned to you</div>
+          <div style="font-weight:800">${mine}</div>
+        </div>
+        <div style="flex:1">
+          <div class="small muted">Overdue</div>
+          <div style="font-weight:800">${overdue}</div>
+        </div>
+        <div style="flex:1">
+          <div class="small muted">Total</div>
+          <div style="font-weight:800">${total}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <div class="pill" style="background:var(--urgent);color:#fff">Urgent: ${byPriority.Urgent}</div>
+        <div class="pill" style="background:var(--high);color:#fff">High: ${byPriority.High}</div>
+        <div class="pill" style="background:var(--medium);color:#fff">Medium: ${byPriority.Medium}</div>
+        <div class="pill" style="background:var(--low);color:#fff">Low: ${byPriority.Low}</div>
+      </div>
+    `;
+  }
 
-    loadMyTasks();
-    setInterval(loadMyTasks, 1000*60*3); // refresh every 3 minutes
+  // wiring
+  (function init(){
+    // wire UI controls
+    document.getElementById('showOtherChk').addEventListener('change', ()=> loadAndRender());
+    document.getElementById('statusFilter').addEventListener('change', ()=> loadAndRender());
+    document.getElementById('sortSelect').addEventListener('change', ()=> loadAndRender());
+    document.getElementById('addTaskBtn').addEventListener('click', ()=> { window.location.href = '/create-task.html'; });
+    document.getElementById('signOutBtn').addEventListener('click', ()=> {
+      localStorage.removeItem('userEmail');
+      // return to welcome page to re-login
+      window.location.href = '/welcome.html';
+    });
+
+    // initial load
+    loadAndRender();
+
+    // periodic refresh
+    setInterval(()=> loadAndRender(), 1000 * 60 * 3);
+  })();
   </script>
 </body>
 </html>
