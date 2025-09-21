@@ -23,20 +23,24 @@ export default function Dashboard() {
         throw new Error(`API ${response.status}: ${response.statusText}`)
       }
 
-      const data = await response.json()
-      setTasks(data.tasks || [])
-    } } catch (err: unknown) {
-  console.error("Failed to load tasks:", err);
-  if (err instanceof Error) {
-    setError(`Failed to load tasks: ${err.message}`);
-  } else {
-    setError(`Failed to load tasks: ${String(err)}`);
-  }
-} finally {
-
-      setLoading(false)
+        try {
+    const response = await fetch(`/api/tasks?email=${encodeURIComponent(userEmail)}`);
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
+    const data = await response.json();
+    setTasks(data.tasks || []);
+  } catch (err: unknown) {
+    console.error("Failed to load tasks:", err);
+    if (err instanceof Error) {
+      setError(`Failed to load tasks: ${err.message}`);
+    } else {
+      setError(`Failed to load tasks: ${String(err)}`);
+    }
+  } finally {
+    setLoading(false);
   }
+
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "24px" }}>
