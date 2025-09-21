@@ -1,29 +1,37 @@
 // api/roles.js
-// Vercel serverless function that returns the configured lists of admins and team members
-// Make sure you set ADMIN_USERS and TEAM_MEMBERS env vars in Vercel (see notes below).
+// Returns configured lists of admins and team members
+// Cleans env vars so only plain emails remain
 
 export default function handler(req, res) {
-  // Read environment variables (expected to be JSON arrays or comma-separated)
   const rawAdmins = process.env.ADMIN_USERS || '[]';
   const rawTeam = process.env.TEAM_MEMBERS || '[]';
 
-  // Accept either JSON array string or comma-separated list
   function parseList(raw) {
     if (!raw) return [];
-    // Try JSON
+    let items = [];
+
     try {
+      // Try JSON (if stored as ["email1","email2"])
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed.map(s => String(s).trim()).filter(Boolean);
-    } catch (e) {
-      // not JSON
+      if (Array.isArray(parsed)) items = parsed;
+    } catch {
+      // Fallback: comma-separated
+      items = String(raw).split(',');
     }
-    // fallback to comma-separated
-    return String(raw).split(',').map(s => s.trim()).filter(Boolean);
+
+    // 🔹 Normalize values: remove names, keep only email
+    return items
+      .map(s => String(s).trim())
+      .filter(Boolean)
+      .map(s => {
+        const match = s.match(/<?([^<>@\s]+@[^<>@\s]+)>?/); // extract email if inside <>
+        return match ? match[1] : s;
+      });
   }
 
   const admins = parseList(rawAdmins);
   const team = parseList(rawTeam);
 
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300'); // small cache
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
   return res.json({ ok: true, admins, team });
 }
