@@ -1,170 +1,127 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Welcome | Thaiba Media Dashboard</title>
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: url("./static/background-image.webp") no-repeat center center / cover;
+    :root { --card-bg: rgba(0,0,0,0.72); --overlay: rgba(0,0,0,0.55); }
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#fff}
+    /* Use absolute path: /static/... (maps to public/static/ on Vercel) */
+    body{
+      background-image: url('/static/background-image.webp');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    .overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.55); /* darker overlay for readability */
+    /* dark overlay to ensure readability across backgrounds */
+    .page-overlay{
+      position:fixed; inset:0; background:var(--overlay); z-index:0;
     }
-    .container {
-      position: relative;
-      z-index: 2;
-      max-width: 800px;
-      width: 90%;
-      background: rgba(0, 0, 0, 0.65); /* more opacity for contrast */
-      border-radius: 16px;
-      padding: 2.5rem;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      text-align: left;
+    .card {
+      position:relative; z-index:2;
+      width:min(1000px, 92%);
+      background: var(--card-bg);
+      border-radius:14px;
+      padding:28px;
+      box-shadow:0 20px 50px rgba(2,6,23,0.55);
+      backdrop-filter: blur(6px);
     }
-    .logo-section {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1.5rem;
+    .logo-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+    .logo-row img{width:64px;height:64px;object-fit:contain;border-radius:8px}
+    .org-title{font-weight:700;font-size:1.15rem}
+    .org-sub{color:#cfcfcf;font-size:0.95rem;margin-top:2px}
+    h1{margin:14px 0 12px;font-size:2rem}
+    p.lead{color:#e6e6e6;margin:0 0 12px;line-height:1.45}
+    form{display:grid;grid-template-columns:1fr 360px;gap:18px 28px;align-items:start}
+    .left{min-width:0}
+    label{display:block;font-size:0.85rem;color:#ddd;margin-bottom:6px}
+    input[type="text"], input[type="email"]{
+      width:100%; padding:10px 12px;border-radius:8px;border:none;background:#fff;color:#111;font-size:1rem;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.06);
     }
-    .logo-section img {
-      height: 64px;
-      width: 64px;
-      object-fit: contain;
-      margin-right: 1rem;
-    }
-    .org-info .org-title {
-      font-size: 1.4rem;
-      font-weight: bold;
-    }
-    .org-info .org-sub {
-      font-size: 0.95rem;
-      color: #d0d0d0;
-    }
-    h1 {
-      margin: 0 0 1rem;
-      font-size: 2rem;
-    }
-    p {
-      margin: 0 0 1rem;
-      color: #ddd;
-      line-height: 1.5;
-    }
-    form {
-      margin-top: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-    }
-    input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 1rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    .actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-    button {
-      padding: 0.7rem 1.4rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .primary-btn {
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #fff;
-    }
-    .secondary-btn {
-      background: transparent;
-      border: 2px solid #aaa;
-      color: #ccc;
-    }
-    .footer {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      text-align: center;
-      color: #bbb;
+    .actions{display:flex;gap:12px;align-items:center;margin-top:8px}
+    .btn-primary{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;padding:10px 16px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+    .btn-ghost{background:transparent;border-radius:8px;border:2px solid rgba(255,255,255,0.12);color:#ddd;padding:8px 14px;cursor:pointer}
+    .right{display:flex;flex-direction:column;gap:10px}
+    .footer{margin-top:16px;color:#cfcfcf;font-size:0.85rem;text-align:center}
+    @media (max-width:880px){
+      form{grid-template-columns:1fr; padding-top:6px}
+      .right{order:2}
     }
   </style>
 </head>
 <body>
-  <div class="overlay"></div>
-  <div class="container">
-    <div class="logo-section">
-      <img src="./static/logo.png" alt="Thaiba Garden Logo" />
-      <div class="org-info">
+  <div class="page-overlay" aria-hidden="true"></div>
+
+  <div class="card" role="main" aria-labelledby="welcome-title">
+    <div class="logo-row">
+      <img src="/static/logo.png" alt="Thaiba Garden logo" />
+      <div>
         <div class="org-title">Thaiba Media Department</div>
         <div class="org-sub">Thaiba Garden Group of Institutions</div>
       </div>
     </div>
 
-    <h1>Welcome to Thaiba Media Dashboard</h1>
-    <p>
-      Sign in once with your name and email. You'll be redirected to the view appropriate
-      for your role (Admin / Team member / Institution requester).
-    </p>
-    <p style="font-size: 0.9rem; color: #aaa;">
-      We keep the UI stable — once you confirm this view it will not be changed unexpectedly.
+    <h1 id="welcome-title">Welcome to Thaiba Media Dashboard</h1>
+    <p class="lead">
+      Sign in once with your name and email. You'll be redirected to the view appropriate for your role
+      (Admin / Team member / Institution requester). You may close this window after successful sign-in.
     </p>
 
-    <form id="welcome-form">
-      <label for="name">Full name</label>
-      <input type="text" id="name" placeholder="Your full name" required />
+    <form id="signinForm" autocomplete="off">
+      <div class="left">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" placeholder="Your full name" required />
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" required />
+        <div class="actions">
+          <button class="btn-primary" type="submit">Continue</button>
+          <button type="button" class="btn-ghost" id="guestBtn">Guest (request only)</button>
+        </div>
+      </div>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com" required />
-
-      <div class="actions">
-        <button type="submit" class="primary-btn">Continue</button>
-        <button type="button" class="secondary-btn" onclick="guestMode()">Guest (request only)</button>
+      <div class="right" aria-hidden="false">
+        <!-- Optionally show quick help / links for first-time users -->
+        <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;color:#ddd">
+          <strong>First time here?</strong>
+          <div style="margin-top:8px;font-size:0.94rem;color:#cfcfcf">
+            Use your official email to be routed to the correct dashboard automatically.
+          </div>
+        </div>
       </div>
     </form>
 
-    <div class="footer">
-      © Thaiba Garden Group of Institutions
-    </div>
+    <div class="footer">© Thaiba Garden Group of Institutions</div>
   </div>
 
   <script>
-    document.getElementById("welcome-form").addEventListener("submit", function (e) {
+    // Keep the UI stable — script only routes based on email domain (simple client-side helper)
+    document.getElementById('signinForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim().toLowerCase();
+      const name = (document.getElementById('name').value || '').trim();
+      const email = (document.getElementById('email').value || '').trim().toLowerCase();
+      if (!name || !email) return alert('Please enter name and email.');
 
-      if (!email) return alert("Please enter a valid email.");
-
-      // Example: redirect logic (to be replaced with real checks)
-      if (email.includes("media@thaibagarden.com")) {
-        window.location.href = "/admin";
-      } else if (email.includes("@thaibagarden.com")) {
-        window.location.href = "/team";
-      } else {
-        window.location.href = "/request";
+      // NOTE: these are client-side shortcuts only — final auth/role decisions must be server-side
+      if (email === 'media@thaibagarden.com') {
+        window.location.href = '/admin';
+        return;
       }
+      if (email.endsWith('@thaibagarden.com')) {
+        window.location.href = '/team';
+        return;
+      }
+      // default = requester
+      window.location.href = '/request';
     });
 
-    function guestMode() {
-      window.location.href = "/request";
-    }
+    document.getElementById('guestBtn').addEventListener('click', function () {
+      window.location.href = '/request';
+    });
   </script>
 </body>
 </html>
