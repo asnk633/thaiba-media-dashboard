@@ -1,279 +1,170 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Thaiba Media — Welcome</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome | Thaiba Media Dashboard</title>
   <style>
-    :root{
-      --bg-start: #020617;
-      --bg-end: #08101a;
-      --card: #0f1a24;
-      --muted: #9aa6b3;
-      --accent: #07c6d8;
-      --accent-2: #048fb0;
-      --glass: rgba(255,255,255,0.03);
-      --radius: 14px;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url("./static/background-image.webp") no-repeat center center / cover;
     }
-    html,body{height:100%;margin:0}
-    body{
-      min-height:100vh;
-      color:#e6eef6;
-      background:
-        linear-gradient(180deg, rgba(2,6,23,0.55) 0%, rgba(3,10,18,0.7) 45%, rgba(3,10,18,0.9) 100%),
-        url("/static/background%20image.webp") center/cover no-repeat fixed;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:36px;
-      box-sizing:border-box;
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55); /* darker overlay for readability */
     }
-
-    /* centered card */
-    .card {
-  width:920px;
-  max-width:94vw;
-  background: rgba(15, 26, 36, 0.8);  /* darker semi-transparent */
-  border-radius: var(--radius);
-  box-shadow: 0 18px 60px rgba(6,10,18,0.7);
-  padding:38px;
-  display:flex;
-  gap:30px;
-  align-items:center;
-  justify-content:space-between;
-  position:relative;
-  overflow:hidden;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-
-.logo-wrap img {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  background: transparent;   /* no white background */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-
-    .small-note { color:var(--muted); font-size:13px; margin-top:6px }
-
-    label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
-    input[type="text"], input[type="email"] {
-      width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.04);
-      background: rgba(255,255,255,0.02);
-      color: #eaf3fb;
-      box-sizing:border-box;
-      outline: none;
-      font-size:14px;
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      width: 90%;
+      background: rgba(0, 0, 0, 0.65); /* more opacity for contrast */
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      text-align: left;
     }
-    input::placeholder { color: rgba(230,238,246,0.35) }
-
-    .btn {
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      background: linear-gradient(180deg,var(--accent),var(--accent-2));
-      color:#04202a;
-      border:0;
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow: 0 8px 26px rgba(3,12,18,0.45);
-      transition: transform .12s ease;
+    .logo-section {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
     }
-    .btn:active { transform: translateY(1px) }
-
-    .ghost {
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      color:var(--muted);
+    .logo-section img {
+      height: 64px;
+      width: 64px;
+      object-fit: contain;
+      margin-right: 1rem;
     }
-
+    .org-info .org-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .org-info .org-sub {
+      font-size: 0.95rem;
+      color: #d0d0d0;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 2rem;
+    }
+    p {
+      margin: 0 0 1rem;
+      color: #ddd;
+      line-height: 1.5;
+    }
+    form {
+      margin-top: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    button {
+      padding: 0.7rem 1.4rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .primary-btn {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+    }
+    .secondary-btn {
+      background: transparent;
+      border: 2px solid #aaa;
+      color: #ccc;
+    }
     .footer {
-      position:fixed;
-      left:0;right:0;bottom:12px;
-      display:flex;justify-content:center;pointer-events:none;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #bbb;
     }
-    .footer .txt { color:rgba(230,238,246,0.28); font-size:13px; pointer-events:auto; background:transparent; padding:8px 12px; border-radius:8px; }
-
-    /* responsive */
-    @media (max-width:880px){
-      .card{flex-direction:column; padding:22px; gap:18px}
-      .right { width:100%; }
-      .left { width:100%; }
-      .logo-wrap img { width:66px; }
-      h1 { font-size:24px }
-    }
-
-    /* small status text */
-    .status { font-size:13px; color:var(--muted); margin-top:8px }
-    .error { color:#ff9b9b; background: rgba(255,80,80,0.04); padding:10px; border-radius:8px; border:1px solid rgba(255,80,80,0.06); margin-top:8px; }
-
   </style>
 </head>
 <body>
-  <main class="card" role="main" aria-labelledby="welcome-title">
-    <section class="left" aria-hidden="false">
-      <div class="logo-wrap" aria-hidden="true">
-        <img src="/static/logo.png" alt="Thaiba Garden logo" id="brandLogo">
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--muted);font-weight:600">Thaiba Media</div>
-          <div style="font-size:12px;color:rgba(230,238,246,0.3)">Media Department — Thaiba Garden</div>
-        </div>
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="logo-section">
+      <img src="./static/logo.png" alt="Thaiba Garden Logo" />
+      <div class="org-info">
+        <div class="org-title">Thaiba Media Department</div>
+        <div class="org-sub">Thaiba Garden Group of Institutions</div>
       </div>
+    </div>
 
-      <h1 id="welcome-title">Welcome to Thaiba Media Dashboard</h1>
-      <p class="lead">Sign in once with your name and email. You'll be redirected to the view appropriate for your role (Admin / Team member / Institution requester). You may close this window after successful sign-in.</p>
+    <h1>Welcome to Thaiba Media Dashboard</h1>
+    <p>
+      Sign in once with your name and email. You'll be redirected to the view appropriate
+      for your role (Admin / Team member / Institution requester).
+    </p>
+    <p style="font-size: 0.9rem; color: #aaa;">
+      We keep the UI stable — once you confirm this view it will not be changed unexpectedly.
+    </p>
 
-      <div class="small-note">We keep the UI stable — once you confirm this view it will not be changed unexpectedly.</div>
+    <form id="welcome-form">
+      <label for="name">Full name</label>
+      <input type="text" id="name" placeholder="Your full name" required />
 
-      <div id="after" class="status" style="display:none">
-        Checking roles...
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required />
+
+      <div class="actions">
+        <button type="submit" class="primary-btn">Continue</button>
+        <button type="button" class="secondary-btn" onclick="guestMode()">Guest (request only)</button>
       </div>
-    </section>
+    </form>
 
-    <aside class="right" aria-label="Sign in / Continue">
-      <div>
-        <label for="name">Full name</label>
-        <input id="name" type="text" placeholder="Your full name" autocomplete="name" />
-      </div>
-
-      <div>
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-      </div>
-
-      <div style="display:flex;gap:10px;margin-top:6px">
-        <button id="continueBtn" class="btn">Continue</button>
-        <button id="guestBtn" class="btn ghost" title="Open requester form without sign-in">Guest (request only)</button>
-      </div>
-
-      <div id="msg" class="status" aria-live="polite"></div>
-      <div id="err" class="error" style="display:none"></div>
-    </aside>
-  </main>
-
-  <div class="footer">
-    <div class="txt">© Thaiba Garden Group of Institutions</div>
+    <div class="footer">
+      © Thaiba Garden Group of Institutions
+    </div>
   </div>
 
   <script>
-    // IMPORTANT:
-    // - Save this file as public/welcome.html
-    // - Put images at: public/static/logo.png and public/static/background image.webp
-    // - This script checks /api/roles to decide redirect destination.
-    //   Make sure your serverless function /api/roles exists and returns JSON { ok:true, admins:[], team:[] }
+    document.getElementById("welcome-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
 
-    const API_ROLES = '/api/roles'; // server endpoint (relative - will hit your Vercel app)
-    const continueBtn = document.getElementById('continueBtn');
-    const guestBtn = document.getElementById('guestBtn');
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const msg = document.getElementById('msg');
-    const err = document.getElementById('err');
-    const after = document.getElementById('after');
+      if (!email) return alert("Please enter a valid email.");
 
-    function showError(text){
-      err.style.display = text ? 'block' : 'none';
-      err.textContent = text || '';
-    }
-    function setMsg(t){
-      msg.textContent = t || '';
-    }
-
-    // Normalize email for comparison
-    function normalizeEmail(e){ return String(e||'').trim().toLowerCase(); }
-
-    // get roles from server
-    async function fetchRoles(){
-      try {
-        after.style.display = 'block';
-        after.textContent = 'Checking roles...';
-        const res = await fetch(API_ROLES, {cache:'no-store'});
-        if(!res.ok) throw new Error('roles API returned ' + res.status);
-        const payload = await res.json();
-        after.style.display = 'none';
-        return payload;
-      } catch (e){
-        after.style.display = 'none';
-        showError('Failed to fetch roles — please try again later.');
-        console.error(e);
-        throw e;
-      }
-    }
-
-    // Where to redirect based on role
-    function chooseRedirect(email, rolesPayload){
-      const e = normalizeEmail(email);
-      if(!e) return '/welcome.html'; // invalid
-      const admins = (rolesPayload?.admins || []).map(normalizeEmail);
-      const team = (rolesPayload?.team || []).map(normalizeEmail);
-
-      if(admins.includes(e)) return '/admin';      // admin app root (adjust if you have another path)
-      if(team.includes(e)) return '/team';        // team view root
-      return '/requester';                         // institution / requester path (no login)
-    }
-
-    continueBtn.addEventListener('click', async ()=>{
-      showError('');
-      setMsg('');
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      if(!name || !email){
-        showError('Please enter both name and email.');
-        return;
-      }
-
-      continueBtn.disabled = true;
-      continueBtn.textContent = 'Checking…';
-      try {
-        const roles = await fetchRoles();
-        const dest = chooseRedirect(email, roles);
-
-        // remember the user (only client-side): first-time sign-in
-        try {
-          localStorage.setItem('tm_user', JSON.stringify({ name, email, when: new Date().toISOString() }));
-        } catch(e){ /* ignore storage errors */ }
-
-        // friendly confirmation before redirect
-        setMsg('Signed in as ' + name + ' — Redirecting to the appropriate view...');
-        // short delay so user sees the message
-        setTimeout(() => {
-          // if destinations are full pages, navigate
-          window.location.href = dest;
-        }, 700);
-
-      } catch (e){
-        showError('Could not continue: ' + (e.message || 'unknown error'));
-      } finally {
-        continueBtn.disabled = false;
-        continueBtn.textContent = 'Continue';
+      // Example: redirect logic (to be replaced with real checks)
+      if (email.includes("media@thaibagarden.com")) {
+        window.location.href = "/admin";
+      } else if (email.includes("@thaibagarden.com")) {
+        window.location.href = "/team";
+      } else {
+        window.location.href = "/request";
       }
     });
 
-    // guest requester: go directly to the public request form
-    guestBtn.addEventListener('click', ()=>{
-      // If you use /request-form or /create-task.html change the path accordingly
-      window.location.href = '/create-task.html'; // requester flow
-    });
-
-    // auto-fill if previously stored
-    (function init(){
-      try {
-        const saved = JSON.parse(localStorage.getItem('tm_user') || '{}');
-        if(saved?.name) nameInput.value = saved.name;
-        if(saved?.email) emailInput.value = saved.email;
-      } catch(e){}
-    })();
+    function guestMode() {
+      window.location.href = "/request";
+    }
   </script>
 </body>
 </html>
