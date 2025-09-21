@@ -1,10 +1,11 @@
+// components/ui/button.tsx
 import React from "react";
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "default" | "ghost" | "primary";
 };
 
-export default function Button({ variant = "default", className = "", children, ...props }: Props) {
+export function Button({ variant = "default", className = "", children, ...props }: ButtonProps) {
   const base = "inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition";
   const variantClass =
     variant === "primary"
@@ -19,3 +20,5 @@ export default function Button({ variant = "default", className = "", children, 
     </button>
   );
 }
+
+export default Button;
