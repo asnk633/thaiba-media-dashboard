@@ -1,49 +1,325 @@
-<!doctype html>
 <!-- SERVED_FROM: PUBLIC_INDEX -->
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Thaiba Media — Entry</title>
+  <title>Thaiba Media — Welcome</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0f1724;color:#e6eef8}
-    .wrap{max-width:900px;margin:6vh auto;padding:28px;background:#071127;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.6)}
-    h1{margin:0 0 8px;font-size:28px}
-    p{margin:0 0 18px;color:#b6c6dd}
-    .grid{display:flex;gap:14px;flex-wrap:wrap}
-    .card{flex:1 1 260px;background:#0b1a2b;padding:18px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-    .card h3{margin:0 0 8px}
-    .btn{display:inline-block;margin-top:12px;padding:10px 12px;border-radius:8px;background:#06b6d4;color:#042027;text-decoration:none;font-weight:700}
-    .muted{color:#9fb1c9;font-size:14px}
-    footer{margin-top:18px;color:#7f98b3;font-size:13px}
+    :root {
+      --bg-1: #071021;
+      --bg-2: #071827;
+      --card: rgba(255,255,255,0.03);
+      --accent: #06d6d6;
+      --muted: #bfc7d3;
+      --glass: rgba(255,255,255,0.03);
+      --shadow: 0 10px 30px rgba(2,6,23,0.6);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body {height:100%; margin:0; background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%); color:#e6eef6}
+    .page {
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:36px 20px;
+      box-sizing:border-box;
+    }
+    .panel {
+      width:100%;
+      max-width:1100px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:28px;
+      box-shadow:var(--shadow);
+      border: 1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px);
+    }
+    header.top {
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .logo {
+      width:64px; height:64px; border-radius:10px; overflow:hidden; flex-shrink:0;
+      box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+    }
+    .logo img { width:100%; height:100%; object-fit:cover; display:block; }
+    h1 { margin:0; font-size:28px; letter-spacing:-0.02em }
+    p.lead { margin:8px 0 0; color:var(--muted); font-size:15px }
+
+    .grid {
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:22px;
+      margin-top:20px;
+    }
+
+    /* left cards */
+    .role-cards { display:grid; gap:14px }
+    .card {
+      background: var(--card);
+      border-radius:12px;
+      padding:18px;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .card h3 { margin:0; font-size:18px }
+    .card p { margin:8px 0 0; color:var(--muted); font-size:14px }
+    .cta {
+      display:inline-block;
+      margin-top:12px;
+      background:var(--accent);
+      color:#012428;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    /* right: login box */
+    .login {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:18px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .form-row { margin-bottom:12px }
+    label { display:block; color:var(--muted); font-size:13px; margin-bottom:6px }
+    input[type="text"], input[type="email"] {
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.01);
+      color: #e9f3fb;
+      box-sizing:border-box;
+      outline:none;
+    }
+    .row { display:flex; gap:10px }
+    .muted { color:var(--muted); font-size:13px }
+    .small { font-size:13px }
+
+    .actions { display:flex; gap:10px; align-items:center; margin-top:8px }
+    .btn { background:var(--accent); color:#012428; padding:10px 12px; border-radius:8px; font-weight:700; border:0; cursor:pointer }
+    .btn-ghost { background:transparent; color:var(--muted); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.02); cursor:pointer }
+
+    .footer-note { margin-top:14px; color:var(--muted); font-size:13px }
+
+    /* small / responsive */
+    @media (max-width:980px){
+      .grid { grid-template-columns: 1fr; }
+      .login { order:-1; margin-bottom:8px }
+      header.top { gap:12px }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Thaiba Media — Choose your view</h1>
-    <p class="muted">Open the portal appropriate to your role. Admin has full access. Team members see their tasks by default. Institutions use the request portal.</p>
+  <div class="page">
+    <main class="panel" role="main" aria-labelledby="welcomeTitle">
+      <header class="top">
+        <div class="logo" aria-hidden="true">
+          <!-- replace the src with your Thaiba Garden group logo -->
+          <img src="/static/favicon.ico" alt="Thaiba logo">
+        </div>
+        <div>
+          <h1 id="welcomeTitle">Thaiba Media — Choose your view</h1>
+          <p class="lead">Open the portal appropriate to your role. Admin has full access. Team members get a compact personal view. Institutions can submit requests without signing in.</p>
+        </div>
+      </header>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Admin</h3>
-        <div class="muted">Full access: tasks, users, templates, exports, reports.</div>
-        <a class="btn" href="/admin.html">Open Admin</a>
+      <div class="grid" role="region" aria-label="landing options">
+        <section class="role-cards" aria-labelledby="rolesTitle">
+          <div class="card" id="adminCard">
+            <h3>Admin</h3>
+            <p>Full access: tasks, users, templates, exports, monthly reports, and master data.</p>
+            <a class="cta" id="openAdminBtn" href="/admin.html" role="button">Open Admin</a>
+          </div>
+
+          <div class="card" id="teamCard">
+            <h3>Team Member</h3>
+            <p>Focused view: my tasks, quick status changes, upload deliverables, and personal reporting.</p>
+            <a class="cta" id="openTeamBtn" href="/team.html" role="button">Open Team View</a>
+          </div>
+
+          <div class="card" id="instCard">
+            <h3>Institution / Requester</h3>
+            <p>Create a new task quickly — no login required. Requesters get a confirmation and tracking ID.</p>
+            <a class="cta" id="openReqBtn" href="/create-task.html" role="button">Open Request Form</a>
+          </div>
+
+          <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong>Deployment note</strong>
+              <div class="muted small">If deployed to Vercel, set your <code>TASKS_BACKEND</code> env var to your API endpoint.</div>
+            </div>
+            <div class="muted small">v1.0</div>
+          </div>
+        </section>
+
+        <aside class="login" aria-labelledby="loginTitle">
+          <h3 id="loginTitle">Quick sign-in / identify</h3>
+          <p class="muted small">Enter your name & email once. We'll remember it locally. Admin and Team emails will be detected and redirected accordingly.</p>
+
+          <div id="signedAs" class="muted small" style="display:none; margin-bottom:12px"></div>
+
+          <form id="whoForm" autocomplete="off">
+            <div class="form-row">
+              <label for="fullName">Full name</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Your name" required>
+            </div>
+            <div class="form-row">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@organization.com" required>
+            </div>
+
+            <div class="actions">
+              <button id="continueBtn" class="btn" type="submit">Continue</button>
+              <button id="signoutBtn" class="btn-ghost" type="button" style="display:none">Sign out</button>
+            </div>
+
+            <div class="footer-note">After sign in you'll be taken to the appropriate dashboard. You can change your role later from settings.</div>
+          </form>
+        </aside>
       </div>
-
-      <div class="card">
-        <h3>Team Member</h3>
-        <div class="muted">Focused view: my tasks, quick status changes, upload deliverables.</div>
-        <a class="btn" href="/team.html">Open Team View</a>
-      </div>
-
-      <div class="card">
-        <h3>Institution / Requester</h3>
-        <div class="muted">Create new task quickly — no login required. Get a confirmation.</div>
-        <a class="btn" href="/create-task.html">Open Request Form</a>
-      </div>
-    </div>
-
-    <footer>If you are deploying to Vercel make sure your `TASKS_BACKEND` env var points to your existing /api/tasks endpoint.</footer>
+    </main>
   </div>
+
+  <script>
+    /*************************************************************************
+     * Landing page client logic
+     *
+     * Two modes for role lists:
+     *  1) Server-provided: GET /api/roles -> { admin: [...], team: [...] }
+     *  2) Hard-coded fallbacks below (edit to match your team emails)
+     *
+     * If both exist the server response takes precedence.
+     *************************************************************************/
+
+    // --- Edit these values if you prefer client-side lists (NOT secure) ---
+    const ADMIN_EMAILS = [
+      // example: 'admin@thaibagarden.com'
+      'media@thaibagarden.com'
+    ];
+    const TEAM_EMAILS = [
+      // example: 'john.doe@thaibagarden.com'
+      'anwar@example.com',
+      'sabith@example.com',
+      'sid@example.com',
+      'shukoor@example.com'
+    ];
+
+    // prefer to fetch server lists (if you implement /api/roles)
+    async function getRoleLists() {
+      try {
+        const resp = await fetch('/api/roles', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('no roles endpoint');
+        const json = await resp.json();
+        return {
+          admin: Array.isArray(json.admin) ? json.admin.map(s => s.toLowerCase()) : ADMIN_EMAILS.map(s => s.toLowerCase()),
+          team: Array.isArray(json.team) ? json.team.map(s => s.toLowerCase()) : TEAM_EMAILS.map(s => s.toLowerCase())
+        };
+      } catch (err) {
+        // fallback to client arrays
+        return {
+          admin: ADMIN_EMAILS.map(s => s.toLowerCase()),
+          team: TEAM_EMAILS.map(s => s.toLowerCase())
+        };
+      }
+    }
+
+    // helpers
+    function byId(id){ return document.getElementById(id); }
+
+    function saveLocalUser(user){
+      try { localStorage.setItem('thaiba_user', JSON.stringify(user)); }
+      catch(e){ console.warn('localStorage write failed', e); }
+    }
+    function loadLocalUser(){
+      try { return JSON.parse(localStorage.getItem('thaiba_user')||'null'); }
+      catch(e){ return null; }
+    }
+    function clearLocalUser(){ localStorage.removeItem('thaiba_user'); }
+
+    // redirect helper (with small delay for UX)
+    function goToRolePage(role){
+      if(role === 'admin') window.location.href = '/admin.html';
+      else if(role === 'team') window.location.href = '/team.html';
+      else window.location.href = '/create-task.html';
+    }
+
+    // initial wiring
+    (function init(){
+      const form = byId('whoForm');
+      const nameInput = byId('fullName');
+      const emailInput = byId('email');
+      const signedAs = byId('signedAs');
+      const signoutBtn = byId('signoutBtn');
+      const continueBtn = byId('continueBtn');
+
+      // populate if stored
+      const stored = loadLocalUser();
+      if(stored && stored.email){
+        signedAs.style.display = 'block';
+        signedAs.innerHTML = `Signed in as <strong>${escapeHtml(stored.name||stored.email)}</strong>`;
+        nameInput.value = stored.name || '';
+        emailInput.value = stored.email || '';
+        form.querySelectorAll('input, button').forEach(n => n.disabled = false);
+        signoutBtn.style.display = 'inline-block';
+      }
+
+      // signout
+      signoutBtn.addEventListener('click', () => {
+        clearLocalUser();
+        signedAs.style.display = 'none';
+        nameInput.value = '';
+        emailInput.value = '';
+        signoutBtn.style.display = 'none';
+      });
+
+      // submit: determine role & redirect
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        continueBtn.disabled = true;
+        continueBtn.textContent = 'Checking…';
+        const name = (nameInput.value || '').trim();
+        const email = (emailInput.value || '').trim().toLowerCase();
+
+        if(!email) {
+          alert('Please enter your email.');
+          continueBtn.disabled = false;
+          continueBtn.textContent = 'Continue';
+          return;
+        }
+
+        // save locally
+        const user = { name, email, seenAt: new Date().toISOString() };
+        saveLocalUser(user);
+
+        // fetch roles (or fallback)
+        const lists = await getRoleLists();
+
+        // determine role precedence: admin > team > requester
+        const isAdmin = lists.admin.includes(email);
+        const isTeam = lists.team.includes(email);
+
+        // small delay then redirect
+        setTimeout(() => {
+          if(isAdmin) goToRolePage('admin');
+          else if(isTeam) goToRolePage('team');
+          else goToRolePage('requester');
+        }, 300);
+      });
+
+      // quick navigation shortcuts (top cards)
+      byId('openAdminBtn').addEventListener('click', (e) => {
+        // if user isn't admin, still let them go but show warning inside admin page if needed
+        // this keeps the welcome page a simple gateway, not a hard firewall.
+      });
+
+      // basic HTML-escape
+      function escapeHtml(t){ if(!t) return ''; return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    })();
+  </script>
 </body>
 </html>
