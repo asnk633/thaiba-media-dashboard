@@ -6,7 +6,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "vercel dev",
-    "build": "vercel build",
     "start": "node server.js"
   },
   "author": "Thaiba Media",
