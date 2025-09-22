@@ -5,3 +5,4 @@ node_modules
 sa.json
 .vercel
 .next
+.env.local
