@@ -1,23 +1,44 @@
-// components/ui/label.tsx
-import React from 'react';
+import * as React from "react"
+import { cn } from "../../lib/utils"
+import { cva, type VariantProps } from "class-variance-authority"
 
-/**
- * Label component that forwards all native <label> props (including htmlFor)
- * Uses the built-in React type so any other label attributes are accepted.
- */
-export type LabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
-  className?: string;
-};
+const labelVariants = cva("font-medium", {
+  variants: {
+    size: {
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
+    },
+    intent: {
+      normal: "text-gray-700",
+      error: "text-red-600",
+      muted: "text-gray-500",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+    intent: "normal",
+  },
+})
 
-export function Label({ children, className = '', ...rest }: LabelProps) {
+export type LabelVariantProps = VariantProps<typeof labelVariants>
+
+export interface LabelProps
+  extends React.LabelHTMLAttributes<HTMLLabelElement>,
+    LabelVariantProps {}
+
+export function Label({
+  children,
+  className,
+  size,
+  intent,
+  ...props
+}: LabelProps) {
   return (
-    <label
-      {...rest}
-      className={`block text-sm font-medium text-gray-700 mb-1 ${className}`}
-    >
+    <label className={cn(labelVariants({ size, intent }), className)} {...props}>
       {children}
     </label>
-  );
+  )
 }
 
-export default Label;
+export default Label

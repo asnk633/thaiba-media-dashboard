@@ -5,3 +5,7 @@ node_modules
 sa.json
 .vercel
 .next
+.env.local
+service-account.json
+sa.base64
+.env.local

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { Sidebar } from "@/components/layout/sidebar"
 import { KanbanBoard } from "@/components/kanban/kanban-board"

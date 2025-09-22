@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { Sidebar } from "@/components/layout/sidebar"
 import { InstitutionsTable } from "@/components/admin/institutions-table"
