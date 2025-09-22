@@ -4,12 +4,10 @@ import { JWT } from "google-auth-library";
 // Helper function to safely parse JSON from environment variable (supports raw or base64)
 function parseServiceAccountKey() {
   try {
-    // Allow either raw JSON string or base64-encoded JSON to be used
     let serviceAccountKeyRaw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
     const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64;
 
     if (!serviceAccountKeyRaw && b64) {
-      // decode base64
       serviceAccountKeyRaw = Buffer.from(b64, "base64").toString("utf8");
       console.log("🔐 Decoded GOOGLE_SERVICE_ACCOUNT_KEY_B64 into JSON");
     }
@@ -19,7 +17,6 @@ function parseServiceAccountKey() {
     }
 
     console.log("🔐 Parsing service account key...");
-    // Parse the JSON
     const keyData = JSON.parse(serviceAccountKeyRaw);
 
     const requiredFields = ["type", "project_id", "private_key", "client_email"];
@@ -29,7 +26,6 @@ function parseServiceAccountKey() {
       }
     }
 
-    // Fix newlines in private key if they were escaped
     if (keyData.private_key) {
       keyData.private_key = keyData.private_key.replace(/\\n/g, "\n");
       console.log("🔐 Private key format corrected");
@@ -52,12 +48,12 @@ function parseServiceAccountKey() {
   }
 }
 
-// Create and configure Google Spreadsheet client
 export async function getGoogleSpreadsheetClient(spreadsheetId) {
   try {
     console.log("🔐 Initializing Google Spreadsheet client...");
     const serviceAccountKey = parseServiceAccountKey();
 
+    // Create a JWT auth client (google-auth-library)
     const serviceAccountAuth = new JWT({
       email: serviceAccountKey.client_email,
       key: serviceAccountKey.private_key,
@@ -67,12 +63,8 @@ export async function getGoogleSpreadsheetClient(spreadsheetId) {
     console.log("🔐 JWT authentication configured");
     console.log("🔐 Connecting to spreadsheet:", spreadsheetId);
 
-    // Create Google Spreadsheet instance (google-spreadsheet accepts auth client differently in v3, but passing JWT works)
-    const doc = new GoogleSpreadsheet(spreadsheetId);
-    await doc.useServiceAccountAuth({
-      client_email: serviceAccountKey.client_email,
-      private_key: serviceAccountKey.private_key,
-    });
+    // Pass the auth client into the GoogleSpreadsheet constructor
+    const doc = new GoogleSpreadsheet(spreadsheetId, serviceAccountAuth);
 
     console.log("📊 Loading spreadsheet info...");
     await doc.loadInfo();
