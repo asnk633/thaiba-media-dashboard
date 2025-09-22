@@ -1,14 +1,6 @@
-// lib/utils.ts
-export function cn(...args: Array<string | false | null | undefined>) {
-  return args.filter(Boolean).join(" ");
-}
+import { clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-export function formatDateISO(iso?: string) {
-  if (!iso) return "";
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString();
-  } catch {
-    return iso;
-  }
+export function cn(...inputs: any[]) {
+  return twMerge(clsx(inputs))
 }
