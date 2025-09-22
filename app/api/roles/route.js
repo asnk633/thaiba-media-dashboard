@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+// Helper: find a row by email using google-spreadsheet rows with headers
+function normalizeStr(s) {
+  return (s || "").toString().trim().toLowerCase();
+}
+
 export async function GET(request) {
   try {
     console.log("[v0] Roles API called");
@@ -14,28 +19,53 @@ export async function GET(request) {
 
     console.log("[v0] Fetching role for email:", userEmail);
 
-    const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+    const spreadsheetId = process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SPREADSHEET_ID;
     if (!spreadsheetId) {
-      console.error("[v0] Missing GOOGLE_SHEETS_ID env var");
+      console.error("[v0] Missing GOOGLE_SHEETS_ID/GOOGLE_SPREADSHEET_ID env var");
       return NextResponse.json({ error: "Server misconfigured: missing spreadsheet id" }, { status: 500 });
     }
 
-    // Lazy import google auth util
-    const { getGoogleSheetsClient } = await import("../../../utils/googleAuth.js");
-    const sheets = await getGoogleSheetsClient();
+    // Import helper that returns a GoogleSpreadsheet doc
+    const { getGoogleSpreadsheetClient } = await import("../../../utils/googleAuth.js");
+    if (typeof getGoogleSpreadsheetClient !== "function") {
+      console.error("[v0] getGoogleSpreadsheetClient is not exported from utils/googleAuth.js");
+      return NextResponse.json({ error: "Server misconfigured: google auth util missing" }, { status: 500 });
+    }
 
-    const range = "Team!A:C"; // Adjust range if needed
-    console.log("[v0] Reading from spreadsheet:", spreadsheetId);
+    const doc = await getGoogleSpreadsheetClient(spreadsheetId);
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range,
-    });
+    // Choose sheet by title "Team" (adjust to your actual sheet title)
+    const sheetTitle = "Team";
+    const sheet = doc.sheetsByTitle?.[sheetTitle] ?? doc.sheetsByIndex?.[0];
 
-    const rows = response.data.values || [];
+    if (!sheet) {
+      console.error("[v0] Sheet not found:", sheetTitle);
+      return NextResponse.json({ error: `Sheet '${sheetTitle}' not found` }, { status: 500 });
+    }
+
+    // Ensure header row is loaded (so row property names like 'Email' work)
+    try {
+      await sheet.loadHeaderRow();
+    } catch (e) {
+      console.warn("[v0] loadHeaderRow failed or not needed:", e?.message || e);
+    }
+
+    // Get all rows (google-spreadsheet API)
+    const rows = await sheet.getRows();
     console.log("[v0] Retrieved rows:", rows.length);
 
-    const userRow = rows.find((row) => row[1] && row[1].toLowerCase() === userEmail.toLowerCase());
+    // Find row by email -- prefer header name 'Email' if present, otherwise fallback to indexing
+    let userRow = rows.find((r) => {
+      // Try header-based field first
+      if (r.Email !== undefined) {
+        return normalizeStr(r.Email) === normalizeStr(userEmail);
+      }
+      // Fallback to raw data if headers aren't present (row._rawData is array of cells)
+      if (Array.isArray(r._rawData)) {
+        return normalizeStr(r._rawData[1]) === normalizeStr(userEmail);
+      }
+      return false;
+    });
 
     if (!userRow) {
       console.log("[v0] User not found in team sheet");
@@ -45,13 +75,14 @@ export async function GET(request) {
       }, { status: 200 });
     }
 
-    const role = (userRow[2] || "member").toLowerCase();
+    // extract role/name/email robustly
+    const role = (userRow.Role ?? userRow.role ?? userRow._rawData?.[2] ?? "member").toString().toLowerCase();
+    const name = userRow.Name ?? userRow.name ?? userRow._rawData?.[0] ?? "";
+    const email = userRow.Email ?? userRow.email ?? userRow._rawData?.[1] ?? "";
 
-    return NextResponse.json({
-      role,
-      name: userRow[0] || "",
-      email: userRow[1] || "",
-    }, { status: 200 });
+    console.log("[v0] Found role for user:", role);
+
+    return NextResponse.json({ role, name, email }, { status: 200 });
   } catch (error) {
     console.error("[v0] Roles API error:", error);
     return NextResponse.json(
