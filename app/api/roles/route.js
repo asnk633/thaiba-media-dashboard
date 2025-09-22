@@ -1,10 +1,3 @@
-import { NextResponse } from "next/server";
-
-// Helper: find a row by email using google-spreadsheet rows with headers
-function normalizeStr(s) {
-  return (s || "").toString().trim().toLowerCase();
-}
-
 export async function GET(request) {
   try {
     console.log("[v0] Roles API called");
@@ -14,80 +7,121 @@ export async function GET(request) {
 
     if (!userEmail) {
       console.log("[v0] No email provided");
-      return NextResponse.json({ error: "Email parameter required" }, { status: 400 });
+      return Response.json({ error: "Email parameter required" }, { status: 400 });
     }
 
     console.log("[v0] Fetching role for email:", userEmail);
 
-    const spreadsheetId = process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SPREADSHEET_ID;
-    if (!spreadsheetId) {
-      console.error("[v0] Missing GOOGLE_SHEETS_ID/GOOGLE_SPREADSHEET_ID env var");
-      return NextResponse.json({ error: "Server misconfigured: missing spreadsheet id" }, { status: 500 });
-    }
-
-    // Import helper that returns a GoogleSpreadsheet doc
     const { getGoogleSpreadsheetClient } = await import("../../../utils/googleAuth.js");
-    if (typeof getGoogleSpreadsheetClient !== "function") {
-      console.error("[v0] getGoogleSpreadsheetClient is not exported from utils/googleAuth.js");
-      return NextResponse.json({ error: "Server misconfigured: google auth util missing" }, { status: 500 });
-    }
+    const doc = await getGoogleSpreadsheetClient(process.env.GOOGLE_SHEETS_ID);
 
-    const doc = await getGoogleSpreadsheetClient(spreadsheetId);
+    console.log("[v0] Spreadsheet title:", doc.title);
 
-    // Choose sheet by title "Team" (adjust to your actual sheet title)
-    const sheetTitle = "Team";
-    const sheet = doc.sheetsByTitle?.[sheetTitle] ?? doc.sheetsByIndex?.[0];
+    // helper to search a sheet (headered or simple list)
+    const findInSheetByEmail = async (sheetTitle, email) => {
+      try {
+        const sheet = doc.sheetsByTitle[sheetTitle];
+        if (!sheet) {
+          console.log(`[v0] Sheet not found: ${sheetTitle}`);
+          return null;
+        }
+        console.log(`[v0] Searching sheet "${sheetTitle}" (rows: ${sheet.rowCount})`);
+        const rows = await sheet.getRows();
+        const eLower = email.toLowerCase();
 
-    if (!sheet) {
-      console.error("[v0] Sheet not found:", sheetTitle);
-      return NextResponse.json({ error: `Sheet '${sheetTitle}' not found` }, { status: 500 });
-    }
+        for (const row of rows) {
+          const raw = row._rawData || [];
 
-    // Ensure header row is loaded (so row property names like 'Email' work)
-    try {
-      await sheet.loadHeaderRow();
-    } catch (e) {
-      console.warn("[v0] loadHeaderRow failed or not needed:", e?.message || e);
-    }
+          // header-based: find a column whose header name includes 'email'
+          for (const key of Object.keys(row)) {
+            if (key && typeof key === "string" && key.toLowerCase().includes("email")) {
+              const val = (row[key] || "").toString().trim().toLowerCase();
+              if (val === eLower) {
+                const name = (row.Name || row.name || raw[0] || "").toString().trim();
+                const role = (row.Role || row.role || raw[2] || "").toString().trim();
+                return { name, email: val, role: role || "member" };
+              }
+            }
+          }
 
-    // Get all rows (google-spreadsheet API)
-    const rows = await sheet.getRows();
-    console.log("[v0] Retrieved rows:", rows.length);
+          // fallback: check raw cells for direct email match (common for single-column lists)
+          for (const cell of raw) {
+            if (!cell) continue;
+            const cellStr = cell.toString().trim().toLowerCase();
+            if (cellStr === eLower) {
+              return { name: "", email: cellStr, role: "member" };
+            }
+          }
+        }
 
-    // Find row by email -- prefer header name 'Email' if present, otherwise fallback to indexing
-    let userRow = rows.find((r) => {
-      // Try header-based field first
-      if (r.Email !== undefined) {
-        return normalizeStr(r.Email) === normalizeStr(userEmail);
+        return null;
+      } catch (err) {
+        console.error(`[v0] Error searching sheet ${sheetTitle}:`, err);
+        return null;
       }
-      // Fallback to raw data if headers aren't present (row._rawData is array of cells)
-      if (Array.isArray(r._rawData)) {
-        return normalizeStr(r._rawData[1]) === normalizeStr(userEmail);
+    };
+
+    // 1) Try Team (structured)
+    let userRow = await findInSheetByEmail("Team", userEmail);
+
+    // 2) Then TeamEmails (email-only list)
+    if (!userRow) {
+      userRow = await findInSheetByEmail("TeamEmails", userEmail);
+    }
+
+    // 3) Then users (fallback)
+    if (!userRow) {
+      userRow = await findInSheetByEmail("users", userEmail);
+    }
+
+    // If we found an email in TeamEmails but name missing, enrich from Team/users
+    if (userRow && !userRow.name) {
+      try {
+        const fallback = doc.sheetsByTitle["Team"] || doc.sheetsByTitle["users"];
+        if (fallback) {
+          const fallbackRows = await fallback.getRows();
+          const eLower = userRow.email.toLowerCase();
+          const found = fallbackRows.find(r => {
+            const raw = (r._rawData || []).map(c => (c || "").toString().toLowerCase());
+            if (raw.includes(eLower)) return true;
+            // also check headered fields
+            for (const val of Object.values(r)) {
+              if ((val || "").toString().toLowerCase() === eLower) return true;
+            }
+            return false;
+          });
+          if (found) {
+            userRow.name = userRow.name || (found.Name || found.name || found._rawData[0] || "").toString().trim();
+            userRow.role = userRow.role || (found.Role || found.role || found._rawData[2] || "member").toString().trim();
+            console.log("[v0] Enriched userRow from fallback sheet:", userRow.name, userRow.role);
+          }
+        }
+      } catch (err) {
+        console.error("[v0] fallback enrichment failed:", err);
       }
-      return false;
-    });
+    }
 
     if (!userRow) {
-      console.log("[v0] User not found in team sheet");
-      return NextResponse.json({
+      console.log("[v0] User not found in any inspected sheet");
+      return Response.json({
         role: "guest",
         message: "User not found in team sheet",
-      }, { status: 200 });
+      });
     }
 
-    // extract role/name/email robustly
-    const role = (userRow.Role ?? userRow.role ?? userRow._rawData?.[2] ?? "member").toString().toLowerCase();
-    const name = userRow.Name ?? userRow.name ?? userRow._rawData?.[0] ?? "";
-    const email = userRow.Email ?? userRow.email ?? userRow._rawData?.[1] ?? "";
-
-    console.log("[v0] Found role for user:", role);
-
-    return NextResponse.json({ role, name, email }, { status: 200 });
+    return Response.json({
+      role: (userRow.role || "member").toLowerCase(),
+      name: userRow.name || "",
+      email: userRow.email || userEmail,
+    });
   } catch (error) {
     console.error("[v0] Roles API error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch user role", details: error?.message || String(error) },
-      { status: 500 }
+    return Response.json(
+      {
+        error: "Failed to fetch user role",
+        details: error.message || String(error),
+      },
+      { status: 500 },
     );
   }
 }
