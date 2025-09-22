@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     console.log("[v0] Tasks API called");
