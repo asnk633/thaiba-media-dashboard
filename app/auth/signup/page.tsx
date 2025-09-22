@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { AuthForm } from "@/components/auth/auth-form"
 import Link from "next/link"
 
