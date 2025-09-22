@@ -1,112 +1,85 @@
 export async function GET(request) {
   try {
     console.log("[v0] Roles API called");
-
     const { searchParams } = new URL(request.url);
-    const userEmail = searchParams.get("email");
-
+    const userEmail = (searchParams.get("email") || "").trim();
     if (!userEmail) {
       console.log("[v0] No email provided");
       return Response.json({ error: "Email parameter required" }, { status: 400 });
     }
-
     console.log("[v0] Fetching role for email:", userEmail);
 
     const { getGoogleSpreadsheetClient } = await import("../../../utils/googleAuth.js");
     const doc = await getGoogleSpreadsheetClient(process.env.GOOGLE_SHEETS_ID);
-
     console.log("[v0] Spreadsheet title:", doc.title);
 
-    // helper to search a sheet (headered or simple list)
-    const findInSheetByEmail = async (sheetTitle, email) => {
+    const eLower = userEmail.toLowerCase();
+
+    // Search a specific sheet for an exact email match and return a normalized row object
+    const findInSheet = async (sheet) => {
       try {
-        const sheet = doc.sheetsByTitle[sheetTitle];
-        if (!sheet) {
-          console.log(`[v0] Sheet not found: ${sheetTitle}`);
-          return null;
-        }
-        console.log(`[v0] Searching sheet "${sheetTitle}" (rows: ${sheet.rowCount})`);
+        if (!sheet) return null;
         const rows = await sheet.getRows();
-        const eLower = email.toLowerCase();
-
         for (const row of rows) {
-          const raw = row._rawData || [];
-
-          // header-based: find a column whose header name includes 'email'
+          // header-based check: any header containing 'email'
           for (const key of Object.keys(row)) {
             if (key && typeof key === "string" && key.toLowerCase().includes("email")) {
               const val = (row[key] || "").toString().trim().toLowerCase();
               if (val === eLower) {
-                const name = (row.Name || row.name || raw[0] || "").toString().trim();
-                const role = (row.Role || row.role || raw[2] || "").toString().trim();
+                // try to locate name and role fields by common header names
+                const name = (row.Name || row.name || row.FullName || row.fullname || row["display name"] || row["display_name"] || row._rawData?.[0] || "").toString().trim();
+                const role = (row.Role || row.role || row.Access || row.access || row._rawData?.[2] || "").toString().trim();
                 return { name, email: val, role: role || "member" };
               }
             }
           }
-
-          // fallback: check raw cells for direct email match (common for single-column lists)
-          for (const cell of raw) {
-            if (!cell) continue;
-            const cellStr = cell.toString().trim().toLowerCase();
-            if (cellStr === eLower) {
-              return { name: "", email: cellStr, role: "member" };
+          // raw-data fallback: check each cell for direct email match
+          const raw = row._rawData || [];
+          for (let i = 0; i < raw.length; i++) {
+            const cell = (raw[i] || "").toString().trim().toLowerCase();
+            if (cell === eLower) {
+              // name guess: prefer a neighboring cell (left or right), else first cell
+              const nameGuess = (raw[i-1] || raw[0] || "").toString().trim();
+              return { name: nameGuess, email: cell, role: "member" };
             }
           }
         }
-
         return null;
       } catch (err) {
-        console.error(`[v0] Error searching sheet ${sheetTitle}:`, err);
+        console.error("[v0] findInSheet error", err);
         return null;
       }
     };
 
-    // 1) Try Team (structured)
-    let userRow = await findInSheetByEmail("Team", userEmail);
-
-    // 2) Then TeamEmails (email-only list)
-    if (!userRow) {
-      userRow = await findInSheetByEmail("TeamEmails", userEmail);
-    }
-
-    // 3) Then users (fallback)
-    if (!userRow) {
-      userRow = await findInSheetByEmail("users", userEmail);
-    }
-
-    // If we found an email in TeamEmails but name missing, enrich from Team/users
-    if (userRow && !userRow.name) {
-      try {
-        const fallback = doc.sheetsByTitle["Team"] || doc.sheetsByTitle["users"];
-        if (fallback) {
-          const fallbackRows = await fallback.getRows();
-          const eLower = userRow.email.toLowerCase();
-          const found = fallbackRows.find(r => {
-            const raw = (r._rawData || []).map(c => (c || "").toString().toLowerCase());
-            if (raw.includes(eLower)) return true;
-            // also check headered fields
-            for (const val of Object.values(r)) {
-              if ((val || "").toString().toLowerCase() === eLower) return true;
-            }
-            return false;
-          });
-          if (found) {
-            userRow.name = userRow.name || (found.Name || found.name || found._rawData[0] || "").toString().trim();
-            userRow.role = userRow.role || (found.Role || found.role || found._rawData[2] || "member").toString().trim();
-            console.log("[v0] Enriched userRow from fallback sheet:", userRow.name, userRow.role);
-          }
+    // 1) Try Team and users
+    let userRow = null;
+    const trySheets = ["Team", "users", "TeamEmails"];
+    for (const t of trySheets) {
+      const s = doc.sheetsByTitle[t];
+      if (s) {
+        userRow = await findInSheet(s);
+        if (userRow) {
+          console.log("[v0] Found in sheet:", t);
+          break;
         }
-      } catch (err) {
-        console.error("[v0] fallback enrichment failed:", err);
+      }
+    }
+
+    // 2) If not found, search all sheets (last resort)
+    if (!userRow) {
+      console.log("[v0] Searching all sheets as fallback");
+      for (const s of doc.sheetsByIndex) {
+        userRow = await findInSheet(s);
+        if (userRow) {
+          console.log("[v0] Found in sheet (fallback):", s.title);
+          break;
+        }
       }
     }
 
     if (!userRow) {
-      console.log("[v0] User not found in any inspected sheet");
-      return Response.json({
-        role: "guest",
-        message: "User not found in team sheet",
-      });
+      console.log("[v0] User not found in any sheet");
+      return Response.json({ role: "guest", message: "User not found in team sheet" });
     }
 
     return Response.json({
@@ -117,10 +90,7 @@ export async function GET(request) {
   } catch (error) {
     console.error("[v0] Roles API error:", error);
     return Response.json(
-      {
-        error: "Failed to fetch user role",
-        details: error.message || String(error),
-      },
+      { error: "Failed to fetch user role", details: error.message || String(error) },
       { status: 500 },
     );
   }
