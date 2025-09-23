@@ -13,3 +13,4 @@ sa.base64
 service-account.json
 sa.base64
 .env.local
+.vercel-bypass
