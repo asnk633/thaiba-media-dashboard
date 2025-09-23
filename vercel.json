@@ -1,4 +1,7 @@
 {
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
   "redirects": [
     { "source": "/", "destination": "/welcome.html", "permanent": false }
   ]
