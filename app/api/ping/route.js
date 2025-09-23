@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  return Response.json({ ok: true, app: "thaiba-media-dashboard", ts: Date.now() });
+  return Response.json({ ok: true, time: new Date().toISOString() });
 }
