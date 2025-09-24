@@ -1,22 +1,16 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  console.log("[/api/debug/sheets] handler invoked", {
-    time: new Date().toISOString()
+export async function GET(req) {
+  const incomingNonce = req.headers?.get('x-debug-nonce') || 'no-nonce';
+  console.log('[/api/debug/sheets] handler invoked', {
+    time: new Date().toISOString(),
+    nonce: incomingNonce,
   });
-  try {
-    return Response.json({
-      ok: true,
-      route: "/api/debug/sheets",
-      deployedAt: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.error("[/api/debug/sheets] error", err && (err.stack || err.message || String(err)));
-    return Response.json({ ok: false, error: String(err) }, { status: 500 });
-  } finally {
-    console.log("[/api/debug/sheets] handler end", {
-      time: new Date().toISOString()
-    });
-  }
+
+  return new Response(JSON.stringify({
+    ok: true,
+    route: '/api/debug/sheets',
+    deployedAt: new Date().toISOString()
+  }), { headers: { 'Content-Type': 'application/json' }});
 }
