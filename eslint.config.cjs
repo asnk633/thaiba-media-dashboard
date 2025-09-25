@@ -1,29 +1,58 @@
+/**
+ * eslint.config.cjs — flat configuration for ESLint (Next + TypeScript + React)
+ * - global: warn for console but allow warn/error/info
+ * - overrides: disable no-console in server api + utils
+ * - ignore unused vars/args starting with _
+ */
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+const reactPlugin = require('eslint-plugin-react');
+const hooksPlugin = require('eslint-plugin-react-hooks');
+const jsxA11yPlugin = require('eslint-plugin-jsx-a11y');
+const prettierPlugin = require('eslint-plugin-prettier');
+
 module.exports = [
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    ignores: ['.next/**', 'node_modules/**', 'dist/**'],
     languageOptions: {
-      parser: require('@typescript-eslint/parser'),
+      // parser and parserOptions belong under languageOptions.parserOptions for flat config
+      parser: tsParser,
       parserOptions: {
         ecmaVersion: 2024,
         sourceType: 'module',
-        ecmaFeatures: { jsx: true },
-      },
+        ecmaFeatures: { jsx: true }
+      }
     },
     plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
-      react: require('eslint-plugin-react'),
-      'react-hooks': require('eslint-plugin-react-hooks'),
-      prettier: require('eslint-plugin-prettier'),
+      '@typescript-eslint': tsPlugin,
+      react: reactPlugin,
+      'react-hooks': hooksPlugin,
+      'jsx-a11y': jsxA11yPlugin,
+      prettier: prettierPlugin
     },
+    settings: { react: { version: 'detect' } },
     rules: {
-      'prettier/prettier': ['warn'],
-      'react/react-in-jsx-scope': 'off',
+      // default policy: warn, but allow common console methods
+      'no-console': ['warn', { allow: ['log','warn','error','info'] }],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
-    },
-    settings: {
-      react: { version: 'detect' },
-    },
-    ignores: ['.next/', 'node_modules/', 'dist/', 'out/'],
+      'prettier/prettier': 'warn'
+    }
   },
+
+  // Override: allow console in server/api files and in small utils
+  {
+    files: ['app/api/**/*.{js,ts,tsx}', 'utils/**/*.{js,ts}'],
+    rules: {
+      'no-console': 'off'
+    }
+  },
+
+  // compiled / generated files (if you ever lint .next)
+  {
+    files: ['.next/**/*', '.next/**'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-console': 'off'
+    }
+  }
 ];

@@ -61,8 +61,7 @@ export function TeamDashboard() {
     return { total, completed, inProgress, pending, overdue };
   };
 
-  // eslint-disable-next-line -eslint/no-unused-vars
-  // eslint-disable-next-line -eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
@@ -78,8 +77,7 @@ export function TeamDashboard() {
     }
   };
 
-  // eslint-disable-next-line -eslint/no-unused-vars
-  // eslint-disable-next-line -eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':

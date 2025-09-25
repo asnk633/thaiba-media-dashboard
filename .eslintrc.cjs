@@ -1,8 +1,9 @@
 /**
- * ESLint CommonJS config for Next.js + TypeScript + React
- *
- * - allow console in API/server and utils files
- * - treat unused vars that start with '_' as allowed
+ * Canonical .eslintrc.cjs created by helper:
+ * - includes next/core-web-vitals + prettier at end of extends
+ * - default: warn for console (allow warn,error,info)
+ * - overrides: turn off no-console for app/api & utils
+ * - ignore unused args that start with _
  */
 module.exports = {
   root: true,
@@ -21,31 +22,30 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
+    'next/core-web-vitals',
     'prettier'
   ],
-  settings: { react: { version: 'detect' } },
-
-  rules: {
-    // prefer the TS rule for unused vars; allow leading underscores
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['warn', { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
-    // warn on console by default
-    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+  settings: {
+    react: { version: 'detect' }
   },
-
+  rules: {
+    // default policy: warn on console but allow common methods
+    'no-console': ['warn', { allow: ['log','warn','error','info'] }],
+    // ignore unused function args/vars that start with underscore
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+  },
   overrides: [
-    // server / API files: allow console (they are backend)
     {
-      files: ['app/api/**/*.{js,ts,jsx,tsx}', 'utils/**/*.{js,ts}'],
+      // allow console inside server-side API code and utils
+      files: ['app/api/**/*.{js,ts,tsx}', 'utils/**/*.{js,ts}'],
       rules: {
         'no-console': 'off'
       }
     },
-    // compiled / generated files (if you ever lint .next or .next/server)
     {
+      // compiled / generated files (if you ever lint .next)
       files: ['.next/**/*', '.next/**'],
       rules: {
-        // lax rules for generated code
         '@typescript-eslint/no-unused-vars': 'off',
         'no-console': 'off'
       }
