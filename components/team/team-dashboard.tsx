@@ -61,7 +61,7 @@ export function TeamDashboard() {
     return { total, completed, inProgress, pending, overdue };
   };
 
-  const getPriorityColor = (priority: string) => {
+  const _getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
         return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -76,7 +76,7 @@ export function TeamDashboard() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
         return 'bg-green-500/10 text-green-500 border-green-500/20';
