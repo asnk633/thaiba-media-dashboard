@@ -1,79 +1,85 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase"
-import { useAuth } from "@/hooks/use-auth"
-import type { UserProfile, Institution } from "@/types/auth"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
+import { useAuth } from '@/hooks/use-auth';
+import type { UserProfile, Institution } from '@/types/auth';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 interface CreateTaskDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onTaskCreated: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onTaskCreated: () => void;
 }
 
 export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTaskDialogProps) {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [institutions, setInstitutions] = useState<Institution[]>([])
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    priority: "medium",
-    assigned_to: "",
-    institution_id: "",
-    due_date: "",
-    notes: "",
-  })
+    title: '',
+    description: '',
+    priority: 'medium',
+    assigned_to: '',
+    institution_id: '',
+    due_date: '',
+    notes: '',
+  });
 
-  const supabase = createClient()
+  const supabase = createClient();
 
   useEffect(() => {
     if (open) {
-      fetchUsers()
-      fetchInstitutions()
+      fetchUsers();
+      fetchInstitutions();
     }
-  }, [open])
+  }, [open]);
 
   const fetchUsers = async () => {
     try {
       const { data, error } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("role", "team_member")
-        .order("full_name")
+        .from('user_profiles')
+        .select('*')
+        .eq('role', 'team_member')
+        .order('full_name');
 
-      if (error) throw error
-      setUsers(data || [])
+      if (error) throw error;
+      setUsers(data || []);
     } catch (error) {
-      console.error("Error fetching users:", error)
+      console.error('Error fetching users:', error);
     }
-  }
+  };
 
   const fetchInstitutions = async () => {
     try {
-      const { data, error } = await supabase.from("institutions").select("*").order("name")
+      const { data, error } = await supabase.from('institutions').select('*').order('name');
 
-      if (error) throw error
-      setInstitutions(data || [])
+      if (error) throw error;
+      setInstitutions(data || []);
     } catch (error) {
-      console.error("Error fetching institutions:", error)
+      console.error('Error fetching institutions:', error);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       const taskData = {
         title: formData.title,
@@ -84,30 +90,30 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
         institution_id: formData.institution_id || null,
         due_date: formData.due_date || null,
         notes: formData.notes || null,
-        status: "pending",
-      }
+        status: 'pending',
+      };
 
-      const { error } = await supabase.from("tasks").insert([taskData])
+      const { error } = await supabase.from('tasks').insert([taskData]);
 
-      if (error) throw error
+      if (error) throw error;
 
-      onTaskCreated()
-      onOpenChange(false)
+      onTaskCreated();
+      onOpenChange(false);
       setFormData({
-        title: "",
-        description: "",
-        priority: "medium",
-        assigned_to: "",
-        institution_id: "",
-        due_date: "",
-        notes: "",
-      })
+        title: '',
+        description: '',
+        priority: 'medium',
+        assigned_to: '',
+        institution_id: '',
+        due_date: '',
+        notes: '',
+      });
     } catch (error) {
-      console.error("Error creating task:", error)
+      console.error('Error creating task:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,7 +129,7 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={e => setFormData({ ...formData, title: e.target.value })}
                 required
               />
             </div>
@@ -133,7 +139,7 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
               />
             </div>
@@ -142,7 +148,7 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Label htmlFor="priority">Priority</Label>
               <Select
                 value={formData.priority}
-                onValueChange={(value) => setFormData({ ...formData, priority: value })}
+                onValueChange={value => setFormData({ ...formData, priority: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -160,13 +166,13 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Label htmlFor="assigned_to">Assign To *</Label>
               <Select
                 value={formData.assigned_to}
-                onValueChange={(value) => setFormData({ ...formData, assigned_to: value })}
+                onValueChange={value => setFormData({ ...formData, assigned_to: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select team member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {users.map((user) => (
+                  {users.map(user => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.full_name}
                     </SelectItem>
@@ -179,13 +185,13 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Label htmlFor="institution_id">Institution</Label>
               <Select
                 value={formData.institution_id}
-                onValueChange={(value) => setFormData({ ...formData, institution_id: value })}
+                onValueChange={value => setFormData({ ...formData, institution_id: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select institution (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {institutions.map((institution) => (
+                  {institutions.map(institution => (
                     <SelectItem key={institution.id} value={institution.id}>
                       {institution.name}
                     </SelectItem>
@@ -200,7 +206,7 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
                 id="due_date"
                 type="date"
                 value={formData.due_date}
-                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                onChange={e => setFormData({ ...formData, due_date: e.target.value })}
               />
             </div>
 
@@ -209,7 +215,7 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               <Textarea
                 id="notes"
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={e => setFormData({ ...formData, notes: e.target.value })}
                 rows={2}
               />
             </div>
@@ -220,11 +226,11 @@ export function CreateTaskDialog({ open, onOpenChange, onTaskCreated }: CreateTa
               Cancel
             </Button>
             <Button type="submit" disabled={loading || !formData.title || !formData.assigned_to}>
-              {loading ? "Creating..." : "Create Task"}
+              {loading ? 'Creating...' : 'Create Task'}
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

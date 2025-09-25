@@ -35,9 +35,14 @@ export async function GET(req) {
     // If parsed is null, return empty tasks rather than erroring
     const tasks = parsed?.tasks ?? [];
 
-    return new Response(JSON.stringify({ ok: true, tasks }), { headers: { 'Content-Type': 'application/json' }});
+    return new Response(JSON.stringify({ ok: true, tasks }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
     console.error('GET /api/tasks uncaught error:', err && err.stack ? err.stack : String(err));
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' }});
+    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

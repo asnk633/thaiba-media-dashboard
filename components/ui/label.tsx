@@ -1,39 +1,37 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
-const labelVariants = cva("font-medium leading-none", {
+const labelVariants = cva('font-medium leading-none', {
   variants: {
     variant: {
-      default: "",
+      default: '',
     },
     size: {
-      default: "text-sm",
-      sm: "text-xs",
-      lg: "text-base",
+      default: 'text-sm',
+      sm: 'text-xs',
+      lg: 'text-base',
     },
   },
   defaultVariants: {
-    variant: "default",
-    size: "default",
+    variant: 'default',
+    size: 'default',
   },
-})
+});
 
-export type LabelVariantProps = VariantProps<typeof labelVariants>
+export type LabelVariantProps = VariantProps<typeof labelVariants>;
 
 // Make LabelProps include all native label attributes so `htmlFor`, `onClick`, etc. are accepted.
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement>, LabelVariantProps {
-  className,
-  children,
-  variant,
-  size,
-  ...props
-}: LabelProps) {
+export interface LabelProps
+  extends React.LabelHTMLAttributes<HTMLLabelElement>,
+    LabelVariantProps {}
+
+export function Label({ className, children, variant, size, ...props }: LabelProps) {
   return (
     <label className={cn(labelVariants({ variant, size, className }))} {...props}>
       {children}
     </label>
-  )
+  );
 }
 
-export default Label
+export default Label;

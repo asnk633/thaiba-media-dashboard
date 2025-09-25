@@ -24,15 +24,17 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
       await sheetsApi.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: {
-          requests: [{
-            addSheet: {
-              properties: {
-                title,
-                gridProperties: { rowCount: 1000, columnCount: Math.max(10, headerRow.length) }
-              }
-            }
-          }]
-        }
+          requests: [
+            {
+              addSheet: {
+                properties: {
+                  title,
+                  gridProperties: { rowCount: 1000, columnCount: Math.max(10, headerRow.length) },
+                },
+              },
+            },
+          ],
+        },
       });
       console.log(`Created sheet "${title}"`);
     } else {
@@ -42,7 +44,9 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
     // If the sheet already existed but race caused error, ignore it.
     const msg = (err && (err.message || JSON.stringify(err))).toString();
     if (msg.includes('already exists')) {
-      console.log(`Warning: attempted to create sheet "${title}" but it already exists. Continuing.`);
+      console.log(
+        `Warning: attempted to create sheet "${title}" but it already exists. Continuing.`,
+      );
     } else {
       throw err;
     }
@@ -50,15 +54,19 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
 
   // Check if header exists (read A1)
   try {
-    const resp = await sheetsApi.spreadsheets.values.get({ spreadsheetId, range: `${title}!A1:Z1` });
-    const values = (resp.data && resp.data.values) ? resp.data.values[0] : [];
-    const headerPresent = values && values.length > 0 && values.some(cell => cell && cell.toString().trim() !== '');
+    const resp = await sheetsApi.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${title}!A1:Z1`,
+    });
+    const values = resp.data && resp.data.values ? resp.data.values[0] : [];
+    const headerPresent =
+      values && values.length > 0 && values.some(cell => cell && cell.toString().trim() !== '');
     if (!headerPresent) {
       await sheetsApi.spreadsheets.values.update({
         spreadsheetId,
         range: `${title}!A1`,
         valueInputOption: 'RAW',
-        requestBody: { values: [headerRow] }
+        requestBody: { values: [headerRow] },
       });
       console.log(`Wrote header to "${title}"`);
     } else {
@@ -66,25 +74,30 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
     }
   } catch (err) {
     // If we can't read (rare), attempt to write header and continue
-    console.log(`Could not read header for "${title}" — attempting to write header. Err: ${err.message || err}`);
+    console.log(
+      `Could not read header for "${title}" — attempting to write header. Err: ${err.message || err}`,
+    );
     await sheetsApi.spreadsheets.values.update({
       spreadsheetId,
       range: `${title}!A1`,
       valueInputOption: 'RAW',
-      requestBody: { values: [headerRow] }
+      requestBody: { values: [headerRow] },
     });
     console.log(`Wrote header to "${title}" after read error`);
   }
 }
 
 async function appendRows(sheetsApi, spreadsheetId, title, rows) {
-  if (!rows || rows.length === 0) { console.log(`No rows to append for ${title}`); return; }
+  if (!rows || rows.length === 0) {
+    console.log(`No rows to append for ${title}`);
+    return;
+  }
   await sheetsApi.spreadsheets.values.append({
     spreadsheetId,
     range: `${title}!A2`,
     valueInputOption: 'RAW',
     insertDataOption: 'INSERT_ROWS',
-    requestBody: { values: rows }
+    requestBody: { values: rows },
   });
   console.log(`Appended ${rows.length} rows into ${title}`);
 }
@@ -95,7 +108,9 @@ async function run() {
   const rawKey = process.env.GOOGLE_PRIVATE_KEY;
 
   if (!spreadsheetId || !clientEmail || !rawKey) {
-    console.error('Missing env: GOOGLE_SPREADSHEET_ID / GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_PRIVATE_KEY');
+    console.error(
+      'Missing env: GOOGLE_SPREADSHEET_ID / GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_PRIVATE_KEY',
+    );
     process.exit(1);
   }
 
@@ -104,7 +119,7 @@ async function run() {
   const jwtClient = new google.auth.JWT({
     email: clientEmail,
     key: privateKey,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
   console.log('Authenticating service account...');
@@ -114,25 +129,103 @@ async function run() {
   const sheetsApi = google.sheets({ version: 'v4', auth: jwtClient });
 
   // Ensure sheet+header exist (safe)
-  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'users', ['id','name','email','role','profileUrl','phone','createdAt']);
-  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'institutions', ['id','name','contactPerson','email','phone','createdAt']);
-  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'tasks', ['id','title','description','requestedBy','requestedByEmail','assignedTo','priority','status','deadline','attachments','createdAt','updatedAt']);
+  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'users', [
+    'id',
+    'name',
+    'email',
+    'role',
+    'profileUrl',
+    'phone',
+    'createdAt',
+  ]);
+  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'institutions', [
+    'id',
+    'name',
+    'contactPerson',
+    'email',
+    'phone',
+    'createdAt',
+  ]);
+  await ensureSheetAndHeader(sheetsApi, spreadsheetId, 'tasks', [
+    'id',
+    'title',
+    'description',
+    'requestedBy',
+    'requestedByEmail',
+    'assignedTo',
+    'priority',
+    'status',
+    'deadline',
+    'attachments',
+    'createdAt',
+    'updatedAt',
+  ]);
 
   // === Update these arrays to use your real emails/team (edit as needed) ===
   const usersRows = [
-    ['u_admin', 'Admin (Media)', 'media@thaibagarden.com', 'Admin', '', '', new Date().toISOString()],
-    ['u_shukoor', 'Shukoor (You)', 'asnk633@gmail.com', 'TeamMember', '', '', new Date().toISOString()],
-    ['u_member2', 'Member Two', 'member2@thaiba.org', 'TeamMember', '', '', new Date().toISOString()]
+    [
+      'u_admin',
+      'Admin (Media)',
+      'media@thaibagarden.com',
+      'Admin',
+      '',
+      '',
+      new Date().toISOString(),
+    ],
+    [
+      'u_shukoor',
+      'Shukoor (You)',
+      'asnk633@gmail.com',
+      'TeamMember',
+      '',
+      '',
+      new Date().toISOString(),
+    ],
+    [
+      'u_member2',
+      'Member Two',
+      'member2@thaiba.org',
+      'TeamMember',
+      '',
+      '',
+      new Date().toISOString(),
+    ],
   ];
 
   const instRows = [
     ['inst_1', 'Thaiba Main Campus', 'Office', 'office@thaiba.org', '', new Date().toISOString()],
-    ['inst_2', 'Thaiba Heritage', 'Coord', 'heritage@thaiba.org', '', new Date().toISOString()]
+    ['inst_2', 'Thaiba Heritage', 'Coord', 'heritage@thaiba.org', '', new Date().toISOString()],
   ];
 
   const tasksRows = [
-    ['t1', 'Welcome Video Edit', '30s edit for campus welcome video', 'Thaiba Main Campus', 'office@thaiba.org', 'asnk633@gmail.com', 'High', 'Pending', new Date(Date.now() + 3*24*3600*1000).toISOString(), '', new Date().toISOString(), new Date().toISOString()],
-    ['t2', 'Monthly Social Posts', 'Create 4 social posts for the month', 'Thaiba Main Campus', 'office@thaiba.org', 'member2@thaiba.org', 'Medium', 'Pending', new Date(Date.now() + 7*24*3600*1000).toISOString(), '', new Date().toISOString(), new Date().toISOString()]
+    [
+      't1',
+      'Welcome Video Edit',
+      '30s edit for campus welcome video',
+      'Thaiba Main Campus',
+      'office@thaiba.org',
+      'asnk633@gmail.com',
+      'High',
+      'Pending',
+      new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+      '',
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ],
+    [
+      't2',
+      'Monthly Social Posts',
+      'Create 4 social posts for the month',
+      'Thaiba Main Campus',
+      'office@thaiba.org',
+      'member2@thaiba.org',
+      'Medium',
+      'Pending',
+      new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+      '',
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ],
   ];
   // === end editable arrays ===
 

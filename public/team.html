@@ -1,245 +1,388 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Team — Thaiba Media</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{ --bg:#f7fafc; --card:#fff; --muted:#6b7280; --accent:#6366f1; --success:#10b981; --danger:#ef4444; --shadow:0 8px 24px rgba(2,6,23,0.06); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; }
-    body{margin:0;background:var(--bg);color:#071229}
-    .wrap{max-width:1100px;margin:22px auto;padding:18px}
-    header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .brand{display:flex;align-items:center;gap:12px}
-    h1{margin:0;font-size:20px}
-    .controls{display:flex;gap:8px;align-items:center}
-    .btn{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-    .btn-ghost{background:#fff;border:1px solid #e6eaf2;padding:8px;border-radius:8px;cursor:pointer}
-    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);margin-top:12px}
-    .row{display:flex;gap:10px;align-items:center}
-    .muted{color:var(--muted)}
-    .filters{display:flex;gap:8px;align-items:center}
-    .task-list{margin-top:12px;display:grid;gap:10px}
-    .task{padding:12px;border-radius:10px;background:#fff;border-left:6px solid #ddd;display:flex;justify-content:space-between;align-items:flex-start}
-    .priority-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
-    .dot-urgent{background:var(--danger)}
-    .dot-high{background:#f97316}
-    .dot-medium{background:#f59e0b}
-    .dot-low{background:var(--success)}
-    .muted-sm{color:var(--muted);font-size:13px}
-    .toggle {cursor:pointer;padding:6px 8px;border-radius:8px;border:1px solid #e8edf2;background:white}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div>
-          <h1>My Tasks</h1>
-          <div class="muted">Only tasks assigned to you will show by default</div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Team — Thaiba Media</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      :root {
+        --bg: #f7fafc;
+        --card: #fff;
+        --muted: #6b7280;
+        --accent: #6366f1;
+        --success: #10b981;
+        --danger: #ef4444;
+        --shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: #071229;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 22px auto;
+        padding: 18px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1px solid #e6eaf2;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .card {
+        background: var(--card);
+        padding: 14px;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        margin-top: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .filters {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .task-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+      .task {
+        padding: 12px;
+        border-radius: 10px;
+        background: #fff;
+        border-left: 6px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .priority-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .dot-urgent {
+        background: var(--danger);
+      }
+      .dot-high {
+        background: #f97316;
+      }
+      .dot-medium {
+        background: #f59e0b;
+      }
+      .dot-low {
+        background: var(--success);
+      }
+      .muted-sm {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .toggle {
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid #e8edf2;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <div>
+            <h1>My Tasks</h1>
+            <div class="muted">Only tasks assigned to you will show by default</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div id="userInfo" class="muted-sm">Signed in as —</div>
+          <button id="logoutBtn" class="btn-ghost">Log out</button>
+        </div>
+      </header>
+
+      <div class="card">
+        <div class="row" style="justify-content: space-between">
+          <div class="filters">
+            <label class="muted-sm">Status</label>
+            <select id="statusFilter">
+              <option value="">All</option>
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>On Hold</option>
+              <option>Completed</option>
+            </select>
+            <label class="muted-sm">Priority</label>
+            <select id="priorityFilter">
+              <option value="">All</option>
+              <option>Urgent</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+            <input id="search" placeholder="Search description or requested by" />
+          </div>
+
+          <div class="row">
+            <label class="muted-sm"
+              ><input id="seeOthers" type="checkbox" /> See other team members' tasks</label
+            >
+            <button id="refreshBtn" class="btn-ghost">Refresh</button>
+            <button id="newTaskBtn" class="btn">New Task</button>
+          </div>
+        </div>
+
+        <div id="taskList" class="task-list"></div>
+        <div id="noTasks" class="muted" style="margin-top: 12px; display: none">
+          No tasks found.
         </div>
       </div>
-
-      <div class="controls">
-        <div id="userInfo" class="muted-sm">Signed in as — </div>
-        <button id="logoutBtn" class="btn-ghost">Log out</button>
-      </div>
-    </header>
-
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <div class="filters">
-          <label class="muted-sm">Status</label>
-          <select id="statusFilter">
-            <option value="">All</option>
-            <option>Pending</option>
-            <option>In Progress</option>
-            <option>On Hold</option>
-            <option>Completed</option>
-          </select>
-          <label class="muted-sm">Priority</label>
-          <select id="priorityFilter">
-            <option value="">All</option>
-            <option>Urgent</option>
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
-          </select>
-          <input id="search" placeholder="Search description or requested by" />
-        </div>
-
-        <div class="row">
-          <label class="muted-sm"><input id="seeOthers" type="checkbox" /> See other team members' tasks</label>
-          <button id="refreshBtn" class="btn-ghost">Refresh</button>
-          <button id="newTaskBtn" class="btn">New Task</button>
-        </div>
-      </div>
-
-      <div id="taskList" class="task-list"></div>
-      <div id="noTasks" class="muted" style="margin-top:12px;display:none">No tasks found.</div>
     </div>
-  </div>
 
-  <script>
-    // Helpers
-    function $(sel){ return document.querySelector(sel); }
-    function el(t, cls){ const d=document.createElement(t); if(cls) d.className=cls; return d; }
-    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function parseRoleEntry(raw){
-      if(!raw) return '';
-      raw = String(raw).replace(/\\u003c/g,'<').replace(/\\u003e/g,'>').trim();
-      const m = raw.match(/<([^>]+)>/);
-      if(m && m[1]) return m[1].trim().toLowerCase();
-      if(raw.includes('@')) return raw.trim().toLowerCase();
-      return raw.trim().toLowerCase();
-    }
-
-    // Session helpers (compatible with welcome.html)
-    function loadSession(){ try{ return JSON.parse(localStorage.getItem('thaiba_session')||'null'); }catch(e){ return null; } }
-    function saveSession(s){ localStorage.setItem('thaiba_session', JSON.stringify(s)); }
-    function clearSession(){ localStorage.removeItem('thaiba_session'); }
-
-    // API endpoints
-    const API_TASKS = '/api/tasks';
-    const API_ROLES = '/api/roles';
-    const UPDATE_API = '/api/update-task';
-
-    // UI elements
-    const userInfo = $('#userInfo');
-    const logoutBtn = $('#logoutBtn');
-    const taskList = $('#taskList');
-    const noTasks = $('#noTasks');
-    const statusFilter = $('#statusFilter');
-    const priorityFilter = $('#priorityFilter');
-    const searchInput = $('#search');
-    const refreshBtn = $('#refreshBtn');
-    const seeOthers = $('#seeOthers');
-    const newTaskBtn = $('#newTaskBtn');
-
-    // state
-    let session = null;
-    let tasks = [];
-    let roles = { admins:[], team:[] };
-
-    // Normalize status (safe)
-    function normalizeStatus(raw){
-      if(!raw) return 'Pending';
-      const s = String(raw).trim().toLowerCase();
-      if(s==='working on' || s==='working' || s==='in progress' || s==='inprogress') return 'In Progress';
-      if(s==='cancelled' || s==='canceled') return 'On Hold';
-      if(s==='completed' || s==='done') return 'Completed';
-      if(s==='pending' || s==='new') return 'Pending';
-      return s.split(' ').map(w=>w[0]?.toUpperCase()+w.slice(1)).join(' ');
-    }
-
-    function priorityDot(p){
-      if(!p) p='Low';
-      const s = (p||'').toLowerCase();
-      if(s.includes('urgent')) return 'dot-urgent';
-      if(s.includes('high')) return 'dot-high';
-      if(s.includes('medium')) return 'dot-medium';
-      return 'dot-low';
-    }
-
-    // Ensure logged in; otherwise back to welcome page (no loop)
-    (function initSession(){
-      session = loadSession();
-      if(!session || !session.email){
-        // No session — go back to welcome (no login loop)
-        location.href = '/welcome.html';
-        return;
+    <script>
+      // Helpers
+      function $(sel) {
+        return document.querySelector(sel);
       }
-      // Show name/email
-      userInfo.innerHTML = `Signed in as <strong>${escapeHtml(session.name || session.email)}</strong> <span class="muted">(${escapeHtml(session.email)})</span>`;
-      // Attach logout
-      logoutBtn.addEventListener('click', ()=> { clearSession(); location.href = '/welcome.html'; });
-
-    })();
-
-    // Load roles (for potential UI or permission checks)
-    async function loadRoles(){
-      try{
-        const r = await fetch(API_ROLES, { cache:'no-store' });
-        const j = await r.json();
-        roles.admins = (j.admins||[]).map(parseRoleEntry);
-        roles.team = (j.team||[]).map(parseRoleEntry);
-      }catch(e){
-        console.warn('roles fetch failed', e);
+      function el(t, cls) {
+        const d = document.createElement(t);
+        if (cls) d.className = cls;
+        return d;
       }
-    }
-
-    // Load tasks from API
-    async function loadTasks(){
-      refreshBtn.disabled = true;
-      try{
-        const r = await fetch(API_TASKS, { cache:'no-store' });
-        if(!r.ok) throw new Error('API ' + r.status);
-        const j = await r.json();
-        tasks = (j.tasks || []).map(t => ({
-          id: t.id || t._id || t._sheetRow || '',
-          description: t.description || t.TaskDescription || '',
-          assignedTo: (t.assignedTo || t.AssignedTo || '').toString(),
-          priority: t.priority || t.Priority || 'Low',
-          status: normalizeStatus(t.status || t.Status || ''),
-          requestedBy: t.requestedBy || t.RequestedBy || '',
-          deadline: t.deadline || t.Deadline || ''
-        }));
-        renderTasks();
-      }catch(e){
-        console.error('load tasks', e);
-        taskList.innerHTML = '';
-        noTasks.style.display = 'block';
-        noTasks.textContent = 'Failed to load tasks: ' + (e.message || e);
-      } finally {
-        refreshBtn.disabled = false;
+      function escapeHtml(s) {
+        if (!s) return '';
+        return String(s).replace(
+          /[&<>"']/g,
+          c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+        );
       }
-    }
+      function parseRoleEntry(raw) {
+        if (!raw) return '';
+        raw = String(raw)
+          .replace(/\\u003c/g, '<')
+          .replace(/\\u003e/g, '>')
+          .trim();
+        const m = raw.match(/<([^>]+)>/);
+        if (m && m[1]) return m[1].trim().toLowerCase();
+        if (raw.includes('@')) return raw.trim().toLowerCase();
+        return raw.trim().toLowerCase();
+      }
 
-    // Render tasks list (only assigned to this user by default)
-    function renderTasks(){
-      const q = (searchInput.value || '').trim().toLowerCase();
-      const st = statusFilter.value;
-      const pr = priorityFilter.value;
-      const showOther = seeOthers.checked;
-      const me = (session && session.email) ? session.email.toLowerCase() : '';
-
-      let filtered = tasks.filter(t => {
-        if(st && t.status !== st) return false;
-        if(pr && t.priority !== pr) return false;
-        if(q && ( (t.description||'').toLowerCase().indexOf(q) === -1 && (t.requestedBy||'').toLowerCase().indexOf(q) === -1 )) return false;
-
-        // member-only logic:
-        // if user is admin, show all unless seeOthers unchecked? admins can see everything by default
-        const isAdmin = roles.admins.includes(me);
-        if(isAdmin) return true;
-        // If showOther is false -> only show tasks assigned to me.
-        if(!showOther){
-          // assignedTo could contain name or email; compare email presence
-          return (t.assignedTo || '').toLowerCase().includes(me);
+      // Session helpers (compatible with welcome.html)
+      function loadSession() {
+        try {
+          return JSON.parse(localStorage.getItem('thaiba_session') || 'null');
+        } catch (e) {
+          return null;
         }
-        return true; // show others if toggled
-      });
-
-      // sort by deadline ascending (nulls last)
-      filtered.sort((a,b) => {
-        const da = a.deadline ? new Date(a.deadline) : null;
-        const db = b.deadline ? new Date(b.deadline) : null;
-        if(!da && !db) return 0;
-        if(!da) return 1;
-        if(!db) return -1;
-        return da - db;
-      });
-
-      taskList.innerHTML = '';
-      if(filtered.length === 0){
-        noTasks.style.display = 'block';
-        noTasks.textContent = 'No tasks found.';
-        return;
       }
-      noTasks.style.display = 'none';
+      function saveSession(s) {
+        localStorage.setItem('thaiba_session', JSON.stringify(s));
+      }
+      function clearSession() {
+        localStorage.removeItem('thaiba_session');
+      }
 
-      for(const t of filtered){
-        const d = el('div','task');
-        d.innerHTML = `
+      // API endpoints
+      const API_TASKS = '/api/tasks';
+      const API_ROLES = '/api/roles';
+      const UPDATE_API = '/api/update-task';
+
+      // UI elements
+      const userInfo = $('#userInfo');
+      const logoutBtn = $('#logoutBtn');
+      const taskList = $('#taskList');
+      const noTasks = $('#noTasks');
+      const statusFilter = $('#statusFilter');
+      const priorityFilter = $('#priorityFilter');
+      const searchInput = $('#search');
+      const refreshBtn = $('#refreshBtn');
+      const seeOthers = $('#seeOthers');
+      const newTaskBtn = $('#newTaskBtn');
+
+      // state
+      let session = null;
+      let tasks = [];
+      let roles = { admins: [], team: [] };
+
+      // Normalize status (safe)
+      function normalizeStatus(raw) {
+        if (!raw) return 'Pending';
+        const s = String(raw).trim().toLowerCase();
+        if (s === 'working on' || s === 'working' || s === 'in progress' || s === 'inprogress')
+          return 'In Progress';
+        if (s === 'cancelled' || s === 'canceled') return 'On Hold';
+        if (s === 'completed' || s === 'done') return 'Completed';
+        if (s === 'pending' || s === 'new') return 'Pending';
+        return s
+          .split(' ')
+          .map(w => w[0]?.toUpperCase() + w.slice(1))
+          .join(' ');
+      }
+
+      function priorityDot(p) {
+        if (!p) p = 'Low';
+        const s = (p || '').toLowerCase();
+        if (s.includes('urgent')) return 'dot-urgent';
+        if (s.includes('high')) return 'dot-high';
+        if (s.includes('medium')) return 'dot-medium';
+        return 'dot-low';
+      }
+
+      // Ensure logged in; otherwise back to welcome page (no loop)
+      (function initSession() {
+        session = loadSession();
+        if (!session || !session.email) {
+          // No session — go back to welcome (no login loop)
+          location.href = '/welcome.html';
+          return;
+        }
+        // Show name/email
+        userInfo.innerHTML = `Signed in as <strong>${escapeHtml(session.name || session.email)}</strong> <span class="muted">(${escapeHtml(session.email)})</span>`;
+        // Attach logout
+        logoutBtn.addEventListener('click', () => {
+          clearSession();
+          location.href = '/welcome.html';
+        });
+      })();
+
+      // Load roles (for potential UI or permission checks)
+      async function loadRoles() {
+        try {
+          const r = await fetch(API_ROLES, { cache: 'no-store' });
+          const j = await r.json();
+          roles.admins = (j.admins || []).map(parseRoleEntry);
+          roles.team = (j.team || []).map(parseRoleEntry);
+        } catch (e) {
+          console.warn('roles fetch failed', e);
+        }
+      }
+
+      // Load tasks from API
+      async function loadTasks() {
+        refreshBtn.disabled = true;
+        try {
+          const r = await fetch(API_TASKS, { cache: 'no-store' });
+          if (!r.ok) throw new Error('API ' + r.status);
+          const j = await r.json();
+          tasks = (j.tasks || []).map(t => ({
+            id: t.id || t._id || t._sheetRow || '',
+            description: t.description || t.TaskDescription || '',
+            assignedTo: (t.assignedTo || t.AssignedTo || '').toString(),
+            priority: t.priority || t.Priority || 'Low',
+            status: normalizeStatus(t.status || t.Status || ''),
+            requestedBy: t.requestedBy || t.RequestedBy || '',
+            deadline: t.deadline || t.Deadline || '',
+          }));
+          renderTasks();
+        } catch (e) {
+          console.error('load tasks', e);
+          taskList.innerHTML = '';
+          noTasks.style.display = 'block';
+          noTasks.textContent = 'Failed to load tasks: ' + (e.message || e);
+        } finally {
+          refreshBtn.disabled = false;
+        }
+      }
+
+      // Render tasks list (only assigned to this user by default)
+      function renderTasks() {
+        const q = (searchInput.value || '').trim().toLowerCase();
+        const st = statusFilter.value;
+        const pr = priorityFilter.value;
+        const showOther = seeOthers.checked;
+        const me = session && session.email ? session.email.toLowerCase() : '';
+
+        let filtered = tasks.filter(t => {
+          if (st && t.status !== st) return false;
+          if (pr && t.priority !== pr) return false;
+          if (
+            q &&
+            (t.description || '').toLowerCase().indexOf(q) === -1 &&
+            (t.requestedBy || '').toLowerCase().indexOf(q) === -1
+          )
+            return false;
+
+          // member-only logic:
+          // if user is admin, show all unless seeOthers unchecked? admins can see everything by default
+          const isAdmin = roles.admins.includes(me);
+          if (isAdmin) return true;
+          // If showOther is false -> only show tasks assigned to me.
+          if (!showOther) {
+            // assignedTo could contain name or email; compare email presence
+            return (t.assignedTo || '').toLowerCase().includes(me);
+          }
+          return true; // show others if toggled
+        });
+
+        // sort by deadline ascending (nulls last)
+        filtered.sort((a, b) => {
+          const da = a.deadline ? new Date(a.deadline) : null;
+          const db = b.deadline ? new Date(b.deadline) : null;
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return da - db;
+        });
+
+        taskList.innerHTML = '';
+        if (filtered.length === 0) {
+          noTasks.style.display = 'block';
+          noTasks.textContent = 'No tasks found.';
+          return;
+        }
+        noTasks.style.display = 'none';
+
+        for (const t of filtered) {
+          const d = el('div', 'task');
+          d.innerHTML = `
           <div style="flex:1">
             <div style="font-weight:700">${escapeHtml(t.description || '(no description)')}</div>
             <div class="muted-sm" style="margin-top:6px">Requested: ${escapeHtml(t.requestedBy)}</div>
@@ -257,52 +400,56 @@
             </div>
           </div>
         `;
-        // attach inline actions
-        d.querySelectorAll('.quick-btn').forEach(b=>{
-          b.addEventListener('click', async (ev)=>{
-            const id = b.dataset.id;
-            const action = b.dataset.action;
-            if(action === 'start') await quickUpdate(id, { status: 'In Progress' });
-            if(action === 'done') await quickUpdate(id, { status: 'Completed' });
+          // attach inline actions
+          d.querySelectorAll('.quick-btn').forEach(b => {
+            b.addEventListener('click', async ev => {
+              const id = b.dataset.id;
+              const action = b.dataset.action;
+              if (action === 'start') await quickUpdate(id, { status: 'In Progress' });
+              if (action === 'done') await quickUpdate(id, { status: 'Completed' });
+            });
           });
-        });
-        taskList.appendChild(d);
-      }
-    }
-
-    // Quick inline update: sends to /api/update-task with actor header
-    async function quickUpdate(id, fields){
-      try{
-        const hdrs = { 'content-type':'application/json' };
-        // add actor email header for audit
-        if(session && session.email) hdrs['x-user-email'] = session.email;
-        const r = await fetch(UPDATE_API, { method:'POST', headers: hdrs, body: JSON.stringify({ id, ...fields })});
-        const j = await r.json();
-        if(!r.ok || j.ok === false){
-          alert('Update failed: ' + (j.error || JSON.stringify(j)));
-          return;
+          taskList.appendChild(d);
         }
-        // successful — refresh tasks
-        await loadTasks();
-      }catch(e){
-        console.error('quick update', e);
-        alert('Update failed: ' + (e.message || e));
       }
-    }
 
-    // Wire UI events
-    statusFilter.addEventListener('change', renderTasks);
-    priorityFilter.addEventListener('change', renderTasks);
-    searchInput.addEventListener('input', ()=> setTimeout(renderTasks, 200));
-    seeOthers.addEventListener('change', renderTasks);
-    refreshBtn.addEventListener('click', loadTasks);
-    newTaskBtn.addEventListener('click', ()=> window.location.href = '/create-task.html');
+      // Quick inline update: sends to /api/update-task with actor header
+      async function quickUpdate(id, fields) {
+        try {
+          const hdrs = { 'content-type': 'application/json' };
+          // add actor email header for audit
+          if (session && session.email) hdrs['x-user-email'] = session.email;
+          const r = await fetch(UPDATE_API, {
+            method: 'POST',
+            headers: hdrs,
+            body: JSON.stringify({ id, ...fields }),
+          });
+          const j = await r.json();
+          if (!r.ok || j.ok === false) {
+            alert('Update failed: ' + (j.error || JSON.stringify(j)));
+            return;
+          }
+          // successful — refresh tasks
+          await loadTasks();
+        } catch (e) {
+          console.error('quick update', e);
+          alert('Update failed: ' + (e.message || e));
+        }
+      }
 
-    // init
-    (async function init(){
-      await loadRoles();
-      await loadTasks();
-    })();
-  </script>
-</body>
+      // Wire UI events
+      statusFilter.addEventListener('change', renderTasks);
+      priorityFilter.addEventListener('change', renderTasks);
+      searchInput.addEventListener('input', () => setTimeout(renderTasks, 200));
+      seeOthers.addEventListener('change', renderTasks);
+      refreshBtn.addEventListener('click', loadTasks);
+      newTaskBtn.addEventListener('click', () => (window.location.href = '/create-task.html'));
+
+      // init
+      (async function init() {
+        await loadRoles();
+        await loadTasks();
+      })();
+    </script>
+  </body>
 </html>

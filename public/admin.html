@@ -1,261 +1,482 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Admin dashboard — Thaiba Media</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#f6f8fa;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --accent:#6366f1;
-      --teal:#06b6d4;
-      --success:#10b981;
-      --danger:#ef4444;
-      --yellow:#f59e0b;
-      --shadow:0 8px 24px rgba(15,23,42,0.06);
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    body{margin:0;background:var(--bg);color:#0f1724}
-    .wrap{max-width:1150px;margin:28px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{font-size:28px;margin:0}
-    .small{color:var(--muted)}
-    .top-actions{display:flex;gap:12px;align-items:center}
-    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
-    .btn-ghost{background:#fff;border:1px solid #eef2f6;padding:8px 12px;border-radius:10px;cursor:pointer}
-    .controls{display:flex;gap:8px;align-items:center}
-    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow);margin-top:18px}
-    .row{display:flex;gap:12px;align-items:center}
-    .select, .input {padding:8px;border-radius:8px;border:1px solid #e8edf2}
-    table{width:100%;border-collapse:collapse}
-    th, td{padding:14px 12px;border-bottom:1px solid #f1f5f9;text-align:left}
-    th{background:transparent;font-weight:700}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:600}
-    .p-urgent{background:#fee2e2;color:var(--danger);border-left:6px solid var(--danger)}
-    .p-high{background:#fff7ed;color:var(--yellow);border-left:6px solid var(--yellow)}
-    .p-medium{background:#fff7ed;color:var(--yellow);border-left:6px solid var(--yellow)}
-    .p-low{background:#ecfdf5;color:var(--success);border-left:6px solid var(--success)}
-    .priority-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
-    .dot-urgent{background:var(--danger)}
-    .dot-high{background:#f97316}
-    .dot-medium{background:var(--yellow)}
-    .dot-low{background:var(--success)}
-    .muted{color:var(--muted)}
-    .toggle{cursor:pointer;padding:8px 10px;border-radius:6px;border:1px solid #e8edf2;background:white}
-    .top-filter{display:flex;gap:8px;align-items:center;margin-top:12px}
-    /* Card mode */
-    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-    .task-card{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);min-height:120px;position:relative}
-    .task-actions{display:flex;gap:8px;margin-top:12px}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid #e8edf2;background:white;cursor:pointer}
-    .logout{background:#fff;border:1px solid #f3f4f6;padding:8px 10px;border-radius:8px}
-    .search{flex:1}
-    @media(max-width:820px){
-      header{flex-direction:column;align-items:flex-start;gap:8px}
-      .top-actions{width:100%;justify-content:space-between}
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Admin dashboard — Thaiba Media</h1>
-        <div class="small">Full access: tasks, users, exports & master data</div>
-      </div>
-
-      <div class="top-actions">
-        <div class="small" id="loggedInAs">Signed in as — <span class="muted">guest</span></div>
-        <button id="logoutBtn" class="logout">Log out</button>
-      </div>
-    </header>
-
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <h3 style="margin:0">Tasks</h3>
-          <div class="small">Shows all tasks. Edit in-line and export or filter quickly.</div>
-        </div>
-
-        <div class="controls">
-          <label class="small" style="margin-right:6px">Mode</label>
-          <button id="toggleView" class="toggle">Table</button>
-          <button id="exportCsv" class="btn-ghost">Export CSV</button>
-          <button id="refreshBtn" class="btn-ghost">Refresh</button>
-        </div>
-      </div>
-
-      <!-- filters -->
-      <div class="top-filter" style="margin-top:14px;">
-        <select id="statusFilter" class="select">
-          <option value="">All statuses</option>
-          <option>Pending</option>
-          <option>In Progress</option>
-          <option>On Hold</option>
-          <option>Completed</option>
-        </select>
-
-        <select id="priorityFilter" class="select">
-          <option value="">All priorities</option>
-          <option>Urgent</option>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
-        </select>
-
-        <input id="searchInput" class="input search" placeholder="Search description or requested by..." />
-        <label class="small"><input id="meOnly" type="checkbox" /> Show only my assigned tasks</label>
-        <label class="small"><input id="showOther" type="checkbox" /> See other team members' tasks</label>
-      </div>
-
-      <!-- table view -->
-      <div id="tableContainer" style="margin-top:16px;">
-        <table id="tasksTable" role="table">
-          <thead>
-            <tr>
-              <th style="width:8%">ID</th>
-              <th style="width:36%">Description</th>
-              <th style="width:18%">Assigned</th>
-              <th style="width:12%">Priority</th>
-              <th style="width:12%">Status</th>
-              <th style="width:14%">Deadline</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- rows injected here -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- card view -->
-      <div id="cardContainer" class="cards" style="display:none;margin-top:16px;"></div>
-
-    </div>
-
-  </div>
-
-  <script>
-  // Config
-  const API_BASE = location.origin; // same domain: /api/tasks and /api/update-task
-  const TASKS_ENDPOINT = API_BASE + "/api/tasks";
-  const UPDATE_ENDPOINT = API_BASE + "/api/update-task";
-
-  // State
-  let tasks = [];
-  let users = []; // team members (from /api/roles)
-  let currentUser = null;
-
-  // Utilities
-  const el = (t, cls='') => { const d = document.createElement(t); if(cls) d.className = cls; return d; };
-  function fmtDate(d){ if(!d) return ''; const dt = new Date(d); if(isNaN(dt)) return d; return dt.toISOString(); }
-  function shortDate(d){ if(!d) return ''; const dt = new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString(); }
-  function priorityDotClass(p){ if(!p) return 'dot-low'; p = String(p).toLowerCase(); if(p.includes('urgent')) return 'dot-urgent'; if(p.includes('high')) return 'dot-high'; if(p.includes('medium')) return 'dot-medium'; return 'dot-low'; }
-  function priorityBadgeClass(p){ if(!p) return 'p-low'; p = String(p).toLowerCase(); if(p.includes('urgent')) return 'p-urgent'; if(p.includes('high')) return 'p-high'; if(p.includes('medium')) return 'p-medium'; return 'p-low'; }
-  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  // Session helpers (store small session in localStorage)
-  function saveSession(obj){ localStorage.setItem('tm_session', JSON.stringify(obj)); }
-  function loadSession(){ try { return JSON.parse(localStorage.getItem('tm_session')); } catch(e){ return null } }
-  function clearSession(){ localStorage.removeItem('tm_session'); }
-
-  // Fetch roles (admins & team members)
-  async function loadRoles(){
-    try{
-      const r = await fetch('/api/roles', {cache:'no-store'});
-      if(!r.ok) throw new Error('roles fetch returned ' + r.status);
-      const j = await r.json();
-      users = (j.team || []).map(s => {
-        // remove angle brackets if present and extract email
-        const m = String(s).match(/<([^>]+)>/);
-        return { raw: s, email: m ? m[1] : s };
-      });
-    }catch(err){
-      console.warn('roles load failed', err);
-      users = [];
-    }
-  }
-
-  // load tasks
-  async function loadTasks(){
-    document.getElementById('refreshBtn').disabled = true;
-    try{
-      const res = await fetch(TASKS_ENDPOINT, {cache: 'no-store'});
-      if(!res.ok) throw new Error('API ' + res.status);
-      const payload = await res.json();
-      // normalize tasks array
-      tasks = (payload.tasks || []).map(r => ({
-        id: r.id || r._id || r._sheetRow || '',
-        description: r.description || r.TaskDescription || '',
-        assignedTo: r.assignedTo || r.AssignedTo || r.assigned || '',
-        priority: r.priority || r.Priority || 'Low',
-        status: r.status || r.Status || 'Pending',
-        requestedBy: r.requestedBy || r.RequestedBy || '',
-        deadline: r.deadline || r.Deadline || '',
-        raw: r
-      }));
-      renderAll();
-    }catch(err){
-      console.error('tasks load error', err);
-      alert('Failed to load tasks — ' + err.message);
-    }finally{
-      document.getElementById('refreshBtn').disabled = false;
-    }
-  }
-
-  // render table and cards
-  function renderAll(){
-    const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = '';
-    const cardContainer = document.getElementById('cardContainer');
-    cardContainer.innerHTML = '';
-
-    // apply filters
-    const statusFilter = document.getElementById('statusFilter').value;
-    const priorityFilter = document.getElementById('priorityFilter').value;
-    const search = document.getElementById('searchInput').value.toLowerCase().trim();
-    const meOnly = document.getElementById('meOnly').checked;
-    const showOther = document.getElementById('showOther').checked;
-
-    const session = loadSession();
-    const meEmail = session?.email?.toLowerCase?.() || '';
-
-    const filtered = tasks.filter(t => {
-      if(statusFilter && t.status !== statusFilter) return false;
-      if(priorityFilter && t.priority !== priorityFilter) return false;
-      if(search){
-        const hay = (t.description + ' ' + t.requestedBy + ' ' + t.assignedTo).toLowerCase();
-        if(!hay.includes(search)) return false;
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin dashboard — Thaiba Media</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f6f8fa;
+        --card: #ffffff;
+        --muted: #6b7280;
+        --accent: #6366f1;
+        --teal: #06b6d4;
+        --success: #10b981;
+        --danger: #ef4444;
+        --yellow: #f59e0b;
+        --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          Arial;
       }
-      // member filtering logic
-      if(meOnly && meEmail){
-        if(!String(t.assignedTo || '').toLowerCase().includes(meEmail)) return false;
-      } else {
-        // if current session is not admin and showOther is false => show only assigned tasks
-        const isAdmin = session?.isAdmin;
-        if(!isAdmin && !showOther && meEmail){
-          if(!String(t.assignedTo || '').toLowerCase().includes(meEmail)) return false;
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: #0f1724;
+      }
+      .wrap {
+        max-width: 1150px;
+        margin: 28px auto;
+        padding: 18px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0;
+      }
+      .small {
+        color: var(--muted);
+      }
+      .top-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .btn {
+        background: var(--accent);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 0;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1px solid #eef2f6;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .card {
+        background: var(--card);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-top: 18px;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .select,
+      .input {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #e8edf2;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: left;
+      }
+      th {
+        background: transparent;
+        font-weight: 700;
+      }
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+      }
+      .p-urgent {
+        background: #fee2e2;
+        color: var(--danger);
+        border-left: 6px solid var(--danger);
+      }
+      .p-high {
+        background: #fff7ed;
+        color: var(--yellow);
+        border-left: 6px solid var(--yellow);
+      }
+      .p-medium {
+        background: #fff7ed;
+        color: var(--yellow);
+        border-left: 6px solid var(--yellow);
+      }
+      .p-low {
+        background: #ecfdf5;
+        color: var(--success);
+        border-left: 6px solid var(--success);
+      }
+      .priority-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .dot-urgent {
+        background: var(--danger);
+      }
+      .dot-high {
+        background: #f97316;
+      }
+      .dot-medium {
+        background: var(--yellow);
+      }
+      .dot-low {
+        background: var(--success);
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .toggle {
+        cursor: pointer;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #e8edf2;
+        background: white;
+      }
+      .top-filter {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 12px;
+      }
+      /* Card mode */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+      }
+      .task-card {
+        background: var(--card);
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        min-height: 120px;
+        position: relative;
+      }
+      .task-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid #e8edf2;
+        background: white;
+        cursor: pointer;
+      }
+      .logout {
+        background: #fff;
+        border: 1px solid #f3f4f6;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .search {
+        flex: 1;
+      }
+      @media (max-width: 820px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        .top-actions {
+          width: 100%;
+          justify-content: space-between;
         }
       }
-      return true;
-    });
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Admin dashboard — Thaiba Media</h1>
+          <div class="small">Full access: tasks, users, exports & master data</div>
+        </div>
 
-    // Sort by deadline ascending by default
-    filtered.sort((a,b)=>{
-      const da = a.deadline ? new Date(a.deadline) : null;
-      const db = b.deadline ? new Date(b.deadline) : null;
-      if(!da && !db) return 0;
-      if(!da) return 1;
-      if(!db) return -1;
-      return da - db;
-    });
+        <div class="top-actions">
+          <div class="small" id="loggedInAs">Signed in as — <span class="muted">guest</span></div>
+          <button id="logoutBtn" class="logout">Log out</button>
+        </div>
+      </header>
 
-    // Table
-    for(const t of filtered){
-      const tr = el('tr');
-      tr.innerHTML = `
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <div>
+            <h3 style="margin: 0">Tasks</h3>
+            <div class="small">Shows all tasks. Edit in-line and export or filter quickly.</div>
+          </div>
+
+          <div class="controls">
+            <label class="small" style="margin-right: 6px">Mode</label>
+            <button id="toggleView" class="toggle">Table</button>
+            <button id="exportCsv" class="btn-ghost">Export CSV</button>
+            <button id="refreshBtn" class="btn-ghost">Refresh</button>
+          </div>
+        </div>
+
+        <!-- filters -->
+        <div class="top-filter" style="margin-top: 14px">
+          <select id="statusFilter" class="select">
+            <option value="">All statuses</option>
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>On Hold</option>
+            <option>Completed</option>
+          </select>
+
+          <select id="priorityFilter" class="select">
+            <option value="">All priorities</option>
+            <option>Urgent</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+
+          <input
+            id="searchInput"
+            class="input search"
+            placeholder="Search description or requested by..."
+          />
+          <label class="small"
+            ><input id="meOnly" type="checkbox" /> Show only my assigned tasks</label
+          >
+          <label class="small"
+            ><input id="showOther" type="checkbox" /> See other team members' tasks</label
+          >
+        </div>
+
+        <!-- table view -->
+        <div id="tableContainer" style="margin-top: 16px">
+          <table id="tasksTable" role="table">
+            <thead>
+              <tr>
+                <th style="width: 8%">ID</th>
+                <th style="width: 36%">Description</th>
+                <th style="width: 18%">Assigned</th>
+                <th style="width: 12%">Priority</th>
+                <th style="width: 12%">Status</th>
+                <th style="width: 14%">Deadline</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- rows injected here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- card view -->
+        <div id="cardContainer" class="cards" style="display: none; margin-top: 16px"></div>
+      </div>
+    </div>
+
+    <script>
+      // Config
+      const API_BASE = location.origin; // same domain: /api/tasks and /api/update-task
+      const TASKS_ENDPOINT = API_BASE + '/api/tasks';
+      const UPDATE_ENDPOINT = API_BASE + '/api/update-task';
+
+      // State
+      let tasks = [];
+      let users = []; // team members (from /api/roles)
+      let currentUser = null;
+
+      // Utilities
+      const el = (t, cls = '') => {
+        const d = document.createElement(t);
+        if (cls) d.className = cls;
+        return d;
+      };
+      function fmtDate(d) {
+        if (!d) return '';
+        const dt = new Date(d);
+        if (isNaN(dt)) return d;
+        return dt.toISOString();
+      }
+      function shortDate(d) {
+        if (!d) return '';
+        const dt = new Date(d);
+        if (isNaN(dt)) return d;
+        return dt.toLocaleDateString();
+      }
+      function priorityDotClass(p) {
+        if (!p) return 'dot-low';
+        p = String(p).toLowerCase();
+        if (p.includes('urgent')) return 'dot-urgent';
+        if (p.includes('high')) return 'dot-high';
+        if (p.includes('medium')) return 'dot-medium';
+        return 'dot-low';
+      }
+      function priorityBadgeClass(p) {
+        if (!p) return 'p-low';
+        p = String(p).toLowerCase();
+        if (p.includes('urgent')) return 'p-urgent';
+        if (p.includes('high')) return 'p-high';
+        if (p.includes('medium')) return 'p-medium';
+        return 'p-low';
+      }
+      function escapeHtml(s) {
+        if (!s) return '';
+        return String(s).replace(
+          /[&<>"']/g,
+          c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+        );
+      }
+
+      // Session helpers (store small session in localStorage)
+      function saveSession(obj) {
+        localStorage.setItem('tm_session', JSON.stringify(obj));
+      }
+      function loadSession() {
+        try {
+          return JSON.parse(localStorage.getItem('tm_session'));
+        } catch (e) {
+          return null;
+        }
+      }
+      function clearSession() {
+        localStorage.removeItem('tm_session');
+      }
+
+      // Fetch roles (admins & team members)
+      async function loadRoles() {
+        try {
+          const r = await fetch('/api/roles', { cache: 'no-store' });
+          if (!r.ok) throw new Error('roles fetch returned ' + r.status);
+          const j = await r.json();
+          users = (j.team || []).map(s => {
+            // remove angle brackets if present and extract email
+            const m = String(s).match(/<([^>]+)>/);
+            return { raw: s, email: m ? m[1] : s };
+          });
+        } catch (err) {
+          console.warn('roles load failed', err);
+          users = [];
+        }
+      }
+
+      // load tasks
+      async function loadTasks() {
+        document.getElementById('refreshBtn').disabled = true;
+        try {
+          const res = await fetch(TASKS_ENDPOINT, { cache: 'no-store' });
+          if (!res.ok) throw new Error('API ' + res.status);
+          const payload = await res.json();
+          // normalize tasks array
+          tasks = (payload.tasks || []).map(r => ({
+            id: r.id || r._id || r._sheetRow || '',
+            description: r.description || r.TaskDescription || '',
+            assignedTo: r.assignedTo || r.AssignedTo || r.assigned || '',
+            priority: r.priority || r.Priority || 'Low',
+            status: r.status || r.Status || 'Pending',
+            requestedBy: r.requestedBy || r.RequestedBy || '',
+            deadline: r.deadline || r.Deadline || '',
+            raw: r,
+          }));
+          renderAll();
+        } catch (err) {
+          console.error('tasks load error', err);
+          alert('Failed to load tasks — ' + err.message);
+        } finally {
+          document.getElementById('refreshBtn').disabled = false;
+        }
+      }
+
+      // render table and cards
+      function renderAll() {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        const cardContainer = document.getElementById('cardContainer');
+        cardContainer.innerHTML = '';
+
+        // apply filters
+        const statusFilter = document.getElementById('statusFilter').value;
+        const priorityFilter = document.getElementById('priorityFilter').value;
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const meOnly = document.getElementById('meOnly').checked;
+        const showOther = document.getElementById('showOther').checked;
+
+        const session = loadSession();
+        const meEmail = session?.email?.toLowerCase?.() || '';
+
+        const filtered = tasks.filter(t => {
+          if (statusFilter && t.status !== statusFilter) return false;
+          if (priorityFilter && t.priority !== priorityFilter) return false;
+          if (search) {
+            const hay = (t.description + ' ' + t.requestedBy + ' ' + t.assignedTo).toLowerCase();
+            if (!hay.includes(search)) return false;
+          }
+          // member filtering logic
+          if (meOnly && meEmail) {
+            if (
+              !String(t.assignedTo || '')
+                .toLowerCase()
+                .includes(meEmail)
+            )
+              return false;
+          } else {
+            // if current session is not admin and showOther is false => show only assigned tasks
+            const isAdmin = session?.isAdmin;
+            if (!isAdmin && !showOther && meEmail) {
+              if (
+                !String(t.assignedTo || '')
+                  .toLowerCase()
+                  .includes(meEmail)
+              )
+                return false;
+            }
+          }
+          return true;
+        });
+
+        // Sort by deadline ascending by default
+        filtered.sort((a, b) => {
+          const da = a.deadline ? new Date(a.deadline) : null;
+          const db = b.deadline ? new Date(b.deadline) : null;
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return da - db;
+        });
+
+        // Table
+        for (const t of filtered) {
+          const tr = el('tr');
+          tr.innerHTML = `
         <td>${escapeHtml(t.id)}</td>
         <td><strong>${escapeHtml(t.description)}</strong><div class="muted" style="margin-top:6px">${escapeHtml(t.requestedBy)}</div></td>
         <td class="assigned-cell"></td>
@@ -263,52 +484,71 @@
         <td class="status-cell"></td>
         <td>${shortDate(t.deadline) || ''}</td>
       `;
-      // assigned select / inline
-      const assignedTd = tr.querySelector('.assigned-cell');
-      const assignedSel = el('select','select');
-      assignedSel.style.minWidth = '160px';
-      const assignedValues = (t.assignedTo||'').split(',').map(s => s.trim()).filter(Boolean);
-      // build options from users list
-      const noneOpt = el('option'); noneOpt.value=''; noneOpt.textContent = assignedValues.join(', ') || '(unassigned)';
-      assignedSel.appendChild(noneOpt);
-      users.forEach(u => {
-        const o = el('option'); o.value = u.email; o.textContent = u.email;
-        if(assignedValues.some(av => av.toLowerCase() === u.email.toLowerCase())) o.selected = true;
-        assignedSel.appendChild(o);
-      });
-      assignedSel.addEventListener('change', ()=> inlineUpdate(t, { assignedTo: assignedSel.value || '' }));
-      assignedTd.appendChild(assignedSel);
+          // assigned select / inline
+          const assignedTd = tr.querySelector('.assigned-cell');
+          const assignedSel = el('select', 'select');
+          assignedSel.style.minWidth = '160px';
+          const assignedValues = (t.assignedTo || '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+          // build options from users list
+          const noneOpt = el('option');
+          noneOpt.value = '';
+          noneOpt.textContent = assignedValues.join(', ') || '(unassigned)';
+          assignedSel.appendChild(noneOpt);
+          users.forEach(u => {
+            const o = el('option');
+            o.value = u.email;
+            o.textContent = u.email;
+            if (assignedValues.some(av => av.toLowerCase() === u.email.toLowerCase()))
+              o.selected = true;
+            assignedSel.appendChild(o);
+          });
+          assignedSel.addEventListener('change', () =>
+            inlineUpdate(t, { assignedTo: assignedSel.value || '' }),
+          );
+          assignedTd.appendChild(assignedSel);
 
-      // priority select
-      const pTd = tr.querySelector('.priority-cell');
-      const priSel = el('select','select');
-      ['Urgent','High','Medium','Low'].forEach(p=>{
-        const o = el('option'); o.value=p; o.textContent=p; if(p===t.priority) o.selected=true; priSel.appendChild(o);
-      });
-      priSel.addEventListener('change', ()=> inlineUpdate(t, { priority: priSel.value }));
-      // show colored dot + select
-      const pWrap = el('div');
-      const pdot = el('span','priority-dot ' + priorityDotClass(t.priority));
-      pWrap.appendChild(pdot); pWrap.appendChild(priSel);
-      pTd.appendChild(pWrap);
+          // priority select
+          const pTd = tr.querySelector('.priority-cell');
+          const priSel = el('select', 'select');
+          ['Urgent', 'High', 'Medium', 'Low'].forEach(p => {
+            const o = el('option');
+            o.value = p;
+            o.textContent = p;
+            if (p === t.priority) o.selected = true;
+            priSel.appendChild(o);
+          });
+          priSel.addEventListener('change', () => inlineUpdate(t, { priority: priSel.value }));
+          // show colored dot + select
+          const pWrap = el('div');
+          const pdot = el('span', 'priority-dot ' + priorityDotClass(t.priority));
+          pWrap.appendChild(pdot);
+          pWrap.appendChild(priSel);
+          pTd.appendChild(pWrap);
 
-      // status select
-      const sTd = tr.querySelector('.status-cell');
-      const sSel = el('select','select');
-      ['Pending','In Progress','On Hold','Completed'].forEach(s=>{
-        const o = el('option'); o.value=s; o.textContent=s; if(s===t.status) o.selected=true; sSel.appendChild(o);
-      });
-      sSel.addEventListener('change', ()=> inlineUpdate(t, { status: sSel.value }));
-      sTd.appendChild(sSel);
+          // status select
+          const sTd = tr.querySelector('.status-cell');
+          const sSel = el('select', 'select');
+          ['Pending', 'In Progress', 'On Hold', 'Completed'].forEach(s => {
+            const o = el('option');
+            o.value = s;
+            o.textContent = s;
+            if (s === t.status) o.selected = true;
+            sSel.appendChild(o);
+          });
+          sSel.addEventListener('change', () => inlineUpdate(t, { status: sSel.value }));
+          sTd.appendChild(sSel);
 
-      tableBody.appendChild(tr);
-    }
+          tableBody.appendChild(tr);
+        }
 
-    // Card view
-    for(const t of filtered){
-      const card = el('div','task-card');
-      const pclass = priorityBadgeClass(t.priority);
-      card.innerHTML = `
+        // Card view
+        for (const t of filtered) {
+          const card = el('div', 'task-card');
+          const pclass = priorityBadgeClass(t.priority);
+          card.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
           <div style="max-width:72%">
             <div style="font-weight:700">${escapeHtml(t.description)}</div>
@@ -322,134 +562,204 @@
         </div>
         <div class="task-actions"></div>
       `;
-      const act = card.querySelector('.task-actions');
+          const act = card.querySelector('.task-actions');
 
-      // inline status button
-      const startBtn = el('button','pill'); startBtn.textContent = 'Start / In Progress';
-      startBtn.addEventListener('click', ()=> inlineUpdate(t, { status: 'In Progress' }));
-      const doneBtn = el('button','pill'); doneBtn.textContent = 'Mark Complete';
-      doneBtn.addEventListener('click', ()=> inlineUpdate(t, { status: 'Completed' }));
-      act.appendChild(startBtn); act.appendChild(doneBtn);
+          // inline status button
+          const startBtn = el('button', 'pill');
+          startBtn.textContent = 'Start / In Progress';
+          startBtn.addEventListener('click', () => inlineUpdate(t, { status: 'In Progress' }));
+          const doneBtn = el('button', 'pill');
+          doneBtn.textContent = 'Mark Complete';
+          doneBtn.addEventListener('click', () => inlineUpdate(t, { status: 'Completed' }));
+          act.appendChild(startBtn);
+          act.appendChild(doneBtn);
 
-      // assign dropdown
-      const assignSel = el('select','select'); assignSel.style.marginLeft='8px';
-      const emptyOpt = el('option'); emptyOpt.value=''; emptyOpt.textContent='Assign to...'; assignSel.appendChild(emptyOpt);
-      users.forEach(u => { const o = el('option'); o.value = u.email; o.textContent = u.email; assignSel.appendChild(o); });
-      assignSel.addEventListener('change', ()=> inlineUpdate(t, { assignedTo: assignSel.value }));
-      act.appendChild(assignSel);
+          // assign dropdown
+          const assignSel = el('select', 'select');
+          assignSel.style.marginLeft = '8px';
+          const emptyOpt = el('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = 'Assign to...';
+          assignSel.appendChild(emptyOpt);
+          users.forEach(u => {
+            const o = el('option');
+            o.value = u.email;
+            o.textContent = u.email;
+            assignSel.appendChild(o);
+          });
+          assignSel.addEventListener('change', () =>
+            inlineUpdate(t, { assignedTo: assignSel.value }),
+          );
+          act.appendChild(assignSel);
 
-      cardContainer.appendChild(card);
-    }
-  }
+          cardContainer.appendChild(card);
+        }
+      }
 
-  // Inline update (optimistic small UI feedback)
-  async function inlineUpdate(task, fields){
-    // show quick disabled UI? (not implemented fully) — do optimistic update in UI
-    const orig = {...task};
-    Object.assign(task, fields);
-    renderAll();
+      // Inline update (optimistic small UI feedback)
+      async function inlineUpdate(task, fields) {
+        // show quick disabled UI? (not implemented fully) — do optimistic update in UI
+        const orig = { ...task };
+        Object.assign(task, fields);
+        renderAll();
 
-    // send to server
-    try{
-      const res = await fetch(UPDATE_ENDPOINT, {
-        method: 'POST',
-        headers: {'content-type':'application/json'},
-        body: JSON.stringify({ id: task.id, ...fields })
+        // send to server
+        try {
+          const res = await fetch(UPDATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ id: task.id, ...fields }),
+          });
+          const j = await res.json();
+          if (!res.ok) {
+            throw new Error(j?.error || 'Update failed');
+          }
+          // success — optionally refresh tasks from server
+          await loadTasks();
+        } catch (err) {
+          console.error('update failed', err);
+          alert('Update failed: ' + err.message);
+          // revert
+          Object.assign(task, orig);
+          renderAll();
+        }
+      }
+
+      // Export filtered CSV
+      function exportCSV() {
+        const rows = [];
+        // headers
+        rows.push([
+          'ID',
+          'Description',
+          'Assigned',
+          'Priority',
+          'Status',
+          'RequestedBy',
+          'Deadline',
+        ]);
+        // use current rendered table (apply same filters)
+        const statusFilter = document.getElementById('statusFilter').value;
+        const priorityFilter = document.getElementById('priorityFilter').value;
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const meOnly = document.getElementById('meOnly').checked;
+        const showOther = document.getElementById('showOther').checked;
+        const session = loadSession();
+        const meEmail = session?.email?.toLowerCase?.() || '';
+
+        tasks.forEach(t => {
+          if (statusFilter && t.status !== statusFilter) return;
+          if (priorityFilter && t.priority !== priorityFilter) return;
+          if (
+            search &&
+            !(t.description + ' ' + t.requestedBy + ' ' + t.assignedTo)
+              .toLowerCase()
+              .includes(search)
+          )
+            return;
+          if (
+            meOnly &&
+            meEmail &&
+            !String(t.assignedTo || '')
+              .toLowerCase()
+              .includes(meEmail)
+          )
+            return;
+          if (
+            !showOther &&
+            !session?.isAdmin &&
+            meEmail &&
+            !String(t.assignedTo || '')
+              .toLowerCase()
+              .includes(meEmail)
+          )
+            return;
+          rows.push([
+            t.id,
+            t.description,
+            t.assignedTo,
+            t.priority,
+            t.status,
+            t.requestedBy,
+            t.deadline,
+          ]);
+        });
+
+        const csv = rows
+          .map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tasks-export.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      // UI wiring
+      document.getElementById('toggleView').addEventListener('click', e => {
+        const t = document.getElementById('tableContainer');
+        const c = document.getElementById('cardContainer');
+        if (t.style.display === 'none') {
+          t.style.display = '';
+          c.style.display = 'none';
+          e.target.textContent = 'Table';
+        } else {
+          t.style.display = 'none';
+          c.style.display = '';
+          e.target.textContent = 'Card';
+        }
       });
-      const j = await res.json();
-      if(!res.ok){ throw new Error(j?.error || 'Update failed'); }
-      // success — optionally refresh tasks from server
-      await loadTasks();
-    }catch(err){
-      console.error('update failed', err);
-      alert('Update failed: ' + err.message);
-      // revert
-      Object.assign(task, orig);
-      renderAll();
-    }
-  }
+      document.getElementById('exportCsv').addEventListener('click', exportCSV);
+      document.getElementById('refreshBtn').addEventListener('click', loadTasks);
+      document.getElementById('statusFilter').addEventListener('change', renderAll);
+      document.getElementById('priorityFilter').addEventListener('change', renderAll);
+      document.getElementById('searchInput').addEventListener('input', debounce(renderAll, 300));
+      document.getElementById('meOnly').addEventListener('change', renderAll);
+      document.getElementById('showOther').addEventListener('change', renderAll);
 
-  // Export filtered CSV
-  function exportCSV(){
-    const rows = [];
-    // headers
-    rows.push(['ID','Description','Assigned','Priority','Status','RequestedBy','Deadline']);
-    // use current rendered table (apply same filters)
-    const statusFilter = document.getElementById('statusFilter').value;
-    const priorityFilter = document.getElementById('priorityFilter').value;
-    const search = document.getElementById('searchInput').value.toLowerCase().trim();
-    const meOnly = document.getElementById('meOnly').checked;
-    const showOther = document.getElementById('showOther').checked;
-    const session = loadSession(); const meEmail = session?.email?.toLowerCase?.() || '';
+      // logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        clearSession();
+        location.href = '/welcome.html';
+      });
 
-    tasks.forEach(t=>{
-      if(statusFilter && t.status !== statusFilter) return;
-      if(priorityFilter && t.priority !== priorityFilter) return;
-      if(search && !(t.description + ' ' + t.requestedBy + ' ' + t.assignedTo).toLowerCase().includes(search)) return;
-      if(meOnly && meEmail && !String(t.assignedTo||'').toLowerCase().includes(meEmail)) return;
-      if(!showOther && !session?.isAdmin && meEmail && !String(t.assignedTo||'').toLowerCase().includes(meEmail)) return;
-      rows.push([t.id, t.description, t.assignedTo, t.priority, t.status, t.requestedBy, t.deadline]);
-    });
+      function debounce(fn, ms) {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), ms);
+        };
+      }
 
-    const csv = rows.map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'tasks-export.csv'; document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  }
+      // Session detection (on admin page load)
+      async function init() {
+        // load session (from welcome flow)
+        const session = loadSession();
+        if (!session) {
+          // if no session, redirect to welcome page
+          location.href = '/welcome.html';
+          return;
+        }
+        // show signed in
+        document.getElementById('loggedInAs').innerHTML =
+          `Signed in as — <strong>${escapeHtml(session.name || session.email || 'guest')}</strong> <span class="muted">(${escapeHtml(session.email || '')})</span>`;
+        // detect admin role (call API to get list)
+        await loadRoles();
+        const admins = (await (await fetch('/api/roles')).json()).admins || [];
+        session.isAdmin = (admins || [])
+          .map(a => a.toLowerCase?.()?.replace(/[<>]/g, ''))
+          .includes(session.email?.toLowerCase?.());
+        saveSession(session);
+        // load tasks
+        await loadTasks();
+      }
 
-  // UI wiring
-  document.getElementById('toggleView').addEventListener('click', (e)=>{
-    const t = document.getElementById('tableContainer');
-    const c = document.getElementById('cardContainer');
-    if(t.style.display === 'none'){
-      t.style.display = ''; c.style.display = 'none'; e.target.textContent='Table';
-    } else {
-      t.style.display = 'none'; c.style.display = ''; e.target.textContent='Card';
-    }
-  });
-  document.getElementById('exportCsv').addEventListener('click', exportCSV);
-  document.getElementById('refreshBtn').addEventListener('click', loadTasks);
-  document.getElementById('statusFilter').addEventListener('change', renderAll);
-  document.getElementById('priorityFilter').addEventListener('change', renderAll);
-  document.getElementById('searchInput').addEventListener('input', debounce(renderAll, 300));
-  document.getElementById('meOnly').addEventListener('change', renderAll);
-  document.getElementById('showOther').addEventListener('change', renderAll);
-
-  // logout
-  document.getElementById('logoutBtn').addEventListener('click', ()=>{
-    clearSession();
-    location.href = '/welcome.html';
-  });
-
-  function debounce(fn, ms){
-    let t;
-    return (...a) => { clearTimeout(t); t = setTimeout(()=> fn(...a), ms); };
-  }
-
-  // Session detection (on admin page load)
-  async function init(){
-    // load session (from welcome flow)
-    const session = loadSession();
-    if(!session){
-      // if no session, redirect to welcome page
-      location.href = '/welcome.html';
-      return;
-    }
-    // show signed in
-    document.getElementById('loggedInAs').innerHTML = `Signed in as — <strong>${escapeHtml(session.name || session.email || 'guest')}</strong> <span class="muted">(${escapeHtml(session.email||'')})</span>`;
-    // detect admin role (call API to get list)
-    await loadRoles();
-    const admins = (await (await fetch('/api/roles')).json()).admins || [];
-    session.isAdmin = (admins || []).map(a => a.toLowerCase?.()?.replace(/[<>]/g,'')).includes(session.email?.toLowerCase?.());
-    saveSession(session);
-    // load tasks
-    await loadTasks();
-  }
-
-  // Start
-  init();
-
-  </script>
-</body>
+      // Start
+      init();
+    </script>
+  </body>
 </html>

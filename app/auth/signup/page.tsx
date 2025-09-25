@@ -1,6 +1,6 @@
-export const dynamic = "force-dynamic";
-import { AuthForm } from "@/components/auth/auth-form"
-import Link from "next/link"
+export const dynamic = 'force-dynamic';
+import { AuthForm } from '@/components/auth/auth-form';
+import Link from 'next/link';
 
 export default function SignUpPage() {
   return (
@@ -8,12 +8,12 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         <AuthForm mode="signup" />
         <p className="text-center mt-4 text-sm text-muted-foreground">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link href="/auth/signin" className="text-primary hover:underline">
             Sign in
           </Link>
         </p>
       </div>
     </div>
-  )
+  );
 }

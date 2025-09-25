@@ -1,11 +1,11 @@
-export const dynamic = "force-dynamic";
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { Sidebar } from "@/components/layout/sidebar"
-import { CalendarView } from "@/components/calendar/calendar-view"
+export const dynamic = 'force-dynamic';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { Sidebar } from '@/components/layout/sidebar';
+import { CalendarView } from '@/components/calendar/calendar-view';
 
 export default function CalendarPage() {
   return (
-    <ProtectedRoute allowedRoles={["admin", "team_member"]}>
+    <ProtectedRoute allowedRoles={['admin', 'team_member']}>
       <div className="flex min-h-screen bg-background">
         <Sidebar />
         <main className="flex-1 p-8">
@@ -19,5 +19,5 @@ export default function CalendarPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

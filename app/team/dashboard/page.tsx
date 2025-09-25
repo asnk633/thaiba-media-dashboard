@@ -1,11 +1,11 @@
-export const dynamic = "force-dynamic";
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { Sidebar } from "@/components/layout/sidebar"
-import { TeamDashboard } from "@/components/team/team-dashboard"
+export const dynamic = 'force-dynamic';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { Sidebar } from '@/components/layout/sidebar';
+import { TeamDashboard } from '@/components/team/team-dashboard';
 
 export default function TeamDashboardPage() {
   return (
-    <ProtectedRoute allowedRoles={["team_member"]}>
+    <ProtectedRoute allowedRoles={['team_member']}>
       <div className="flex min-h-screen bg-background">
         <Sidebar />
         <main className="flex-1 p-8">
@@ -13,5 +13,5 @@ export default function TeamDashboardPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-export const dynamic = "force-dynamic";
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { Sidebar } from "@/components/layout/sidebar"
-import { UsersTable } from "@/components/admin/users-table"
+export const dynamic = 'force-dynamic';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { Sidebar } from '@/components/layout/sidebar';
+import { UsersTable } from '@/components/admin/users-table';
 
 export default function AdminUsersPage() {
   return (
-    <ProtectedRoute allowedRoles={["admin"]}>
+    <ProtectedRoute allowedRoles={['admin']}>
       <div className="flex min-h-screen bg-background">
         <Sidebar />
         <main className="flex-1 p-8">
@@ -21,5 +21,5 @@ export default function AdminUsersPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

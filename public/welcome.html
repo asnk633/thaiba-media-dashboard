@@ -1,139 +1,234 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Welcome — Thaiba Media</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body { margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#071229; color:#e6eef8; display:flex; align-items:center; justify-content:center; height:100vh; }
-    .card { width:100%; max-width:720px; background: rgba(7,18,38,0.55); padding:28px; border-radius:12px; box-shadow:0 8px 40px rgba(2,6,23,0.6); backdrop-filter: blur(6px); }
-    h1 { margin:0 0 8px; font-size:22px }
-    p { margin:0 0 18px; color:#cfe3ff }
-    label { display:block; margin-top:12px; color:#cfe3ff; font-weight:600 }
-    input { width:100%; padding:10px 12px; margin-top:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:#e6eef8 }
-    .row { display:flex; gap:8px; margin-top:16px }
-    button { padding:10px 14px; border-radius:8px; border:0; cursor:pointer; font-weight:700 }
-    .btn-primary { background:#06b6d4; color:#02282b }
-    .btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#e6eef8 }
-    .muted { color:#a9c7e6; font-size:13px; margin-top:8px }
-    .error { margin-top:12px; padding:10px; border-radius:8px; background:#581515; color:#ffd6d6 }
-  </style>
-</head>
-<body>
-  <div class="card" role="main" aria-labelledby="title">
-    <h1 id="title">Welcome — Thaiba Media</h1>
-    <p>Sign in once with your name and email. We’ll remember you on this device until you log out.</p>
-
-    <form id="loginForm" autocomplete="off">
-      <label for="name">Your name</label>
-      <input id="name" name="name" type="text" placeholder="e.g. Abdul Shukoor" required>
-
-      <label for="email">Email address</label>
-      <input id="email" name="email" type="email" placeholder="you@example.com" required>
-
-      <div class="row">
-        <button id="continueBtn" class="btn-primary" type="submit">Continue</button>
-        <button id="clearBtn" type="button" class="btn-ghost">Clear saved session</button>
-      </div>
-
-      <div id="message" class="muted">If you are a team member or admin, use the same email you provided earlier so role checks work.</div>
-      <div id="error" class="error" style="display:none"></div>
-    </form>
-  </div>
-
-  <script>
-    // Helpers
-    function e(q){ return document.querySelector(q); }
-    function parseRoleEntry(raw){
-      // Accept formats like "Name <email@x.com>" or "<email@x.com>" or "email@x.com"
-      if(!raw) return '';
-      try {
-        raw = String(raw);
-        // decode \u003c and similar if present
-        raw = raw.replace(/\\u003c/g,'<').replace(/\\u003e/g,'>').trim();
-        const m = raw.match(/<([^>]+)>/);
-        if(m && m[1]) return m[1].trim().toLowerCase();
-        // if it's simple email-like
-        if(raw.includes('@')) return raw.trim().toLowerCase();
-        return raw.trim().toLowerCase();
-      } catch(e){ return String(raw).toLowerCase(); }
-    }
-
-    // Save session object to localStorage
-    function saveSession(session){
-      localStorage.setItem('tm_session', JSON.stringify(session));
-    }
-    function loadSession(){
-      try { return JSON.parse(localStorage.getItem('tm_session') || 'null'); } catch(e){ return null; }
-    }
-    function clearSession(){
-      localStorage.removeItem('tm_session');
-    }
-
-    // UX helpers
-    function setError(msg){
-      if(!msg){ e('#error').style.display='none'; e('#error').textContent=''; return; }
-      e('#error').style.display='block'; e('#error').textContent = msg;
-    }
-
-    // On load, if session exists redirect to the right page immediately
-    (function preflightRedirect(){
-      const s = loadSession();
-      if(s && s.email){
-        // Already signed in — route by role (admin/team/institution)
-        if(s.role === 'admin') { location.href = '/admin.html'; return; }
-        if(s.role === 'team') { location.href = '/team.html'; return; }
-        location.href = '/institution.html';
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome — Thaiba Media</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          Arial;
+        background: #071229;
+        color: #e6eef8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
       }
-    })();
+      .card {
+        width: 100%;
+        max-width: 720px;
+        background: rgba(7, 18, 38, 0.55);
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 8px 40px rgba(2, 6, 23, 0.6);
+        backdrop-filter: blur(6px);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 22px;
+      }
+      p {
+        margin: 0 0 18px;
+        color: #cfe3ff;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        color: #cfe3ff;
+        font-weight: 600;
+      }
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.02);
+        color: #e6eef8;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      button {
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 0;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn-primary {
+        background: #06b6d4;
+        color: #02282b;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: #e6eef8;
+      }
+      .muted {
+        color: #a9c7e6;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      .error {
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #581515;
+        color: #ffd6d6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card" role="main" aria-labelledby="title">
+      <h1 id="title">Welcome — Thaiba Media</h1>
+      <p>
+        Sign in once with your name and email. We’ll remember you on this device until you log out.
+      </p>
 
-    // Login flow
-    e('#loginForm').addEventListener('submit', async function(evt){
-      evt.preventDefault();
-      setError(null);
-      const name = e('#name').value.trim();
-      const email = e('#email').value.trim().toLowerCase();
+      <form id="loginForm" autocomplete="off">
+        <label for="name">Your name</label>
+        <input id="name" name="name" type="text" placeholder="e.g. Abdul Shukoor" required />
 
-      if(!name || !email){
-        setError('Please enter both name and email.');
-        return;
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" required />
+
+        <div class="row">
+          <button id="continueBtn" class="btn-primary" type="submit">Continue</button>
+          <button id="clearBtn" type="button" class="btn-ghost">Clear saved session</button>
+        </div>
+
+        <div id="message" class="muted">
+          If you are a team member or admin, use the same email you provided earlier so role checks
+          work.
+        </div>
+        <div id="error" class="error" style="display: none"></div>
+      </form>
+    </div>
+
+    <script>
+      // Helpers
+      function e(q) {
+        return document.querySelector(q);
+      }
+      function parseRoleEntry(raw) {
+        // Accept formats like "Name <email@x.com>" or "<email@x.com>" or "email@x.com"
+        if (!raw) return '';
+        try {
+          raw = String(raw);
+          // decode \u003c and similar if present
+          raw = raw
+            .replace(/\\u003c/g, '<')
+            .replace(/\\u003e/g, '>')
+            .trim();
+          const m = raw.match(/<([^>]+)>/);
+          if (m && m[1]) return m[1].trim().toLowerCase();
+          // if it's simple email-like
+          if (raw.includes('@')) return raw.trim().toLowerCase();
+          return raw.trim().toLowerCase();
+        } catch (e) {
+          return String(raw).toLowerCase();
+        }
       }
 
-      // call /api/roles to determine role
-      try {
-        const r = await fetch('/api/roles', { cache: 'no-store' });
-        if(!r.ok) throw new Error('roles endpoint returned ' + r.status);
-        const j = await r.json();
-        const adminsRaw = j.admins || [];
-        const teamRaw = j.team || [];
-
-        const admins = adminsRaw.map(parseRoleEntry);
-        const team = teamRaw.map(parseRoleEntry);
-
-        let role = 'institution';
-        if(admins.includes(email)) role = 'admin';
-        else if(team.includes(email)) role = 'team';
-
-        const session = { name, email, role, loggedAt: new Date().toISOString() };
-        saveSession(session);
-
-        // Redirect by role
-        if(role === 'admin') location.href = '/admin.html';
-        else if(role === 'team') location.href = '/team.html';
-        else location.href = '/institution.html';
-
-      } catch(err){
-        console.error('roles error', err);
-        setError('Failed to check roles: ' + (err.message||err));
+      // Save session object to localStorage
+      function saveSession(session) {
+        localStorage.setItem('tm_session', JSON.stringify(session));
       }
-    });
+      function loadSession() {
+        try {
+          return JSON.parse(localStorage.getItem('tm_session') || 'null');
+        } catch (e) {
+          return null;
+        }
+      }
+      function clearSession() {
+        localStorage.removeItem('tm_session');
+      }
 
-    // Clear saved session (for troubleshooting)
-    e('#clearBtn').addEventListener('click', function(){
-      clearSession();
-      setError(null);
-      alert('Local session cleared. You can sign in again.');
-    });
-  </script>
-</body>
+      // UX helpers
+      function setError(msg) {
+        if (!msg) {
+          e('#error').style.display = 'none';
+          e('#error').textContent = '';
+          return;
+        }
+        e('#error').style.display = 'block';
+        e('#error').textContent = msg;
+      }
+
+      // On load, if session exists redirect to the right page immediately
+      (function preflightRedirect() {
+        const s = loadSession();
+        if (s && s.email) {
+          // Already signed in — route by role (admin/team/institution)
+          if (s.role === 'admin') {
+            location.href = '/admin.html';
+            return;
+          }
+          if (s.role === 'team') {
+            location.href = '/team.html';
+            return;
+          }
+          location.href = '/institution.html';
+        }
+      })();
+
+      // Login flow
+      e('#loginForm').addEventListener('submit', async function (evt) {
+        evt.preventDefault();
+        setError(null);
+        const name = e('#name').value.trim();
+        const email = e('#email').value.trim().toLowerCase();
+
+        if (!name || !email) {
+          setError('Please enter both name and email.');
+          return;
+        }
+
+        // call /api/roles to determine role
+        try {
+          const r = await fetch('/api/roles', { cache: 'no-store' });
+          if (!r.ok) throw new Error('roles endpoint returned ' + r.status);
+          const j = await r.json();
+          const adminsRaw = j.admins || [];
+          const teamRaw = j.team || [];
+
+          const admins = adminsRaw.map(parseRoleEntry);
+          const team = teamRaw.map(parseRoleEntry);
+
+          let role = 'institution';
+          if (admins.includes(email)) role = 'admin';
+          else if (team.includes(email)) role = 'team';
+
+          const session = { name, email, role, loggedAt: new Date().toISOString() };
+          saveSession(session);
+
+          // Redirect by role
+          if (role === 'admin') location.href = '/admin.html';
+          else if (role === 'team') location.href = '/team.html';
+          else location.href = '/institution.html';
+        } catch (err) {
+          console.error('roles error', err);
+          setError('Failed to check roles: ' + (err.message || err));
+        }
+      });
+
+      // Clear saved session (for troubleshooting)
+      e('#clearBtn').addEventListener('click', function () {
+        clearSession();
+        setError(null);
+        alert('Local session cleared. You can sign in again.');
+      });
+    </script>
+  </body>
 </html>

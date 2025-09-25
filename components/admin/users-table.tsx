@@ -1,92 +1,107 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase"
-import type { UserProfile, Institution } from "@/types/auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Search, UserPlus, Edit } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
+import type { UserProfile, Institution } from '@/types/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Search, UserPlus, Edit } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 export function UsersTable() {
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [institutions, setInstitutions] = useState<Institution[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedRole, setSelectedRole] = useState<string>("all")
-  const [editingUser, setEditingUser] = useState<UserProfile | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState<string>('all');
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const supabase = createClient()
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchUsers()
-    fetchInstitutions()
-  }, [])
+    fetchUsers();
+    fetchInstitutions();
+  }, []);
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.from("user_profiles").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (error) throw error
-      setUsers(data || [])
+      if (error) throw error;
+      setUsers(data || []);
     } catch (error) {
-      console.error("Error fetching users:", error)
+      console.error('Error fetching users:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchInstitutions = async () => {
     try {
-      const { data, error } = await supabase.from("institutions").select("*")
-      if (error) throw error
-      setInstitutions(data || [])
+      const { data, error } = await supabase.from('institutions').select('*');
+      if (error) throw error;
+      setInstitutions(data || []);
     } catch (error) {
-      console.error("Error fetching institutions:", error)
+      console.error('Error fetching institutions:', error);
     }
-  }
+  };
 
   const updateUserRole = async (userId: string, newRole: string, institutionId?: string) => {
     try {
       const { error } = await supabase
-        .from("user_profiles")
+        .from('user_profiles')
         .update({ role: newRole, institution_id: institutionId })
-        .eq("id", userId)
+        .eq('id', userId);
 
-      if (error) throw error
-      fetchUsers()
-      setIsDialogOpen(false)
-      setEditingUser(null)
+      if (error) throw error;
+      fetchUsers();
+      setIsDialogOpen(false);
+      setEditingUser(null);
     } catch (error) {
-      console.error("Error updating user:", error)
+      console.error('Error updating user:', error);
     }
-  }
+  };
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = users.filter(user => {
     const matchesSearch =
       user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = selectedRole === "all" || user.role === selectedRole
-    return matchesSearch && matchesRole
-  })
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+    return matchesSearch && matchesRole;
+  });
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case "admin":
-        return "bg-red-500/10 text-red-500 border-red-500/20"
-      case "team_member":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20"
-      case "institution":
-        return "bg-green-500/10 text-green-500 border-green-500/20"
+      case 'admin':
+        return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'team_member':
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'institution':
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
       default:
-        return "bg-gray-500/10 text-gray-500 border-gray-500/20"
+        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -97,7 +112,7 @@ export function UsersTable() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -115,7 +130,7 @@ export function UsersTable() {
             <Input
               placeholder="Search users..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -133,11 +148,16 @@ export function UsersTable() {
         </div>
 
         <div className="space-y-4">
-          {filteredUsers.map((user) => (
-            <div key={user.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+          {filteredUsers.map(user => (
+            <div
+              key={user.id}
+              className="flex items-center justify-between p-4 border border-border rounded-lg"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-primary">{user.full_name.charAt(0).toUpperCase()}</span>
+                  <span className="text-sm font-medium text-primary">
+                    {user.full_name.charAt(0).toUpperCase()}
+                  </span>
                 </div>
                 <div>
                   <h3 className="font-medium text-foreground">{user.full_name}</h3>
@@ -146,15 +166,20 @@ export function UsersTable() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Badge className={getRoleBadgeColor(user.role)}>{user.role.replace("_", " ")}</Badge>
-                <Dialog open={isDialogOpen && editingUser?.id === user.id} onOpenChange={setIsDialogOpen}>
+                <Badge className={getRoleBadgeColor(user.role)}>
+                  {user.role.replace('_', ' ')}
+                </Badge>
+                <Dialog
+                  open={isDialogOpen && editingUser?.id === user.id}
+                  onOpenChange={setIsDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setEditingUser(user)
-                        setIsDialogOpen(true)
+                        setEditingUser(user);
+                        setIsDialogOpen(true);
                       }}
                     >
                       <Edit className="h-4 w-4" />
@@ -175,9 +200,9 @@ export function UsersTable() {
                         <Label>Role</Label>
                         <Select
                           defaultValue={user.role}
-                          onValueChange={(value) => {
+                          onValueChange={value => {
                             if (editingUser) {
-                              setEditingUser({ ...editingUser, role: value as any })
+                              setEditingUser({ ...editingUser, role: value as any });
                             }
                           }}
                         >
@@ -191,14 +216,14 @@ export function UsersTable() {
                           </SelectContent>
                         </Select>
                       </div>
-                      {editingUser?.role === "institution" && (
+                      {editingUser?.role === 'institution' && (
                         <div>
                           <Label>Institution</Label>
                           <Select
-                            defaultValue={user.institution_id || ""}
-                            onValueChange={(value) => {
+                            defaultValue={user.institution_id || ''}
+                            onValueChange={value => {
                               if (editingUser) {
-                                setEditingUser({ ...editingUser, institution_id: value })
+                                setEditingUser({ ...editingUser, institution_id: value });
                               }
                             }}
                           >
@@ -206,7 +231,7 @@ export function UsersTable() {
                               <SelectValue placeholder="Select institution" />
                             </SelectTrigger>
                             <SelectContent>
-                              {institutions.map((institution) => (
+                              {institutions.map(institution => (
                                 <SelectItem key={institution.id} value={institution.id}>
                                   {institution.name}
                                 </SelectItem>
@@ -218,7 +243,11 @@ export function UsersTable() {
                       <Button
                         onClick={() => {
                           if (editingUser) {
-                            updateUserRole(editingUser.id, editingUser.role, editingUser.institution_id)
+                            updateUserRole(
+                              editingUser.id,
+                              editingUser.role,
+                              editingUser.institution_id,
+                            );
                           }
                         }}
                         className="w-full"
@@ -240,5 +269,5 @@ export function UsersTable() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

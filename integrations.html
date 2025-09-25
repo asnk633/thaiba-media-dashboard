@@ -1,302 +1,396 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Integrations - Thaiba Garden Media Task Manager</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <img class="h-8 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
-                        <span class="ml-2 text-xl font-semibold text-gray-900">Media Task Manager</span>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="hidden md:ml-4 md:flex md:items-center">
-                        <button class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i data-feather="bell"></i>
-                        </button>
-                        <div class="ml-3 relative">
-                            <div>
-                                <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu" aria-expanded="false" aria-haspopup="true">
-                                    <span class="sr-only">Open user menu</span>
-                                    <img class="h-8 w-8 rounded-full" src="http://static.photos/people/200x200/10" alt="User profile">
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 flex items-center">
+              <img
+                class="h-8 w-auto"
+                src="http://static.photos/education/200x200/5"
+                alt="Thaiba Garden Logo"
+              />
+              <span class="ml-2 text-xl font-semibold text-gray-900">Media Task Manager</span>
             </div>
+          </div>
+          <div class="flex items-center">
+            <div class="hidden md:ml-4 md:flex md:items-center">
+              <button
+                class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <i data-feather="bell"></i>
+              </button>
+              <div class="ml-3 relative">
+                <div>
+                  <button
+                    type="button"
+                    class="flex text-sm rounded-full focus:outline-none"
+                    id="user-menu"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                  >
+                    <span class="sr-only">Open user menu</span>
+                    <img
+                      class="h-8 w-8 rounded-full"
+                      src="http://static.photos/people/200x200/10"
+                      alt="User profile"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-900">Integrations</h1>
-            <p class="mt-1 text-sm text-gray-500">Connect your task management tools for seamless workflow</p>
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Integrations</h1>
+        <p class="mt-1 text-sm text-gray-500">
+          Connect your task management tools for seamless workflow
+        </p>
+      </div>
+
+      <!-- Integration Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Google Sheets Integration -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center">
+              <img
+                src="https://www.gstatic.com/images/branding/product/1x/sheets_48dp.png"
+                alt="Google Sheets"
+                class="h-10 w-10"
+              />
+              <h3 class="ml-3 text-lg font-medium text-gray-900">Google Sheets</h3>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">
+              Sync tasks between this platform and your Google Sheets. All updates will be reflected
+              in real-time.
+            </p>
+            <div class="mt-4">
+              <div class="flex items-center text-sm text-gray-500">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Auto-sync tasks in both directions</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Maintain all task details in spreadsheet format</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Quick entry row for new tasks</span>
+              </div>
+            </div>
+            <div class="mt-6">
+              <button
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                <i data-feather="link" class="mr-2"></i> Connect Google Sheets
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-6 py-4">
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"
+                >View connected sheet</a
+              >
+            </div>
+          </div>
         </div>
 
-        <!-- Integration Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Google Sheets Integration -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/sheets_48dp.png" alt="Google Sheets" class="h-10 w-10">
-                        <h3 class="ml-3 text-lg font-medium text-gray-900">Google Sheets</h3>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        Sync tasks between this platform and your Google Sheets. All updates will be reflected in real-time.
-                    </p>
-                    <div class="mt-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Auto-sync tasks in both directions</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Maintain all task details in spreadsheet format</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Quick entry row for new tasks</span>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            <i data-feather="link" class="mr-2"></i> Connect Google Sheets
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">View connected sheet</a>
-                    </div>
-                </div>
+        <!-- Microsoft To Do Integration -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center">
+              <img
+                src="https://img.icons8.com/fluency/48/000000/microsoft-to-do-app.png"
+                alt="Microsoft To Do"
+                class="h-10 w-10"
+              />
+              <h3 class="ml-3 text-lg font-medium text-gray-900">Microsoft To Do</h3>
             </div>
-
-            <!-- Microsoft To Do Integration -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <img src="https://img.icons8.com/fluency/48/000000/microsoft-to-do-app.png" alt="Microsoft To Do" class="h-10 w-10">
-                        <h3 class="ml-3 text-lg font-medium text-gray-900">Microsoft To Do</h3>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        Connect with Microsoft To Do to manage tasks across platforms. Changes sync automatically.
-                    </p>
-                    <div class="mt-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Two-way sync with your To Do lists</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Get notifications on your devices</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Reminders and due dates sync automatically</span>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i data-feather="link" class="mr-2"></i> Connect Microsoft To Do
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">View connected lists</a>
-                    </div>
-                </div>
+            <p class="mt-2 text-sm text-gray-500">
+              Connect with Microsoft To Do to manage tasks across platforms. Changes sync
+              automatically.
+            </p>
+            <div class="mt-4">
+              <div class="flex items-center text-sm text-gray-500">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Two-way sync with your To Do lists</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Get notifications on your devices</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Reminders and due dates sync automatically</span>
+              </div>
             </div>
-
-            <!-- WhatsApp Notifications -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <img src="https://img.icons8.com/color/48/000000/whatsapp.png" alt="WhatsApp" class="h-10 w-10">
-                        <h3 class="ml-3 text-lg font-medium text-gray-900">WhatsApp Notifications</h3>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        Get instant WhatsApp notifications when new tasks are assigned or deadlines approach.
-                    </p>
-                    <div class="mt-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>New task assignments</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Deadline reminders</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Status change notifications</span>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            <i data-feather="smartphone" class="mr-2"></i> Setup WhatsApp Alerts
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Manage notifications</a>
-                    </div>
-                </div>
+            <div class="mt-6">
+              <button
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <i data-feather="link" class="mr-2"></i> Connect Microsoft To Do
+              </button>
             </div>
-
-            <!-- Email Notifications -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-center">
-                        <i data-feather="mail" class="h-10 w-10 text-gray-600"></i>
-                        <h3 class="ml-3 text-lg font-medium text-gray-900">Email Notifications</h3>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                        Configure email notifications for daily summaries, overdue tasks, and important updates.
-                    </p>
-                    <div class="mt-4">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Daily task summaries</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Overdue task alerts</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <i data-feather="check" class="mr-2 text-green-500"></i>
-                            <span>Weekly reports</span>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <i data-feather="settings" class="mr-2"></i> Configure Email Alerts
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">View notification settings</a>
-                    </div>
-                </div>
+          </div>
+          <div class="bg-gray-50 px-6 py-4">
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"
+                >View connected lists</a
+              >
             </div>
+          </div>
         </div>
 
-        <!-- Sync Settings -->
-        <div class="mt-12 bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-6 py-5 border-b border-gray-200">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Sync Settings</h3>
-                <p class="mt-1 text-sm text-gray-500">Configure how and when your tasks sync between platforms.</p>
+        <!-- WhatsApp Notifications -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center">
+              <img
+                src="https://img.icons8.com/color/48/000000/whatsapp.png"
+                alt="WhatsApp"
+                class="h-10 w-10"
+              />
+              <h3 class="ml-3 text-lg font-medium text-gray-900">WhatsApp Notifications</h3>
             </div>
-            <div class="px-6 py-4">
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="real-time-sync" name="real-time-sync" type="checkbox" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="real-time-sync" class="font-medium text-gray-700">Real-time Sync</label>
-                            <p class="text-gray-500">Changes sync immediately between all connected platforms.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="sync-history" name="sync-history" type="checkbox" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="sync-history" class="font-medium text-gray-700">Sync Task History</label>
-                            <p class="text-gray-500">Include completed tasks in the sync process.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="conflict-resolution" name="conflict-resolution" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="conflict-resolution" class="font-medium text-gray-700">Manual Conflict Resolution</label>
-                            <p class="text-gray-500">Prompt me when there are conflicting changes between platforms.</p>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="sync-frequency" class="block text-sm font-medium text-gray-700">Sync Frequency (when not real-time)</label>
-                        <select id="sync-frequency" name="sync-frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option>Every 5 minutes</option>
-                            <option selected>Every 15 minutes</option>
-                            <option>Every 30 minutes</option>
-                            <option>Every hour</option>
-                            <option>Manually only</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="mt-6">
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Save Sync Settings
-                    </button>
-                </div>
+            <p class="mt-2 text-sm text-gray-500">
+              Get instant WhatsApp notifications when new tasks are assigned or deadlines approach.
+            </p>
+            <div class="mt-4">
+              <div class="flex items-center text-sm text-gray-500">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>New task assignments</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Deadline reminders</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Status change notifications</span>
+              </div>
             </div>
+            <div class="mt-6">
+              <button
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                <i data-feather="smartphone" class="mr-2"></i> Setup WhatsApp Alerts
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-6 py-4">
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"
+                >Manage notifications</a
+              >
+            </div>
+          </div>
         </div>
+
+        <!-- Email Notifications -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center">
+              <i data-feather="mail" class="h-10 w-10 text-gray-600"></i>
+              <h3 class="ml-3 text-lg font-medium text-gray-900">Email Notifications</h3>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">
+              Configure email notifications for daily summaries, overdue tasks, and important
+              updates.
+            </p>
+            <div class="mt-4">
+              <div class="flex items-center text-sm text-gray-500">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Daily task summaries</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Overdue task alerts</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500 mt-2">
+                <i data-feather="check" class="mr-2 text-green-500"></i>
+                <span>Weekly reports</span>
+              </div>
+            </div>
+            <div class="mt-6">
+              <button
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <i data-feather="settings" class="mr-2"></i> Configure Email Alerts
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-6 py-4">
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"
+                >View notification settings</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sync Settings -->
+      <div class="mt-12 bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Sync Settings</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Configure how and when your tasks sync between platforms.
+          </p>
+        </div>
+        <div class="px-6 py-4">
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id="real-time-sync"
+                  name="real-time-sync"
+                  type="checkbox"
+                  checked
+                  class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="real-time-sync" class="font-medium text-gray-700">Real-time Sync</label>
+                <p class="text-gray-500">
+                  Changes sync immediately between all connected platforms.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id="sync-history"
+                  name="sync-history"
+                  type="checkbox"
+                  checked
+                  class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="sync-history" class="font-medium text-gray-700"
+                  >Sync Task History</label
+                >
+                <p class="text-gray-500">Include completed tasks in the sync process.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id="conflict-resolution"
+                  name="conflict-resolution"
+                  type="checkbox"
+                  class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="conflict-resolution" class="font-medium text-gray-700"
+                  >Manual Conflict Resolution</label
+                >
+                <p class="text-gray-500">
+                  Prompt me when there are conflicting changes between platforms.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label for="sync-frequency" class="block text-sm font-medium text-gray-700"
+                >Sync Frequency (when not real-time)</label
+              >
+              <select
+                id="sync-frequency"
+                name="sync-frequency"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              >
+                <option>Every 5 minutes</option>
+                <option selected>Every 15 minutes</option>
+                <option>Every 30 minutes</option>
+                <option>Every hour</option>
+                <option>Manually only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <button
+              type="button"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Save Sync Settings
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 mt-12">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center">
-                    <img class="h-6 w-auto" src="http://static.photos/education/200x200/5" alt="Thaiba Garden Logo">
-                    <span class="ml-2 text-sm text-gray-500">© 2023 Thaiba Garden Group. All rights reserved.</span>
-                </div>
-                <div class="mt-4 md:mt-0">
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Google Sheets</span>
-                            <i data-feather="file-text"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Microsoft To Do</span>
-                            <i data-feather="check-square"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">WhatsApp</span>
-                            <i data-feather="message-square"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Email</span>
-                            <i data-feather="mail"></i>
-                        </a>
-                    </div>
-                </div>
+      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="flex items-center">
+            <img
+              class="h-6 w-auto"
+              src="http://static.photos/education/200x200/5"
+              alt="Thaiba Garden Logo"
+            />
+            <span class="ml-2 text-sm text-gray-500"
+              >© 2023 Thaiba Garden Group. All rights reserved.</span
+            >
+          </div>
+          <div class="mt-4 md:mt-0">
+            <div class="flex space-x-6">
+              <a href="#" class="text-gray-400 hover:text-gray-500">
+                <span class="sr-only">Google Sheets</span>
+                <i data-feather="file-text"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-gray-500">
+                <span class="sr-only">Microsoft To Do</span>
+                <i data-feather="check-square"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-gray-500">
+                <span class="sr-only">WhatsApp</span>
+                <i data-feather="message-square"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-gray-500">
+                <span class="sr-only">Email</span>
+                <i data-feather="mail"></i>
+              </a>
             </div>
+          </div>
         </div>
+      </div>
     </footer>
 
     <script>
-        // Initialize AOS animations
-        AOS.init();
-        
-        // Initialize Feather Icons
-        feather.replace();
+      // Initialize AOS animations
+      AOS.init();
+
+      // Initialize Feather Icons
+      feather.replace();
     </script>
-</body>
+  </body>
 </html>

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const [,, serviceFile, sheetId] = process.argv;
+const [, , serviceFile, sheetId] = process.argv;
 
 if (!serviceFile || !sheetId) {
   console.error('Usage: node create-env.js <service-account.json> <GOOGLE_SHEETS_ID>');

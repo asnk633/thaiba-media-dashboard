@@ -1,6 +1,6 @@
-export const dynamic = "force-dynamic";
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { Sidebar } from "@/components/layout/sidebar"
+export const dynamic = 'force-dynamic';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { Sidebar } from '@/components/layout/sidebar';
 
 export default function DashboardPage() {
   return (
@@ -35,5 +35,5 @@ export default function DashboardPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

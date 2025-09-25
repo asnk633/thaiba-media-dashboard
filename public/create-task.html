@@ -1,398 +1,561 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Create Task — Thaiba Media</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{
-      --bg:#071226; --card:#071226; --panel:#0b1220; --muted:#9fb2c7; --accent:#06b6d4;
-      --text:#e6eef8; --input-bg:#0b1220; --border:#263446;
-    }
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding:28px; background:#0f1724; color:var(--text); }
-    .wrap { max-width:840px; margin:0 auto; }
-    .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); padding:28px; border-radius:12px; box-shadow:0 18px 70px rgba(0,0,0,.6); }
-    h2 { margin:0 0 14px 0; font-size:30px; }
-    label { display:block; margin-top:16px; font-weight:600; color:#cfe3ff; }
-    input[type="text"], input[type="date"], textarea, select { width:100%; padding:10px 12px; margin-top:8px; border-radius:8px; border:1px solid var(--border); background:var(--input-bg); color:var(--text); box-sizing:border-box; font-size:15px; }
-    textarea { min-height:120px; resize:vertical; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; align-items:start; }
-    .full { grid-column:1/-1; }
-    .row { display:flex; gap:12px; align-items:center; margin-top:12px; }
-    button { display:inline-block; margin-top:18px; padding:10px 16px; border-radius:10px; background:var(--accent); color:#042027; border:0; cursor:pointer; font-weight:700 }
-    .muted { color:var(--muted); margin-top:6px; font-size:14px }
-    .status-msg { margin-top:14px; padding:12px; border-radius:8px; background:#4b1b1b; color:#ffdede; display:none; }
-    .ok-msg { background:#073227; color:#bfffe8; display:none; padding:12px; border-radius:8px; margin-top:12px }
-    .signed { margin-top:8px; color:#bfe8ee; font-size:14px; }
-    .signed small { color:var(--muted); display:block; font-weight:500 }
-    .gsi-btn { margin-top:10px; }
-    .top-note { margin-bottom:8px; color:var(--muted); }
-    .inline { display:inline-block; }
-    .left { float:left; }
-    .right { float:right; }
-    @media (max-width:720px){ .grid{grid-template-columns:1fr} }
-  </style>
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h2>Create Task</h2>
+  <head>
+    <meta charset="utf-8" />
+    <title>Create Task — Thaiba Media</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      :root {
+        --bg: #071226;
+        --card: #071226;
+        --panel: #0b1220;
+        --muted: #9fb2c7;
+        --accent: #06b6d4;
+        --text: #e6eef8;
+        --input-bg: #0b1220;
+        --border: #263446;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        padding: 28px;
+        background: #0f1724;
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 840px;
+        margin: 0 auto;
+      }
+      .card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.02));
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 18px 70px rgba(0, 0, 0, 0.6);
+      }
+      h2 {
+        margin: 0 0 14px 0;
+        font-size: 30px;
+      }
+      label {
+        display: block;
+        margin-top: 16px;
+        font-weight: 600;
+        color: #cfe3ff;
+      }
+      input[type='text'],
+      input[type='date'],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--input-bg);
+        color: var(--text);
+        box-sizing: border-box;
+        font-size: 15px;
+      }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        align-items: start;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 12px;
+      }
+      button {
+        display: inline-block;
+        margin-top: 18px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #042027;
+        border: 0;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .muted {
+        color: var(--muted);
+        margin-top: 6px;
+        font-size: 14px;
+      }
+      .status-msg {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #4b1b1b;
+        color: #ffdede;
+        display: none;
+      }
+      .ok-msg {
+        background: #073227;
+        color: #bfffe8;
+        display: none;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 12px;
+      }
+      .signed {
+        margin-top: 8px;
+        color: #bfe8ee;
+        font-size: 14px;
+      }
+      .signed small {
+        color: var(--muted);
+        display: block;
+        font-weight: 500;
+      }
+      .gsi-btn {
+        margin-top: 10px;
+      }
+      .top-note {
+        margin-bottom: 8px;
+        color: var(--muted);
+      }
+      .inline {
+        display: inline-block;
+      }
+      .left {
+        float: left;
+      }
+      .right {
+        float: right;
+      }
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h2>Create Task</h2>
 
-      <div id="signedArea" class="signed" style="display:none;">
-        <span id="signedText"></span>
-        <small><a href="#" id="signOutLink">Sign out</a></small>
+        <div id="signedArea" class="signed" style="display: none">
+          <span id="signedText"></span>
+          <small><a href="#" id="signOutLink">Sign out</a></small>
+        </div>
+
+        <div id="signinHint" class="top-note">
+          Sign in with Google to create tasks (we will verify your email).
+        </div>
+        <div id="gsiButton" class="gsi-btn"></div>
+
+        <form id="taskForm" autocomplete="off">
+          <label
+            >Task ID
+            <input id="task_id" name="task_id" required placeholder="Auto-generated" readonly />
+          </label>
+
+          <label
+            >Task Description
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              placeholder="Describe the task"
+            ></textarea>
+          </label>
+
+          <div class="grid">
+            <div>
+              <label
+                >Assigned To
+                <select id="assigned_to" name="assigned_to">
+                  <option value="">-- choose --</option>
+                </select>
+              </label>
+            </div>
+
+            <div>
+              <label
+                >Priority
+                <select id="priority" name="priority">
+                  <option>Urgent</option>
+                  <option selected>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </label>
+            </div>
+
+            <div>
+              <label
+                >Status
+                <select id="status" name="status">
+                  <option selected>Pending</option>
+                  <option>In Progress</option>
+                  <option>On Hold</option>
+                  <option>Completed</option>
+                </select>
+              </label>
+            </div>
+
+            <div>
+              <label
+                >Requested By
+                <select id="requested_by" name="requested_by">
+                  <option value="">-- choose institution --</option>
+                </select>
+              </label>
+            </div>
+
+            <div>
+              <label
+                >Deadline
+                <input id="deadline" type="date" name="deadline" />
+              </label>
+              <div class="muted">
+                Display preview (DD/MM/YYYY): <span id="deadlinePreview">—</span>
+              </div>
+            </div>
+
+            <div>
+              <label
+                >Notes
+                <textarea id="notes" name="notes" rows="2" placeholder="Optional notes"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="submitBtn" type="button">Create Task</button>
+            <div id="spinner" style="display: none; color: var(--muted); padding-left: 10px">
+              Working…
+            </div>
+          </div>
+
+          <div id="okBox" class="ok-msg"></div>
+          <div id="errBox" class="status-msg"></div>
+        </form>
       </div>
-
-      <div id="signinHint" class="top-note">Sign in with Google to create tasks (we will verify your email).</div>
-      <div id="gsiButton" class="gsi-btn"></div>
-
-      <form id="taskForm" autocomplete="off">
-        <label>Task ID
-          <input id="task_id" name="task_id" required placeholder="Auto-generated" readonly>
-        </label>
-
-        <label>Task Description
-          <textarea id="description" name="description" rows="4" placeholder="Describe the task"></textarea>
-        </label>
-
-        <div class="grid">
-          <div>
-            <label>Assigned To
-              <select id="assigned_to" name="assigned_to">
-                <option value="">-- choose --</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <label>Priority
-              <select id="priority" name="priority">
-                <option>Urgent</option>
-                <option selected>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <label>Status
-              <select id="status" name="status">
-                <option selected>Pending</option>
-                <option>In Progress</option>
-                <option>On Hold</option>
-                <option>Completed</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <label>Requested By
-              <select id="requested_by" name="requested_by">
-                <option value="">-- choose institution --</option>
-              </select>
-            </label>
-          </div>
-
-          <div>
-            <label>Deadline
-              <input id="deadline" type="date" name="deadline" />
-            </label>
-            <div class="muted">Display preview (DD/MM/YYYY): <span id="deadlinePreview">—</span></div>
-          </div>
-
-          <div>
-            <label>Notes
-              <textarea id="notes" name="notes" rows="2" placeholder="Optional notes"></textarea>
-            </label>
-          </div>
-
-        </div>
-
-        <div class="row">
-          <button id="submitBtn" type="button">Create Task</button>
-          <div id="spinner" style="display:none; color:var(--muted); padding-left:10px">Working…</div>
-        </div>
-
-        <div id="okBox" class="ok-msg"></div>
-        <div id="errBox" class="status-msg"></div>
-      </form>
     </div>
-  </div>
 
-<script>
-/*
+    <script>
+      /*
   Frontend create-task page
   - Uses Google Identity Services to sign-in (client id inserted below)
   - Fetches metadata from /api/get-metadata to populate dropdowns and nextTaskId
   - Sends POST to /api/sync with Authorization: Bearer <id_token>
 */
 
-const GOOGLE_OAUTH_CLIENT_ID = "498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com";
+      const GOOGLE_OAUTH_CLIENT_ID =
+        '498891903814-hatabb5r7sif258vvshk3cn263ff4inj.apps.googleusercontent.com';
 
-let idToken = null;
-let signedPayload = null;
+      let idToken = null;
+      let signedPayload = null;
 
-// utility: safe JSON parse
-async function safeFetchJson(url, opts){
-  const res = await fetch(url, opts);
-  const text = await res.text();
-  try {
-    const json = JSON.parse(text);
-    return { ok: res.ok, status: res.status, json, text };
-  } catch(e){
-    return { ok: res.ok, status: res.status, json: null, text };
-  }
-}
-
-function showError(msg){
-  const e = document.getElementById('errBox');
-  e.style.display = 'block';
-  e.textContent = msg;
-  document.getElementById('okBox').style.display = 'none';
-}
-function showOk(msg){
-  const e = document.getElementById('okBox');
-  e.style.display = 'block';
-  e.textContent = msg;
-  document.getElementById('errBox').style.display = 'none';
-}
-
-// --- Google Identity Services init (render button and handle credential) ---
-function initGSI(){
-  if(!window.google || !google.accounts || !google.accounts.id){
-    console.warn('GSI not available yet');
-    return;
-  }
-
-  google.accounts.id.initialize({
-    client_id: GOOGLE_OAUTH_CLIENT_ID,
-    callback: handleCredentialResponse,
-    auto_select: false
-  });
-
-  // render a button
-  google.accounts.id.renderButton(
-    document.getElementById('gsiButton'),
-    { theme: "outline", size: "large", width: 240 }  // customization
-  );
-
-  // optionally show one-tap prompt (commented out)
-  // google.accounts.id.prompt();
-}
-
-function decodeJwtPayload(tok){
-  try {
-    const parts = tok.split('.');
-    if(parts.length < 2) return null;
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const json = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
-    return json;
-  } catch(e){ return null; }
-}
-
-function handleCredentialResponse(response){
-  // response.credential is the ID token (JWT)
-  if(!response || !response.credential){
-    showError('Sign-in failed.');
-    return;
-  }
-  idToken = response.credential;
-  signedPayload = decodeJwtPayload(idToken);
-  updateSignedUI();
-}
-
-function updateSignedUI(){
-  const signedArea = document.getElementById('signedArea');
-  const signedText = document.getElementById('signedText');
-  const signOutLink = document.getElementById('signOutLink');
-  const gsiButton = document.getElementById('gsiButton');
-
-  if(signedPayload && signedPayload.email){
-    signedText.innerHTML = `Signed in as <strong>${signedPayload.email}</strong>`;
-    signedArea.style.display = 'block';
-    gsiButton.style.display = 'none';
-    document.getElementById('signinHint').style.display = 'none';
-  } else {
-    signedArea.style.display = 'none';
-    gsiButton.style.display = 'block';
-    document.getElementById('signinHint').style.display = 'block';
-  }
-
-  signOutLink.addEventListener('click', (ev)=>{
-    ev.preventDefault();
-    // clear token and tell google to disable auto select
-    idToken = null;
-    signedPayload = null;
-    try { google.accounts.id.disableAutoSelect(); } catch(e){}
-    updateSignedUI();
-  });
-}
-
-// --- load metadata (assignedTo, institutions, nextTaskId) ---
-async function loadMetadata(){
-  const res = await safeFetchJson('/api/get-metadata', { method:'GET' });
-  if(!res.ok){
-    showError(res.text || `Failed to load metadata (status ${res.status})`);
-    return;
-  }
-  const data = res.json;
-  // expected shape: { assignedTo: [...], institutions: [...], nextTaskId: "T132", sheet: "Sheet1" }
-  populateMetadata(data);
-}
-
-function clearSelect(sel){
-  while(sel.options.length>0) sel.remove(0);
-}
-
-function populateMetadata(data){
-  // assignedTo
-  const assigned = Array.isArray(data.assignedTo) ? data.assignedTo : (data.assignedTo || []);
-  const assignedSel = document.getElementById('assigned_to');
-  clearSelect(assignedSel);
-  const dflt = document.createElement('option'); dflt.value=''; dflt.text='-- choose --';
-  assignedSel.appendChild(dflt);
-  assigned.forEach(n=>{
-    const o = document.createElement('option'); o.value=n; o.text=n; assignedSel.appendChild(o);
-  });
-
-  // institutions
-  const inst = Array.isArray(data.institutions) ? data.institutions : (data.institutions || []);
-  const instSel = document.getElementById('requested_by');
-  clearSelect(instSel);
-  const dflt2 = document.createElement('option'); dflt2.value=''; dflt2.text='-- choose institution --';
-  instSel.appendChild(dflt2);
-  inst.forEach(s=>{
-    const o = document.createElement('option'); o.value=s; o.text=s; instSel.appendChild(o);
-  });
-
-  // nextTaskId
-  if(data.nextTaskId){
-    document.getElementById('task_id').value = data.nextTaskId;
-  }
-}
-
-// --- deadline preview (DD/MM/YYYY) ---
-function updateDeadlinePreview(){
-  const el = document.getElementById('deadline');
-  const pv = document.getElementById('deadlinePreview');
-  if(!el.value){ pv.textContent = '—'; return; }
-  const d = new Date(el.value);
-  if(isNaN(d.getTime())) { pv.textContent = '—'; return; }
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
-  pv.textContent = `${dd}/${mm}/${yyyy}`;
-}
-document.getElementById('deadline').addEventListener('input', updateDeadlinePreview);
-
-// --- submit handler ---
-async function submitTask(){
-  // hide messages
-  document.getElementById('errBox').style.display = 'none';
-  document.getElementById('okBox').style.display = 'none';
-  document.getElementById('spinner').style.display = 'inline-block';
-
-  // build body
-  const payload = {
-    task: {
-      task_id: document.getElementById('task_id').value.trim(),
-      description: document.getElementById('description').value.trim(),
-      assigned_to: document.getElementById('assigned_to').value || '',
-      priority: document.getElementById('priority').value || '',
-      status: document.getElementById('status').value || '',
-      requested_by: document.getElementById('requested_by').value || '',
-      // server expects ISO date; convert from date input (YYYY-MM-DD). For safety send as-is.
-      deadline: document.getElementById('deadline').value ? document.getElementById('deadline').value : '',
-      notes: document.getElementById('notes').value || ''
-    }
-  };
-
-  // Basic client-side validation
-  if(!payload.task.description){
-    showError('Please enter a task description.');
-    document.getElementById('spinner').style.display = 'none';
-    return;
-  }
-  if(!payload.task.requested_by){
-    showError('Please choose "Requested By".');
-    document.getElementById('spinner').style.display = 'none';
-    return;
-  }
-
-  // set headers
-  const headers = { 'Content-Type': 'application/json' };
-  if(idToken){
-    headers['Authorization'] = 'Bearer ' + idToken;
-  }
-
-  try {
-    const resp = await fetch('/api/sync', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload)
-    });
-    const text = await resp.text();
-    let obj = null;
-    try { obj = JSON.parse(text); } catch(e){ obj = null; }
-    if(!resp.ok){
-      // show server error message if available
-      const msg = (obj && (obj.error || obj.details)) ? (obj.error + (obj.details ? ` — ${obj.details}` : '')) : text || `Server returned ${resp.status}`;
-      showError(msg);
-      document.getElementById('spinner').style.display = 'none';
-      return;
-    }
-    // success
-    const appendedInfo = obj && obj.appended_row ? `${obj.appended_row}` : '';
-    showOk('ok  appended_row ' + (obj && obj.appended_row ? obj.appended_row : '') + (obj && obj.sheet ? '  sheet ' + obj.sheet : ''));
-    // update next task id if server returns it (optional)
-    if(obj && obj.nextTaskId){
-      document.getElementById('task_id').value = obj.nextTaskId;
-    } else {
-      // increment naive T### -> next
-      try {
-        const current = document.getElementById('task_id').value.trim();
-        const m = current.match(/^([A-Za-z]*)(\d+)$/);
-        if(m){
-          const prefix = m[1];
-          const num = String(Number(m[2]) + 1).padStart(m[2].length,'0');
-          document.getElementById('task_id').value = prefix + num;
+      // utility: safe JSON parse
+      async function safeFetchJson(url, opts) {
+        const res = await fetch(url, opts);
+        const text = await res.text();
+        try {
+          const json = JSON.parse(text);
+          return { ok: res.ok, status: res.status, json, text };
+        } catch (e) {
+          return { ok: res.ok, status: res.status, json: null, text };
         }
-      } catch(e){}
-    }
-    // optionally clear description and notes
-    document.getElementById('description').value = '';
-    document.getElementById('notes').value = '';
-  } catch (err){
-    showError('Network or server error: ' + (err.message || String(err)));
-  } finally {
-    document.getElementById('spinner').style.display = 'none';
-  }
-}
+      }
 
-// hooks
-document.getElementById('submitBtn').addEventListener('click', submitTask);
+      function showError(msg) {
+        const e = document.getElementById('errBox');
+        e.style.display = 'block';
+        e.textContent = msg;
+        document.getElementById('okBox').style.display = 'none';
+      }
+      function showOk(msg) {
+        const e = document.getElementById('okBox');
+        e.style.display = 'block';
+        e.textContent = msg;
+        document.getElementById('errBox').style.display = 'none';
+      }
 
-// when DOM ready initialize
-window.addEventListener('load', async ()=>{
-  // init GSI after script loads
-  const tryInit = () => {
-    if(window.google && google.accounts && google.accounts.id){
-      initGSI();
-    } else {
-      setTimeout(tryInit, 250);
-    }
-  };
-  tryInit();
+      // --- Google Identity Services init (render button and handle credential) ---
+      function initGSI() {
+        if (!window.google || !google.accounts || !google.accounts.id) {
+          console.warn('GSI not available yet');
+          return;
+        }
 
-  // load metadata for dropdowns and nextTaskId
-  await loadMetadata();
+        google.accounts.id.initialize({
+          client_id: GOOGLE_OAUTH_CLIENT_ID,
+          callback: handleCredentialResponse,
+          auto_select: false,
+        });
 
-  // deadline preview initial
-  updateDeadlinePreview();
-});
-</script>
-</body>
+        // render a button
+        google.accounts.id.renderButton(
+          document.getElementById('gsiButton'),
+          { theme: 'outline', size: 'large', width: 240 }, // customization
+        );
+
+        // optionally show one-tap prompt (commented out)
+        // google.accounts.id.prompt();
+      }
+
+      function decodeJwtPayload(tok) {
+        try {
+          const parts = tok.split('.');
+          if (parts.length < 2) return null;
+          const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+          const json = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
+          return json;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function handleCredentialResponse(response) {
+        // response.credential is the ID token (JWT)
+        if (!response || !response.credential) {
+          showError('Sign-in failed.');
+          return;
+        }
+        idToken = response.credential;
+        signedPayload = decodeJwtPayload(idToken);
+        updateSignedUI();
+      }
+
+      function updateSignedUI() {
+        const signedArea = document.getElementById('signedArea');
+        const signedText = document.getElementById('signedText');
+        const signOutLink = document.getElementById('signOutLink');
+        const gsiButton = document.getElementById('gsiButton');
+
+        if (signedPayload && signedPayload.email) {
+          signedText.innerHTML = `Signed in as <strong>${signedPayload.email}</strong>`;
+          signedArea.style.display = 'block';
+          gsiButton.style.display = 'none';
+          document.getElementById('signinHint').style.display = 'none';
+        } else {
+          signedArea.style.display = 'none';
+          gsiButton.style.display = 'block';
+          document.getElementById('signinHint').style.display = 'block';
+        }
+
+        signOutLink.addEventListener('click', ev => {
+          ev.preventDefault();
+          // clear token and tell google to disable auto select
+          idToken = null;
+          signedPayload = null;
+          try {
+            google.accounts.id.disableAutoSelect();
+          } catch (e) {}
+          updateSignedUI();
+        });
+      }
+
+      // --- load metadata (assignedTo, institutions, nextTaskId) ---
+      async function loadMetadata() {
+        const res = await safeFetchJson('/api/get-metadata', { method: 'GET' });
+        if (!res.ok) {
+          showError(res.text || `Failed to load metadata (status ${res.status})`);
+          return;
+        }
+        const data = res.json;
+        // expected shape: { assignedTo: [...], institutions: [...], nextTaskId: "T132", sheet: "Sheet1" }
+        populateMetadata(data);
+      }
+
+      function clearSelect(sel) {
+        while (sel.options.length > 0) sel.remove(0);
+      }
+
+      function populateMetadata(data) {
+        // assignedTo
+        const assigned = Array.isArray(data.assignedTo) ? data.assignedTo : data.assignedTo || [];
+        const assignedSel = document.getElementById('assigned_to');
+        clearSelect(assignedSel);
+        const dflt = document.createElement('option');
+        dflt.value = '';
+        dflt.text = '-- choose --';
+        assignedSel.appendChild(dflt);
+        assigned.forEach(n => {
+          const o = document.createElement('option');
+          o.value = n;
+          o.text = n;
+          assignedSel.appendChild(o);
+        });
+
+        // institutions
+        const inst = Array.isArray(data.institutions) ? data.institutions : data.institutions || [];
+        const instSel = document.getElementById('requested_by');
+        clearSelect(instSel);
+        const dflt2 = document.createElement('option');
+        dflt2.value = '';
+        dflt2.text = '-- choose institution --';
+        instSel.appendChild(dflt2);
+        inst.forEach(s => {
+          const o = document.createElement('option');
+          o.value = s;
+          o.text = s;
+          instSel.appendChild(o);
+        });
+
+        // nextTaskId
+        if (data.nextTaskId) {
+          document.getElementById('task_id').value = data.nextTaskId;
+        }
+      }
+
+      // --- deadline preview (DD/MM/YYYY) ---
+      function updateDeadlinePreview() {
+        const el = document.getElementById('deadline');
+        const pv = document.getElementById('deadlinePreview');
+        if (!el.value) {
+          pv.textContent = '—';
+          return;
+        }
+        const d = new Date(el.value);
+        if (isNaN(d.getTime())) {
+          pv.textContent = '—';
+          return;
+        }
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        pv.textContent = `${dd}/${mm}/${yyyy}`;
+      }
+      document.getElementById('deadline').addEventListener('input', updateDeadlinePreview);
+
+      // --- submit handler ---
+      async function submitTask() {
+        // hide messages
+        document.getElementById('errBox').style.display = 'none';
+        document.getElementById('okBox').style.display = 'none';
+        document.getElementById('spinner').style.display = 'inline-block';
+
+        // build body
+        const payload = {
+          task: {
+            task_id: document.getElementById('task_id').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            assigned_to: document.getElementById('assigned_to').value || '',
+            priority: document.getElementById('priority').value || '',
+            status: document.getElementById('status').value || '',
+            requested_by: document.getElementById('requested_by').value || '',
+            // server expects ISO date; convert from date input (YYYY-MM-DD). For safety send as-is.
+            deadline: document.getElementById('deadline').value
+              ? document.getElementById('deadline').value
+              : '',
+            notes: document.getElementById('notes').value || '',
+          },
+        };
+
+        // Basic client-side validation
+        if (!payload.task.description) {
+          showError('Please enter a task description.');
+          document.getElementById('spinner').style.display = 'none';
+          return;
+        }
+        if (!payload.task.requested_by) {
+          showError('Please choose "Requested By".');
+          document.getElementById('spinner').style.display = 'none';
+          return;
+        }
+
+        // set headers
+        const headers = { 'Content-Type': 'application/json' };
+        if (idToken) {
+          headers['Authorization'] = 'Bearer ' + idToken;
+        }
+
+        try {
+          const resp = await fetch('/api/sync', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+          });
+          const text = await resp.text();
+          let obj = null;
+          try {
+            obj = JSON.parse(text);
+          } catch (e) {
+            obj = null;
+          }
+          if (!resp.ok) {
+            // show server error message if available
+            const msg =
+              obj && (obj.error || obj.details)
+                ? obj.error + (obj.details ? ` — ${obj.details}` : '')
+                : text || `Server returned ${resp.status}`;
+            showError(msg);
+            document.getElementById('spinner').style.display = 'none';
+            return;
+          }
+          // success
+          const appendedInfo = obj && obj.appended_row ? `${obj.appended_row}` : '';
+          showOk(
+            'ok  appended_row ' +
+              (obj && obj.appended_row ? obj.appended_row : '') +
+              (obj && obj.sheet ? '  sheet ' + obj.sheet : ''),
+          );
+          // update next task id if server returns it (optional)
+          if (obj && obj.nextTaskId) {
+            document.getElementById('task_id').value = obj.nextTaskId;
+          } else {
+            // increment naive T### -> next
+            try {
+              const current = document.getElementById('task_id').value.trim();
+              const m = current.match(/^([A-Za-z]*)(\d+)$/);
+              if (m) {
+                const prefix = m[1];
+                const num = String(Number(m[2]) + 1).padStart(m[2].length, '0');
+                document.getElementById('task_id').value = prefix + num;
+              }
+            } catch (e) {}
+          }
+          // optionally clear description and notes
+          document.getElementById('description').value = '';
+          document.getElementById('notes').value = '';
+        } catch (err) {
+          showError('Network or server error: ' + (err.message || String(err)));
+        } finally {
+          document.getElementById('spinner').style.display = 'none';
+        }
+      }
+
+      // hooks
+      document.getElementById('submitBtn').addEventListener('click', submitTask);
+
+      // when DOM ready initialize
+      window.addEventListener('load', async () => {
+        // init GSI after script loads
+        const tryInit = () => {
+          if (window.google && google.accounts && google.accounts.id) {
+            initGSI();
+          } else {
+            setTimeout(tryInit, 250);
+          }
+        };
+        tryInit();
+
+        // load metadata for dropdowns and nextTaskId
+        await loadMetadata();
+
+        // deadline preview initial
+        updateDeadlinePreview();
+      });
+    </script>
+  </body>
 </html>

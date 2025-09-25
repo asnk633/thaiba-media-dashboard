@@ -1,114 +1,119 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase"
-import { useAuth } from "@/hooks/use-auth"
-import type { Notification } from "@/types/notifications"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Bell, Check, X } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
+import { useAuth } from '@/hooks/use-auth';
+import type { Notification } from '@/types/notifications';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Bell, Check, X } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 
 export function NotificationCenter() {
-  const { user } = useAuth()
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isOpen, setIsOpen] = useState(false)
-  const supabase = createClient()
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     if (user) {
-      fetchNotifications()
+      fetchNotifications();
 
       // Subscribe to real-time notifications
       const channel = supabase
-        .channel("notifications")
+        .channel('notifications')
         .on(
-          "postgres_changes",
+          'postgres_changes',
           {
-            event: "INSERT",
-            schema: "public",
-            table: "notifications",
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
             filter: `user_id=eq.${user.id}`,
           },
-          (payload) => {
-            setNotifications((prev) => [payload.new as Notification, ...prev])
+          payload => {
+            setNotifications(prev => [payload.new as Notification, ...prev]);
           },
         )
-        .subscribe()
+        .subscribe();
 
       return () => {
-        supabase.removeChannel(channel)
-      }
+        supabase.removeChannel(channel);
+      };
     }
-  }, [user])
+  }, [user]);
 
   const fetchNotifications = async () => {
     try {
       const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false })
-        .limit(20)
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-      if (error) throw error
-      setNotifications(data || [])
+      if (error) throw error;
+      setNotifications(data || []);
     } catch (error) {
-      console.error("Error fetching notifications:", error)
+      console.error('Error fetching notifications:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await supabase.from("notifications").update({ read: true }).eq("id", notificationId)
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
 
-      if (error) throw error
+      if (error) throw error;
 
-      setNotifications((prev) => prev.map((notif) => (notif.id === notificationId ? { ...notif, read: true } : notif)))
+      setNotifications(prev =>
+        prev.map(notif => (notif.id === notificationId ? { ...notif, read: true } : notif)),
+      );
     } catch (error) {
-      console.error("Error marking notification as read:", error)
+      console.error('Error marking notification as read:', error);
     }
-  }
+  };
 
   const markAllAsRead = async () => {
     try {
       const { error } = await supabase
-        .from("notifications")
+        .from('notifications')
         .update({ read: true })
-        .eq("user_id", user?.id)
-        .eq("read", false)
+        .eq('user_id', user?.id)
+        .eq('read', false);
 
-      if (error) throw error
+      if (error) throw error;
 
-      setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })))
+      setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
     } catch (error) {
-      console.error("Error marking all notifications as read:", error)
+      console.error('Error marking all notifications as read:', error);
     }
-  }
+  };
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case "task_assigned":
-        return "📋"
-      case "task_due":
-        return "⏰"
-      case "task_completed":
-        return "✅"
-      case "task_overdue":
-        return "🚨"
-      case "comment_added":
-        return "💬"
+      case 'task_assigned':
+        return '📋';
+      case 'task_due':
+        return '⏰';
+      case 'task_completed':
+        return '✅';
+      case 'task_overdue':
+        return '🚨';
+      case 'comment_added':
+        return '💬';
       default:
-        return "📢"
+        return '📢';
     }
-  }
+  };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -117,7 +122,7 @@ export function NotificationCenter() {
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-              {unreadCount > 9 ? "9+" : unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
           )}
         </Button>
@@ -141,13 +146,15 @@ export function NotificationCenter() {
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">No notifications yet</div>
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No notifications yet
+              </div>
             ) : (
               <div className="max-h-96 overflow-y-auto">
-                {notifications.map((notification) => (
+                {notifications.map(notification => (
                   <div
                     key={notification.id}
-                    className={`p-3 border-b border-border last:border-b-0 ${!notification.read ? "bg-primary/5" : ""}`}
+                    className={`p-3 border-b border-border last:border-b-0 ${!notification.read ? 'bg-primary/5' : ''}`}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-lg">{getNotificationIcon(notification.type)}</span>
@@ -167,7 +174,7 @@ export function NotificationCenter() {
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {format(new Date(notification.created_at), "MMM d, h:mm a")}
+                          {format(new Date(notification.created_at), 'MMM d, h:mm a')}
                         </p>
                       </div>
                     </div>
@@ -179,5 +186,5 @@ export function NotificationCenter() {
         </Card>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
