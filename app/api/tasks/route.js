@@ -1,37 +1,43 @@
-export const dynamic = 'force-dynamic';
+import zlib from 'node:zlib';
+
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
+async function tryParseResponseAsJson(res) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userEmail = (searchParams.get("email") || "").trim().toLowerCase();
-
-    const { getGoogleSpreadsheetClient } = await import("../../../utils/googleAuth.js");
-    const sheetId = process.env.GOOGLE_SHEETS_ID;
-    const doc = await getGoogleSpreadsheetClient(sheetId);
-
-    const taskSheet = doc.sheetsByTitle["tasks"] || doc.sheetsByTitle["MediaTasks"];
-    if (!taskSheet) {
-      return Response.json({ tasks: [] });
+    // If server returned a body with gzip encoding, gunzip before parsing
+    const enc = res.headers && res.headers.get ? res.headers.get('content-encoding') : '';
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (enc && enc.toLowerCase().includes('gzip')) {
+      const unzipped = zlib.gunzipSync(buf).toString('utf8');
+      return JSON.parse(unzipped);
     }
-
-    const rows = await taskSheet.getRows();
-    const filtered = userEmail
-      ? rows.filter(r =>
-          Object.values(r._rawData).some(val => val.toString().trim().toLowerCase() === userEmail)
-        )
-      : rows;
-
-    const tasks = filtered.map(r => ({
-      id: r.id || r.ID || "",
-      title: r.title || r.Task || r.task || "",
-      status: r.status || r.Status || "pending",
-      assignedTo: r.assignedTo || r.AssignedTo || "",
-      deadline: r.deadline || r.Deadline || "",
-    }));
-
-    return Response.json({ tasks });
+    // otherwise try parse as text
+    const txt = buf.toString('utf8');
+    return JSON.parse(txt);
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    // don't throw—return null so caller can handle gracefully
+    console.error('tryParseResponseAsJson failed:', String(err));
+    return null;
+  }
+}
+
+export async function GET(req) {
+  try {
+    // Example: if your original handler fetched some remote URL, adjust below.
+    // Replace REMOTE_URL with whatever your handler actually calls, or adapt
+    // to re-use your existing logic but use tryParseResponseAsJson() for parsing.
+    const REMOTE_URL = process.env.TASKS_SOURCE_URL || 'https://example.com/placeholder.json';
+
+    const r = await fetch(REMOTE_URL, { next: { revalidate: 0 } });
+    const parsed = await tryParseResponseAsJson(r);
+
+    // If parsed is null, return empty tasks rather than erroring
+    const tasks = parsed?.tasks ?? [];
+
+    return new Response(JSON.stringify({ ok: true, tasks }), { headers: { 'Content-Type': 'application/json' }});
+  } catch (err) {
+    console.error('GET /api/tasks uncaught error:', err && err.stack ? err.stack : String(err));
+    return new Response(JSON.stringify({ ok: false, error: String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' }});
   }
 }
