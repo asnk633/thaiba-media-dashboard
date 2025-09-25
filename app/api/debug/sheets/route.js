@@ -1,7 +1,7 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(req) {
+export async function GET(_req) {
   // Keep this handler minimal and valid JS
   return new Response(
     JSON.stringify({

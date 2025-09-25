@@ -22,7 +22,7 @@ async function tryParseResponseAsJson(res) {
   }
 }
 
-export async function GET(req) {
+export async function GET(_req) {
   try {
     // Example: if your original handler fetched some remote URL, adjust below.
     // Replace REMOTE_URL with whatever your handler actually calls, or adapt
