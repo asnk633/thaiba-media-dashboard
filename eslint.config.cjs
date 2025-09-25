@@ -1,19 +1,16 @@
-/* eslint.config.cjs — flat config for ESLint v9 (CommonJS)
-   Uses module objects (require(...)) for parser & plugins. */
+/* eslint.config.cjs — flat config for ESLint v9
+   Typed linting enabled only for .ts/.tsx via parser override.
+   No 'env' keys — use languageOptions.globals instead. */
 module.exports = [
+  // ignore node_modules
   { ignores: ['node_modules/**'] },
 
+  // Base config for JS/JSX (no @typescript-eslint parser here)
   {
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
-      // parser must be the module object, not a path string
-      parser: require('@typescript-eslint/parser'),
-      parserOptions: {
-        project: './tsconfig.json',
-        ecmaFeatures: { jsx: true }
-      },
-      // Replace legacy "env" with explicit globals for files that expect browser/node globals
+      ecmaFeatures: { jsx: true },
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -24,12 +21,14 @@ module.exports = [
         Response: 'readonly',
         localStorage: 'readonly',
         sessionStorage: 'readonly',
+
         process: 'readonly',
         global: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
         module: 'readonly',
         require: 'readonly',
+
         console: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
@@ -40,9 +39,7 @@ module.exports = [
       }
     },
 
-    // plugins must be the plugin modules for flat config
     plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
       react: require('eslint-plugin-react'),
       'react-hooks': require('eslint-plugin-react-hooks'),
       'jsx-a11y': require('eslint-plugin-jsx-a11y'),
@@ -50,19 +47,36 @@ module.exports = [
     },
 
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'warn',
-
       'prettier/prettier': 'warn',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'jsx-a11y/anchor-is-valid': 'off',
-
       'no-console': ['warn', { allow: ['warn', 'error', 'info', 'log'] }]
     },
 
     settings: { react: { version: 'detect' } }
+  },
+
+  // TypeScript override — typed linting only for .ts/.tsx files
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: require('@typescript-eslint/parser'),
+      parserOptions: {
+        project: './tsconfig.json',
+        ecmaVersion: 2024,
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true }
+      }
+    },
+    plugins: {
+      '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'warn'
+    }
   },
 
   // Allow console in server/api files
