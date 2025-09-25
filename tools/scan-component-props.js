@@ -46,12 +46,12 @@ for (const f of files) {
     bad = true;
     for (const e of issues) {
       const line = c.slice(0, e.index).split('\n').length;
-      console.log(`✳️ REVIEW ${f}:${line} -> ${e.iface}`);
+      console.info(`✳️ REVIEW ${f}:${line} -> ${e.iface}`);
     }
   } else {
     for (const e of ex) {
       const line = c.slice(0, e.index).split('\n').length;
-      console.log(`✅ OK ${f}:${line} -> ${e.iface}`);
+      console.info(`✅ OK ${f}:${line} -> ${e.iface}`);
     }
   }
 }

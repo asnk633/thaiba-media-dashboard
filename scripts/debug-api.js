@@ -43,28 +43,28 @@ async function testApiEndpoint(url) {
 }
 
 async function debugApi() {
-  console.log('🔍 Starting API debugging...');
-  console.log('🔍 Environment variables check:');
-  console.log('   GOOGLE_SPREADSHEET_ID:', !!process.env.GOOGLE_SPREADSHEET_ID);
-  console.log('   GOOGLE_SERVICE_ACCOUNT_KEY:', !!process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+  console.info('🔍 Starting API debugging...');
+  console.info('🔍 Environment variables check:');
+  console.info('   GOOGLE_SPREADSHEET_ID:', !!process.env.GOOGLE_SPREADSHEET_ID);
+  console.info('   GOOGLE_SERVICE_ACCOUNT_KEY:', !!process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
   const endpoints = [`${baseUrl}/api/tasks`, `${baseUrl}/api/roles`];
 
   for (const endpoint of endpoints) {
-    console.log(`\n🔍 Testing: ${endpoint}`);
+    console.info(`\n🔍 Testing: ${endpoint}`);
 
     try {
       const result = await testApiEndpoint(endpoint);
-      console.log(`✅ Status: ${result.status}`);
+      console.info(`✅ Status: ${result.status}`);
 
       if (result.status === 200) {
-        console.log(`✅ Success:`, result.data);
+        console.info(`✅ Success:`, result.data);
       } else {
-        console.log(`❌ Error Response:`, result.data);
+        console.info(`❌ Error Response:`, result.data);
       }
     } catch (error) {
-      console.log(`❌ Request failed:`, error.message);
+      console.info(`❌ Request failed:`, error.message);
     }
   }
 }

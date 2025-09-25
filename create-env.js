@@ -33,4 +33,4 @@ GOOGLE_SHEETS_ID=${sheetId}
 `;
 
 fs.writeFileSync('.env.local', out, { encoding: 'utf8' });
-console.log('.env.local created (not committed).');
+console.info('.env.local created (not committed).');

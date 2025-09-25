@@ -2,27 +2,27 @@
 const BASE_URL = 'https://thaiba-media-dashboard-nnn2vz05j-abdul-shukoors-projects.vercel.app';
 
 async function testLiveAPI() {
-  console.log('🔍 Testing live API...');
+  console.info('🔍 Testing live API...');
 
   try {
     const response = await fetch(`${BASE_URL}/api/tasks`);
     const data = await response.text(); // Get raw response first
 
-    console.log('📊 Response Status:', response.status);
-    console.log('📋 Response Headers:', Object.fromEntries(response.headers));
-    console.log('📄 Raw Response:', data);
+    console.info('📊 Response Status:', response.status);
+    console.info('📋 Response Headers:', Object.fromEntries(response.headers));
+    console.info('📄 Raw Response:', data);
 
     if (!response.ok) {
-      console.log('❌ API Error Details:');
+      console.info('❌ API Error Details:');
       try {
         const errorData = JSON.parse(data);
-        console.log('Error Object:', errorData);
+        console.info('Error Object:', errorData);
       } catch {
-        console.log('Raw Error Text:', data);
+        console.info('Raw Error Text:', data);
       }
     }
   } catch (error) {
-    console.log('🚨 Network Error:', error.message);
+    console.info('🚨 Network Error:', error.message);
   }
 }
 

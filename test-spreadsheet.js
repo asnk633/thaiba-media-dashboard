@@ -9,11 +9,11 @@ require('dotenv').config({ path: '.env.local' });
       process.exit(2);
     }
     const doc = await getGoogleSpreadsheetClient(id);
-    console.log('SPREADSHEET TITLE:', doc.title);
+    console.info('SPREADSHEET TITLE:', doc.title);
     if (doc.sheetsByIndex && doc.sheetsByIndex.length) {
-      doc.sheetsByIndex.forEach((s, i) => console.log('sheet', i, '->', s.title));
+      doc.sheetsByIndex.forEach((s, i) => console.info('sheet', i, '->', s.title));
     } else {
-      console.log('No sheets found or sheetsByIndex empty');
+      console.info('No sheets found or sheetsByIndex empty');
     }
   } catch (e) {
     console.error('TEST ERROR:', e.message || e);

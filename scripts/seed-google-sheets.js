@@ -36,15 +36,15 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
           ],
         },
       });
-      console.log(`Created sheet "${title}"`);
+      console.info(`Created sheet "${title}"`);
     } else {
-      console.log(`Sheet "${title}" already exists`);
+      console.info(`Sheet "${title}" already exists`);
     }
   } catch (err) {
     // If the sheet already existed but race caused error, ignore it.
     const msg = (err && (err.message || JSON.stringify(err))).toString();
     if (msg.includes('already exists')) {
-      console.log(
+      console.info(
         `Warning: attempted to create sheet "${title}" but it already exists. Continuing.`,
       );
     } else {
@@ -68,13 +68,13 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
         valueInputOption: 'RAW',
         requestBody: { values: [headerRow] },
       });
-      console.log(`Wrote header to "${title}"`);
+      console.info(`Wrote header to "${title}"`);
     } else {
-      console.log(`Header already present for "${title}"`);
+      console.info(`Header already present for "${title}"`);
     }
   } catch (err) {
     // If we can't read (rare), attempt to write header and continue
-    console.log(
+    console.info(
       `Could not read header for "${title}" — attempting to write header. Err: ${err.message || err}`,
     );
     await sheetsApi.spreadsheets.values.update({
@@ -83,13 +83,13 @@ async function ensureSheetAndHeader(sheetsApi, spreadsheetId, title, headerRow) 
       valueInputOption: 'RAW',
       requestBody: { values: [headerRow] },
     });
-    console.log(`Wrote header to "${title}" after read error`);
+    console.info(`Wrote header to "${title}" after read error`);
   }
 }
 
 async function appendRows(sheetsApi, spreadsheetId, title, rows) {
   if (!rows || rows.length === 0) {
-    console.log(`No rows to append for ${title}`);
+    console.info(`No rows to append for ${title}`);
     return;
   }
   await sheetsApi.spreadsheets.values.append({
@@ -99,7 +99,7 @@ async function appendRows(sheetsApi, spreadsheetId, title, rows) {
     insertDataOption: 'INSERT_ROWS',
     requestBody: { values: rows },
   });
-  console.log(`Appended ${rows.length} rows into ${title}`);
+  console.info(`Appended ${rows.length} rows into ${title}`);
 }
 
 async function run() {
@@ -122,9 +122,9 @@ async function run() {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
-  console.log('Authenticating service account...');
+  console.info('Authenticating service account...');
   await jwtClient.authorize();
-  console.log('Authenticated.');
+  console.info('Authenticated.');
 
   const sheetsApi = google.sheets({ version: 'v4', auth: jwtClient });
 
@@ -246,7 +246,7 @@ async function run() {
     console.error('Failed appending tasks:', err.message || err);
   }
 
-  console.log('Seed finished (some sheets may have already existed). ✅');
+  console.info('Seed finished (some sheets may have already existed). ✅');
 }
 
 run().catch(err => {

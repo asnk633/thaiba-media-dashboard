@@ -1,8 +1,8 @@
 import { testGoogleSheetsConnection } from '../utils/googleAuth.js';
 
 async function testConnection() {
-  console.log('🧪 Testing Google Sheets connection...');
-  console.log('⏰ Timestamp:', new Date().toISOString());
+  console.info('🧪 Testing Google Sheets connection...');
+  console.info('⏰ Timestamp:', new Date().toISOString());
 
   const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
@@ -11,9 +11,9 @@ async function testConnection() {
     process.exit(1);
   }
 
-  console.log('📊 Environment check:');
-  console.log('  - GOOGLE_SPREADSHEET_ID:', spreadsheetId ? '✅ Set' : '❌ Missing');
-  console.log(
+  console.info('📊 Environment check:');
+  console.info('  - GOOGLE_SPREADSHEET_ID:', spreadsheetId ? '✅ Set' : '❌ Missing');
+  console.info(
     '  - GOOGLE_SERVICE_ACCOUNT_KEY:',
     process.env.GOOGLE_SERVICE_ACCOUNT_KEY ? '✅ Set' : '❌ Missing',
   );
@@ -22,11 +22,11 @@ async function testConnection() {
     const success = await testGoogleSheetsConnection(spreadsheetId);
 
     if (success) {
-      console.log('\n🎉 Connection test successful!');
-      console.log('💡 Your Google Sheets integration is working correctly.');
+      console.info('\n🎉 Connection test successful!');
+      console.info('💡 Your Google Sheets integration is working correctly.');
     } else {
-      console.log('\n❌ Connection test failed!');
-      console.log('💡 Check the error messages above for troubleshooting steps.');
+      console.info('\n❌ Connection test failed!');
+      console.info('💡 Check the error messages above for troubleshooting steps.');
       process.exit(1);
     }
   } catch (error) {
