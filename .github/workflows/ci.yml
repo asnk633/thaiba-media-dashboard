@@ -1,1 +1,56 @@
-# (paste the whole YAML from step 1 here)
+mkdir -p .github/workflows
+cat > .github/workflows/ci.yml <<'YML'
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: Typecheck / Scanner / Lint / Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run component props scanner (if present)
+        run: |
+          if [ -f tools/scan-component-props.js ]; then
+            node tools/scan-component-props.js
+          else
+            echo "No scanner found, skipping."
+          fi
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Prettier check (format)
+        run: npm run format:check || true
+
+      - name: ESLint
+        run: |
+          # call npm script so it uses your project config
+          if npm run -s lint --silent; then
+            echo "eslint passed"
+          else
+            echo "eslint failed"
+            exit 1
+          fi
+
+      - name: Next.js build
+        run: npm run build
+YML
