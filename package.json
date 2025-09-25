@@ -96,8 +96,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "npm run lint -- --max-warnings=0 --fix",
-      "git add"
+      "npm run lint -- --max-warnings=0 --fix"
     ]
   }
 }

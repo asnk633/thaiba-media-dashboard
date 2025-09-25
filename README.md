@@ -1,5 +1,5 @@
 ---
-title: media-task-manager
+title: media-manager
 emoji: 🐳
 colorFrom: purple
 colorTo: pink
