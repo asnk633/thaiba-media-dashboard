@@ -1,41 +1,40 @@
 import * as React from "react"
-import { cn } from "../../lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
 
-const labelVariants = cva("font-medium", {
+const labelVariants = cva("font-medium leading-none", {
   variants: {
-    size: {
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
+    variant: {
+      default: "",
     },
-    intent: {
-      normal: "text-gray-700",
-      error: "text-red-600",
-      muted: "text-gray-500",
+    size: {
+      default: "text-sm",
+      sm: "text-xs",
+      lg: "text-base",
     },
   },
   defaultVariants: {
-    size: "sm",
-    intent: "normal",
+    variant: "default",
+    size: "default",
   },
 })
 
 export type LabelVariantProps = VariantProps<typeof labelVariants>
 
+// Make LabelProps include all native label attributes so `htmlFor`, `onClick`, etc. are accepted.
 export interface LabelProps
   extends React.LabelHTMLAttributes<HTMLLabelElement>,
     LabelVariantProps {}
 
 export function Label({
-  children,
   className,
+  children,
+  variant,
   size,
-  intent,
   ...props
 }: LabelProps) {
   return (
-    <label className={cn(labelVariants({ size, intent }), className)} {...props}>
+    <label className={cn(labelVariants({ variant, size, className }))} {...props}>
       {children}
     </label>
   )
