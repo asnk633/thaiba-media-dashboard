@@ -22,7 +22,11 @@ const labelVariants = cva("font-medium leading-none", {
 export type LabelVariantProps = VariantProps<typeof labelVariants>
 
 // Make LabelProps include all native label attributes so `htmlFor`, `onClick`, etc. are accepted.
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement>, LabelVariantProps {
+export interface LabelProps
+  extends React.LabelHTMLAttributes<HTMLLabelElement>,
+    LabelVariantProps {}
+
+export function Label({
   className,
   children,
   variant,
