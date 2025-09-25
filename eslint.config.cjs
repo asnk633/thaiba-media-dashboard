@@ -1,6 +1,6 @@
 /* eslint.config.cjs — flat config for ESLint v9
    Typed linting enabled only for .ts/.tsx via parser override.
-   No 'env' keys — use languageOptions.globals instead. */
+   No 'env' keys — use languageOptions.globals; parserOptions holds ecmaFeatures. */
 module.exports = [
   // ignore node_modules
   { ignores: ['node_modules/**'] },
@@ -10,7 +10,8 @@ module.exports = [
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
-      ecmaFeatures: { jsx: true },
+      // parserOptions holds ecmaFeatures per flat config rules
+      parserOptions: { ecmaFeatures: { jsx: true } },
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -61,6 +62,7 @@ module.exports = [
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
+      // parser MUST be the module object
       parser: require('@typescript-eslint/parser'),
       parserOptions: {
         project: './tsconfig.json',
