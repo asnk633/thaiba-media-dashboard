@@ -1,1 +1,47 @@
-# (paste the workflow YAML content here)
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint -- --no-cache --max-warnings=0
+
+      - name: Run tests
+        if: ${{ always() }}
+        run: |
+          if npm run | grep -q " test"; then
+            npm test --silent || (echo "Tests failed" && exit 1)
+          else
+            echo "No test script defined, skipping tests."
+          fi
+
+      - name: Build
+        if: ${{ always() }}
+        run: |
+          if npm run | grep -q " build"; then
+            npm run build || (echo "Build failed" && exit 1)
+          else
+            echo "No build script defined, skipping build."
+          fi
