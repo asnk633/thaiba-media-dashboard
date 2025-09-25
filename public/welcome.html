@@ -61,13 +61,13 @@
 
     // Save session object to localStorage
     function saveSession(session){
-      localStorage.setItem('thaiba_session', JSON.stringify(session));
+      localStorage.setItem('tm_session', JSON.stringify(session));
     }
     function loadSession(){
-      try { return JSON.parse(localStorage.getItem('thaiba_session') || 'null'); } catch(e){ return null; }
+      try { return JSON.parse(localStorage.getItem('tm_session') || 'null'); } catch(e){ return null; }
     }
     function clearSession(){
-      localStorage.removeItem('thaiba_session');
+      localStorage.removeItem('tm_session');
     }
 
     // UX helpers
