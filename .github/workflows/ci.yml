@@ -42,3 +42,11 @@ jobs:
           else
             echo "No build script defined, skipping build."
           fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          # If your repo is PUBLIC, omit the token line.
+          # If private, first add a repo secret named CODECOV_TOKEN, then uncomment:
+          # token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true     # make CI fail if upload fails
