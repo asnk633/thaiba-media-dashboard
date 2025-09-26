@@ -1,8 +1,10 @@
 # Thaiba Media Dashboard
 
-[![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml)
+[![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/graph/badge.svg?token=XCGSIWWQKB)](https://codecov.io/gh/asnk633/thaiba-media-dashboard)
 ![Node.js](https://img.shields.io/badge/node-20.x-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+
 
 ---
 
