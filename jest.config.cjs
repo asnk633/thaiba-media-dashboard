@@ -1,54 +1,35 @@
 /** @type {import('jest').Config} */
-const nextJest = require('next/jest');
-
-const createJestConfig = nextJest({ dir: './' });
-
-const customJestConfig = {
+module.exports = {
   testEnvironment: 'jest-environment-jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+
+  // Pick up both __tests__ and *.test / *.spec files
   testMatch: [
     '<rootDir>/**/__tests__/**/*.(test|spec).[jt]s?(x)',
     '<rootDir>/**/*.(test|spec).[jt]s?(x)'
   ],
+
+  // Support "@/..." imports
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
   },
-  // --- Coverage settings ---
-  collectCoverage: true,
-  collectCoverageFrom: [
-    'app/**/*.{ts,tsx,js,jsx}',
-    'components/**/*.{ts,tsx,js,jsx}',
-    'utils/**/*.{ts,tsx,js,jsx}'
-  ],
-  coverageReporters: ['text', 'lcov']
-};
 
-module.exports = createJestConfig(customJestConfig);
-const customJestConfig = {
-  testEnvironment: 'jest-environment-jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  testMatch: [
-    '<rootDir>/**/__tests__/**/*.(test|spec).[jt]s?(x)',
-    '<rootDir>/**/*.(test|spec).[jt]s?(x)',
-  ],
-  moduleNameMapper: { '^@/(.*)$': '<rootDir>/$1' },
-
-  // ▶ collect only app components/libs (adjust as you like)
+  // Only measure what matters right now
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',
     'app/lib/**/*.{ts,tsx}',
-    'app/**/page.{ts,tsx}',     // if you want page components
+    'app/**/page.{ts,tsx}',
     '!**/*.d.ts',
-    '!**/node_modules/**',
+    '!**/node_modules/**'
   ],
   coveragePathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/coverage/',
-    '<rootDir>/app/api/',       // ignore API routes for now
+    '<rootDir>/app/api/' // ignore API routes for now
   ],
 
-  // (Optional) gentle thresholds to keep drift in check
+  // Gentle defaults so CI stays green while we grow tests
   coverageThreshold: {
-    global: { branches: 5, functions: 8, lines: 8, statements: 8 },
-  },
-}
+    global: { branches: 5, functions: 8, lines: 8, statements: 8 }
+  }
+};
