@@ -2,8 +2,8 @@ coverage:
   status:
     project:
       default:
-        target: 75%   # fail if overall project coverage < 75%
-        threshold: 2% # allow coverage to drop by up to 2% without failing
+        target: 75%   # overall project coverage must be >= 75%
+        threshold: 2% # allow small 2% drop without failing
     patch:
       default:
-        target: 75%   # fail if changed lines < 75% coverage
+        target: 75%   # changed files in PR must be >= 75%
