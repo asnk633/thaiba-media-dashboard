@@ -1,0 +1,9 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 75%   # fail if overall project coverage < 75%
+        threshold: 2% # allow coverage to drop by up to 2% without failing
+    patch:
+      default:
+        target: 75%   # fail if changed lines < 75% coverage
