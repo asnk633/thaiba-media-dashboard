@@ -34,3 +34,6 @@ jobs:
           files: ./coverage/lcov.info
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
+          verbose: true
+          comment: true   # <-- enables PR comments
+

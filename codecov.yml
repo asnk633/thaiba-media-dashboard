@@ -7,3 +7,7 @@ coverage:
     patch:
       default:
         target: 75%   # changed files in PR must be >= 75%
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false  # true = only comment if coverage changes
