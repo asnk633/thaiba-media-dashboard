@@ -1,10 +1,18 @@
 # Thaiba Media Dashboard
 
 [![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml)
-[![Codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/graph/badge.svg?token=XCGSIWWQKB)](https://codecov.io/gh/asnk633/thaiba-media-dashboard)
+[![codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/graph/badge.svg?token=XCGSIWWQKB)]
+(https://codecov.io/gh/asnk633/thaiba-media-dashboard)
+[![codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/branch/main/graph/badge.svg)](https://codecov.io/gh/asnk633/thaiba-media-dashboard)
 ![Node.js](https://img.shields.io/badge/node-20.x-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
+# Thaiba Media Dashboard
+
+![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/branch/main/graph/badge.svg)](https://codecov.io/gh/asnk633/thaiba-media-dashboard)
+
+Your media management dashboard for Thaiba Garden institutions.
 
 ---
 
@@ -14,14 +22,17 @@ It ensures smooth collaboration with linting, testing, and CI/CD pipelines power
 ---
 
 ### 🚀 Features
-- ✅ Continuous Integration with GitHub Actions  
-- 🧹 Auto linting & code style enforcement (ESLint + Prettier)  
-- ⚡ Built on Node.js 20.x  
-- 🔒 Protected `main` branch with status checks  
+
+- ✅ Continuous Integration with GitHub Actions
+- ✅ Auto linting & code style enforcement (**ESLint + Prettier**)
+- ✅ Built on **Node.js 20.x**
+- ✅ Protected **main** branch with required status checks
+- ✅ Test coverage tracked via **Codecov**
 
 ---
 
-### 📦 Project Setup
+### 🛠️ Project Setup
+
 ```bash
 # install dependencies
 npm install
@@ -31,3 +42,4 @@ npm run lint
 
 # run dev
 npm run dev
+```

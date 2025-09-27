@@ -24,8 +24,12 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Tests
-        run: npm test
-
-      - name: Coverage (fail if below threshold)
+      - name: Run tests with coverage
         run: npm run test:cov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
