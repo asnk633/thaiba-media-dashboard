@@ -1,5 +1,7 @@
 # Thaiba Media Dashboard
 
+![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/branch/main/graph/badge.svg)](https://codecov.io/gh/asnk633/thaiba-media-dashboard)
 [![CI](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/asnk633/thaiba-media-dashboard/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/asnk633/thaiba-media-dashboard/graph/badge.svg?token=XCGSIWWQKB)]
 (https://codecov.io/gh/asnk633/thaiba-media-dashboard)
