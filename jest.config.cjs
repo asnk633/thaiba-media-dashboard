@@ -1,35 +1,29 @@
-/** @type {import('jest').Config} */
-module.exports = {
-  testEnvironment: 'jest-environment-jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+const nextJest = require('next/jest');
+const createJestConfig = nextJest({ dir: './' });
 
-  // Pick up both __tests__ and *.test / *.spec files
-  testMatch: [
-    '<rootDir>/**/__tests__/**/*.(test|spec).[jt]s?(x)',
-    '<rootDir>/**/*.(test|spec).[jt]s?(x)'
-  ],
-
-  // Support "@/..." imports
+const customJestConfig = {
+  testEnvironment: 'jsdom',
+  transform: { '^.+\\.(t|j)sx?$': 'babel-jest' },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx|js)'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
+    '^@/(.*)$': '<rootDir>/$1',
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy'
   },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  transformIgnorePatterns: ['/node_modules/'],
 
-  // Only measure what matters right now
+  // Coverage settings
+  coverageDirectory: 'coverage',
   collectCoverageFrom: [
-    'components/**/*.{ts,tsx}',
-    'app/lib/**/*.{ts,tsx}',
-    'app/**/page.{ts,tsx}',
-    '!**/*.d.ts',
-    '!**/node_modules/**'
+    'app/**/*.{ts,tsx,js,jsx}',
+    'components/**/*.{ts,tsx,js,jsx}',
+    'utils/**/*.{ts,tsx,js,jsx}',
+    '!**/*.d.ts'
   ],
-  coveragePathIgnorePatterns: [
-    '<rootDir>/.next/',
-    '<rootDir>/coverage/',
-    '<rootDir>/app/api/' // ignore API routes for now
-  ],
-
-  // Gentle defaults so CI stays green while we grow tests
   coverageThreshold: {
-    global: { branches: 5, functions: 8, lines: 8, statements: 8 }
+    global: { branches: 60, functions: 70, lines: 75, statements: 75 }
   }
 };
+
+module.exports = createJestConfig(customJestConfig);
