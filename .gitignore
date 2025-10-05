@@ -15,3 +15,8 @@ sa.base64
 .env.local
 .vercel-bypass
 tsconfig.tsbuildinfo
+coverage/
+coverage/**
+lcov.info
+README_badge.md
+.nyc_output/
