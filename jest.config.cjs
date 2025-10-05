@@ -8,7 +8,7 @@ const customJestConfig = {
   testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx|js)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '\\.(css|less|sass|scss)$': 'identity-obj-proxy'
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   transformIgnorePatterns: ['/node_modules/'],
@@ -19,11 +19,11 @@ const customJestConfig = {
     'app/**/*.{ts,tsx,js,jsx}',
     'components/**/*.{ts,tsx,js,jsx}',
     'utils/**/*.{ts,tsx,js,jsx}',
-    '!**/*.d.ts'
+    '!**/*.d.ts',
   ],
   coverageThreshold: {
-    global: { branches: 60, functions: 70, lines: 75, statements: 75 }
-  }
+    global: { branches: 60, functions: 70, lines: 75, statements: 75 },
+  },
 };
 
 module.exports = createJestConfig(customJestConfig);

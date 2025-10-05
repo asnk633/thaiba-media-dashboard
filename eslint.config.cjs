@@ -1,94 +1,76 @@
-/* eslint.config.cjs — ESLint v9 flat config
-   - Base rules for JS/JSX
-   - Typed linting enabled only for TS/TSX
-   - No legacy `env`, uses languageOptions.globals
-   - Console allowed in app/api/** and utils/** files
-*/
+// eslint.config.cjs
+const js = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const importPlugin = require('eslint-plugin-import');
+
 module.exports = [
-  { ignores: ['node_modules/**'] },
-
-  // Base config (JS/JSX + common rules)
+  // Ignore globs
   {
-    languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: 'module',
-      parserOptions: { ecmaFeatures: { jsx: true } },
-      globals: {
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        fetch: 'readonly',
-        Headers: 'readonly',
-        Request: 'readonly',
-        Response: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        process: 'readonly',
-        global: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        TextEncoder: 'readonly',
-        TextDecoder: 'readonly'
-      }
-    },
-
-    plugins: {
-      react: require('eslint-plugin-react'),
-      'react-hooks': require('eslint-plugin-react-hooks'),
-      'jsx-a11y': require('eslint-plugin-jsx-a11y'),
-      prettier: require('eslint-plugin-prettier')
-    },
-
-    rules: {
-      'prettier/prettier': 'warn',
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
-      'jsx-a11y/anchor-is-valid': 'off',
-      'no-console': ['warn', { allow: ['warn', 'error', 'info', 'log'] }]
-    },
-
-    settings: { react: { version: 'detect' } }
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'coverage/**',
+      '.nyc_output/**',
+      'dist/**',
+      'public/**',
+    ],
   },
 
-  // TypeScript override: typed linting for TS/TSX only
-  {
-    files: ['**/*.ts', '**/*.tsx'],
+  // JS recommended
+  js.configs.recommended,
+
+  // TypeScript recommended (type-checked)
+  ...tseslint.configs.recommendedTypeChecked.map(cfg => ({
+    ...cfg,
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
-      parser: require('@typescript-eslint/parser'),
+      ...cfg.languageOptions,
       parserOptions: {
-        project: './tsconfig.json',
-        ecmaVersion: 2024,
-        sourceType: 'module',
-        ecmaFeatures: { jsx: true }
-      }
+        ...cfg.languageOptions?.parserOptions,
+        // make sure this file exists
+        project: ['./tsconfig.eslint.json'],
+        tsconfigRootDir: __dirname,
+      },
     },
+  })),
+
+  // Apply basic rules to JS/TS
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin')
+      import: importPlugin,
+    },
+    settings: {
+      // let eslint-plugin-import resolve TS paths
+      'import/resolver': {
+        typescript: { alwaysTryTypes: true },
+        node: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+      },
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'warn'
-    }
-  },
+      // stylistic & safety
+      'no-unused-vars': 'off', // handled by TS
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 
-  // Allow console in server/api files
-  {
-    files: ['app/api/**', 'utils/**'],
-    rules: { 'no-console': 'off' }
+      // import hygiene
+      'import/order': [
+        'warn',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            ['parent', 'sibling', 'index'],
+            'object',
+            'type',
+          ],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
+      'import/newline-after-import': ['warn', { count: 1 }],
+      'import/no-unresolved': 'error',
+    },
   },
-
-  // Test overrides
-  {
-    files: ['**/*.test.*', '**/__tests__/**'],
-    languageOptions: { globals: { jest: 'readonly' } },
-    rules: { '@typescript-eslint/no-explicit-any': 'off' }
-  }
 ];
