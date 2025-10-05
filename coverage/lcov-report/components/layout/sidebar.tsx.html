@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -168,8 +168,6 @@
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -177,24 +175,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -208,6 +188,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -222,7 +222,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -271,8 +271,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client';
 &nbsp;
-import { useAuth } from <span class="cstat-no" title="statement not covered" >'@/hooks/use-auth';</span>
-import { Button } from <span class="cstat-no" title="statement not covered" >'@/components/ui/button';</span>
+import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Users,
@@ -282,18 +282,18 @@ import {
   LogOut,
   Building2,
   KanbanSquare,
-} from <span class="cstat-no" title="statement not covered" >'lucide-react';</span>
-import Link from <span class="cstat-no" title="statement not covered" >'next/link';</span>
-import { usePathname } from <span class="cstat-no" title="statement not covered" >'next/navigation';</span>
-import { NotificationCenter } from <span class="cstat-no" title="statement not covered" >'@/components/notifications/notification-center';</span>
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { NotificationCenter } from '@/components/notifications/notification-center';
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >Sidebar() {</span></span>
+export function <span class="fstat-no" title="function not covered" >Sidebar(</span>) {
   const { user, signOut } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
   const pathname = <span class="cstat-no" title="statement not covered" >usePathname();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!user) <span class="cstat-no" title="statement not covered" >return null;</span></span>
 &nbsp;
-  const getNavItems = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+  const getNavItems = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const baseItems = <span class="cstat-no" title="statement not covered" >[{ href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' }];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (user.role === 'admin') {</span>
@@ -325,7 +325,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 &nbsp;
   const navItems = <span class="cstat-no" title="statement not covered" >getNavItems();</span>
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div className="w-64 bg-card border-r border-border h-screen flex flex-col"&gt;
       &lt;div className="p-6 border-b border-border"&gt;
         &lt;div className="flex items-center justify-between mb-2"&gt;
@@ -338,7 +338,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 &nbsp;
       &lt;nav className="flex-1 p-4"&gt;
         &lt;ul className="space-y-2"&gt;
-          {navItems.map(<span class="fstat-no" title="function not covered" >item =&gt; {</span>
+          {navItems.map(<span class="fstat-no" title="function not covered" >it</span>em =&gt; {
             const isActive = <span class="cstat-no" title="statement not covered" >pathname === item.href;</span>
 <span class="cstat-no" title="statement not covered" >            return (</span>
               &lt;li key={item.href}&gt;
@@ -379,7 +379,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-05T08:56:48.147Z
+                at 2025-10-05T09:22:46.274Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -127,30 +127,30 @@
 <a name='L62'></a><a href='#L62'>62</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -188,7 +188,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client';
 &nbsp;
 import type { Task } from '@/types/tasks';
-import { format, isToday } from <span class="cstat-no" title="statement not covered" >'date-fns';</span>
+import { format, isToday } from 'date-fns';
 &nbsp;
 interface CalendarDayProps {
   date: Date;
@@ -198,20 +198,20 @@ interface CalendarDayProps {
   onSelect: (date: Date) =&gt; void;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >CalendarDay({</span></span>
+export function <span class="fstat-no" title="function not covered" >CalendarDay(</span>{
   date,
   tasks,
   isCurrentMonth,
   isSelected,
   onSelect,
 }: CalendarDayProps) {
-  const urgentTasks = <span class="cstat-no" title="statement not covered" >tasks.filter(<span class="fstat-no" title="function not covered" >task =&gt; <span class="cstat-no" title="statement not covered" >t</span>ask.priority === 'urgent').l</span>ength;</span>
-  const highTasks = <span class="cstat-no" title="statement not covered" >tasks.filter(<span class="fstat-no" title="function not covered" >task =&gt; <span class="cstat-no" title="statement not covered" >t</span>ask.priority === 'high').l</span>ength;</span>
+  const urgentTasks = <span class="cstat-no" title="statement not covered" >tasks.filter(<span class="fstat-no" title="function not covered" >ta</span>sk =&gt; <span class="cstat-no" title="statement not covered" >task.priority === 'urgent')</span>.length;</span>
+  const highTasks = <span class="cstat-no" title="statement not covered" >tasks.filter(<span class="fstat-no" title="function not covered" >ta</span>sk =&gt; <span class="cstat-no" title="statement not covered" >task.priority === 'high')</span>.length;</span>
   const overdueTasks = <span class="cstat-no" title="statement not covered" >tasks.filter(</span>
-<span class="fstat-no" title="function not covered" >    task =&gt; <span class="cstat-no" title="statement not covered" >n</span>ew Date(task.due_date!) &lt; new Date() &amp;&amp; task.status !== 'completed',</span>
+<span class="fstat-no" title="function not covered" >    ta</span>sk =&gt; <span class="cstat-no" title="statement not covered" >new Date(task.due_date!) &lt; new Date() &amp;&amp; task.status !== 'completed',</span>
   ).length;
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div
       className={`
         min-h-[80px] p-2 border border-border cursor-pointer transition-colors
@@ -219,7 +219,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         ${isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-accent'}
         ${isToday(date) ? 'ring-2 ring-primary/50' : ''}
       `}
-      onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nSelect(date)}</span>
+      onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >onSelect(date)}</span>
     &gt;
       &lt;div className="flex items-center justify-between mb-1"&gt;
         &lt;span
@@ -229,17 +229,17 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         &gt;
           {format(date, 'd')}
         &lt;/span&gt;
-        {<span class="branch-0 cbranch-no" title="branch not covered" >tasks.length &gt; 0 &amp;&amp; (</span>
+        {tasks.length &gt; 0 &amp;&amp; (
           &lt;span className="text-xs bg-primary/20 text-primary px-1 rounded"&gt;{tasks.length}&lt;/span&gt;
         )}
       &lt;/div&gt;
 &nbsp;
       {/* Task indicators */}
       &lt;div className="space-y-1"&gt;
-        {<span class="branch-0 cbranch-no" title="branch not covered" >overdueTasks &gt; 0 &amp;&amp; &lt;</span>div className="w-full h-1 bg-red-500 rounded"&gt;&lt;/div&gt;}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >urgentTasks &gt; 0 &amp;&amp; &lt;</span>div className="w-full h-1 bg-red-400 rounded"&gt;&lt;/div&gt;}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >highTasks &gt; 0 &amp;&amp; &lt;</span>div className="w-full h-1 bg-orange-400 rounded"&gt;&lt;/div&gt;}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >tasks.length &gt; urgentTasks + highTasks + overdueTasks &amp;&amp; (</span>
+        {overdueTasks &gt; 0 &amp;&amp; &lt;div className="w-full h-1 bg-red-500 rounded"&gt;&lt;/div&gt;}
+        {urgentTasks &gt; 0 &amp;&amp; &lt;div className="w-full h-1 bg-red-400 rounded"&gt;&lt;/div&gt;}
+        {highTasks &gt; 0 &amp;&amp; &lt;div className="w-full h-1 bg-orange-400 rounded"&gt;&lt;/div&gt;}
+        {tasks.length &gt; urgentTasks + highTasks + overdueTasks &amp;&amp; (
           &lt;div className="w-full h-1 bg-blue-400 rounded"&gt;&lt;/div&gt;
         )}
       &lt;/div&gt;
@@ -253,7 +253,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-05T08:56:48.147Z
+                at 2025-10-05T09:22:46.274Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

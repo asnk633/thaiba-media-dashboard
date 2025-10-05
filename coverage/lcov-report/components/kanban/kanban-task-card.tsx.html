@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -160,22 +160,20 @@
 <a name='L95'></a><a href='#L95'>95</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -186,12 +184,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -254,10 +254,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client';
 &nbsp;
 import type { Task } from '@/types/tasks';
-import { Card, CardContent } from <span class="cstat-no" title="statement not covered" >'@/components/ui/card';</span>
-import { Badge } from <span class="cstat-no" title="statement not covered" >'@/components/ui/badge';</span>
-import { Calendar, Clock, User } from <span class="cstat-no" title="statement not covered" >'lucide-react';</span>
-import { format } from <span class="cstat-no" title="statement not covered" >'date-fns';</span>
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Clock, User } from 'lucide-react';
+import { format } from 'date-fns';
 &nbsp;
 interface KanbanTaskCardProps {
   task: Task;
@@ -266,7 +266,7 @@ interface KanbanTaskCardProps {
   isDragging: boolean;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >KanbanTaskCard({</span></span> task, onDragStart, onDragEnd, isDragging }: KanbanTaskCardProps) {
+export function <span class="fstat-no" title="function not covered" >KanbanTaskCard(</span>{ task, onDragStart, onDragEnd, isDragging }: KanbanTaskCardProps) {
   const getPriorityColor = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>riority: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    switch (priority) {</span>
       case 'urgent':
@@ -285,10 +285,10 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   const isOverdue =
 <span class="cstat-no" title="statement not covered" >    task.due_date &amp;&amp; new Date(task.due_date) &lt; new Date() &amp;&amp; task.status !== 'completed';</span>
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Card
       draggable
-      onDragStart={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nDragStart(task)}</span>
+      onDragStart={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >onDragStart(task)}</span>
       onDragEnd={onDragEnd}
       className={`cursor-move transition-all hover:shadow-md ${
         isDragging ? 'opacity-50 rotate-2' : ''
@@ -298,7 +298,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         &lt;div className="space-y-3"&gt;
           &lt;div&gt;
             &lt;h3 className="font-medium text-foreground text-sm line-clamp-2"&gt;{task.title}&lt;/h3&gt;
-            {<span class="branch-0 cbranch-no" title="branch not covered" >task.description </span>&amp;&amp; (
+            {task.description &amp;&amp; (
               &lt;p className="text-xs text-muted-foreground mt-1 line-clamp-2"&gt;{task.description}&lt;/p&gt;
             )}
           &lt;/div&gt;
@@ -307,7 +307,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             &lt;Badge className={getPriorityColor(task.priority)} variant="outline"&gt;
               {task.priority}
             &lt;/Badge&gt;
-            {<span class="branch-0 cbranch-no" title="branch not covered" >isOverdue &amp;&amp; (</span>
+            {isOverdue &amp;&amp; (
               &lt;Badge className="bg-red-500/10 text-red-500 border-red-500/20" variant="outline"&gt;
                 Overdue
               &lt;/Badge&gt;
@@ -315,7 +315,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
           &lt;/div&gt;
 &nbsp;
           &lt;div className="space-y-2 text-xs text-muted-foreground"&gt;
-            {<span class="branch-0 cbranch-no" title="branch not covered" >task.due_date </span>&amp;&amp; (
+            {task.due_date &amp;&amp; (
               &lt;div className="flex items-center gap-1"&gt;
                 &lt;Calendar className="h-3 w-3" /&gt;
                 &lt;span&gt;Due {format(new Date(task.due_date), 'MMM d')}&lt;/span&gt;
@@ -327,7 +327,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
               &lt;span&gt;Created {format(new Date(task.created_at), 'MMM d')}&lt;/span&gt;
             &lt;/div&gt;
 &nbsp;
-            {(<span class="branch-0 cbranch-no" title="branch not covered" >task as any).assigned_to_profile </span>&amp;&amp; (
+            {(task as any).assigned_to_profile &amp;&amp; (
               &lt;div className="flex items-center gap-1"&gt;
                 &lt;User className="h-3 w-3" /&gt;
                 &lt;span&gt;{(task as any).assigned_to_profile.full_name}&lt;/span&gt;
@@ -335,7 +335,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             )}
           &lt;/div&gt;
 &nbsp;
-          {<span class="branch-0 cbranch-no" title="branch not covered" >task.notes </span>&amp;&amp; (
+          {task.notes &amp;&amp; (
             &lt;div className="p-2 bg-muted/50 rounded text-xs text-muted-foreground line-clamp-2"&gt;
               {task.notes}
             &lt;/div&gt;
@@ -352,7 +352,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-05T08:56:48.147Z
+                at 2025-10-05T09:22:46.274Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

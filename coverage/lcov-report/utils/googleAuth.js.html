@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -108,23 +108,16 @@
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -135,6 +128,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,20 +146,20 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// utils/googleAuth.js
-import { GoogleSpreadsheet } from <span class="cstat-no" title="statement not covered" >'google-spreadsheet';</span>
-import { JWT } from <span class="cstat-no" title="statement not covered" >'google-auth-library';</span>
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
 &nbsp;
 /**
  * Parse service account key from env.
  * Supports GOOGLE_SERVICE_ACCOUNT_KEY_B64 (base64) or GOOGLE_SERVICE_ACCOUNT_KEY (raw JSON).
  */
-function <span class="fstat-no" title="function not covered" >parseServiceAccountKey() {</span>
+function <span class="fstat-no" title="function not covered" >parseServiceAccountKey(</span>) {
   let raw = <span class="cstat-no" title="statement not covered" >process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64 || process.env.GOOGLE_SERVICE_ACCOUNT_KEY;</span>
 <span class="cstat-no" title="statement not covered" >  if (!raw) <span class="cstat-no" title="statement not covered" >throw new Error('Missing GOOGLE_SERVICE_ACCOUNT_KEY_B64 or GOOGLE_SERVICE_ACCOUNT_KEY');</span></span>
 &nbsp;
@@ -177,7 +177,7 @@ function <span class="fstat-no" title="function not covered" >parseServiceAccoun
 <span class="cstat-no" title="statement not covered" >  return keyData;</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getGoogleSpreadsheetClient(</span></span>spreadsheetId) {
+export async function <span class="fstat-no" title="function not covered" >getGoogleSpreadsheetClient(</span>spreadsheetId) {
   const creds = <span class="cstat-no" title="statement not covered" >parseServiceAccountKey();</span>
   const auth = <span class="cstat-no" title="statement not covered" >new JWT({</span>
     email: creds.client_email,
@@ -190,7 +190,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return doc;</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >testGoogleSheetsConnection(</span></span>spreadsheetId) {
+export async function <span class="fstat-no" title="function not covered" >testGoogleSheetsConnection(</span>spreadsheetId) {
   const doc = <span class="cstat-no" title="statement not covered" >await getGoogleSpreadsheetClient(spreadsheetId);</span>
 <span class="cstat-no" title="statement not covered" >  console.log('Connected to spreadsheet:', doc.title);</span>
 <span class="cstat-no" title="statement not covered" >  return doc;</span>
@@ -202,7 +202,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-05T08:56:48.147Z
+                at 2025-10-05T09:22:46.274Z
             </div>
         <script src="../prettify.js"></script>
         <script>
