@@ -1,0 +1,35 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+    // ... any other configs
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+    // ... any other plugins
+  ],
+  "settings": {
+    // ✨ THIS IS THE ALIAS FIX ✨
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "parserOptions": {
+    // Other parser options you might have:
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    // ✨ THIS IS THE TS TYPE-CHECKING FIX ✨
+    "project": ["./tsconfig.json"],
+    "tsconfigRootDir": "__dirname"
+  },
+  "rules": {
+    // ... your custom rules
+  }
+}
