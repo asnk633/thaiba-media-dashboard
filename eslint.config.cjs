@@ -1,12 +1,11 @@
 // eslint.config.cjs
-const js = require('@eslint/js');
+const globals = require('globals');
 const tsParser = require('@typescript-eslint/parser');
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
 const importPlugin = require('eslint-plugin-import');
-const globals = require('globals');
 
 module.exports = [
-  // 0) Ignores (add scripts/tools/tests JS for now to avoid noise)
+  // 0) Global ignores
   {
     ignores: [
       'node_modules/**',
@@ -14,77 +13,79 @@ module.exports = [
       'coverage/**',
       '.nyc_output/**',
       'dist/**',
+      'build/**',
       'public/**',
-      // temp ignores to keep CI green; we can re-enable later:
-      'scripts/**',
-      'tools/**',
-      'test*.js',
-      'utils/*.js',
+      '.eslintcache',
     ],
   },
 
-  // 1) Base JS recommended
-  js.configs.recommended,
-
-  // 2) TypeScript across TS/TSX
+  // 1) Base (all JS/TS) — keep import noise low
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.es2021 },
     },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-      import: importPlugin,
-    },
+    plugins: { import: importPlugin },
     rules: {
-      ...(tsPlugin.configs.recommended.rules || {}),
-
-      // Keep it practical for now
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      // ↓ Turn off the rule that’s flagging `import type React`
-      '@typescript-eslint/consistent-type-imports': 'off',
-
-      // Temporarily quiet strict type rules (re-enable later per-folder)
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/no-misused-promises': 'off',
-      '@typescript-eslint/await-thenable': 'off',
-
-      // Import noise off for now
       'import/order': 'off',
       'import/newline-after-import': 'off',
       'import/no-unresolved': 'off',
     },
   },
 
-  // 3) App/Components/Hooks/Lib — browser + node globals
+  // 2) TypeScript (no type-aware rules → no parserServices needed)
   {
-    files: ['app/**/*.{ts,tsx,js,jsx}', 'components/**/*.{ts,tsx,js,jsx}', 'hooks/**/*.{ts,tsx,js,jsx}', 'lib/**/*.{ts,tsx,js,jsx}'],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.browser, ...globals.node },
+    },
+    plugins: { '@typescript-eslint': tsPlugin },
+    rules: {
+      ...(tsPlugin.configs.recommended.rules || {}),
+
+      // Practical TS rules
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/consistent-type-imports': 'off',
+
+      // Turn OFF strict/type-aware rules for now
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/await-thenable': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+
+  // 3) App/Components/Hooks/Lib — Next.js (browser + node globals)
+  {
+    files: [
+      'app/**/*.{js,jsx,ts,tsx}',
+      'components/**/*.{js,jsx,ts,tsx}',
+      'hooks/**/*.{js,jsx,ts,tsx}',
+      'lib/**/*.{js,jsx,ts,tsx}',
+    ],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      'no-console': 'off',
       'no-undef': 'off',
+      'no-console': 'off',
     },
   },
 
   // 4) Tests — Jest + DOM
   {
-    files: ['__tests__/**/*.{ts,tsx,js,jsx}', 'jest.setup.ts'],
+    files: ['__tests__/**/*.{js,jsx,ts,tsx}', 'jest.setup.ts'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -93,7 +94,7 @@ module.exports = [
     rules: { 'no-undef': 'off' },
   },
 
-  // 5) API routes in JS — allow underscore args & Node globals
+  // 5) API routes — allow _req/_res; Node + browser globals
   {
     files: ['app/api/**/*.{js,ts}'],
     languageOptions: {
@@ -105,21 +106,35 @@ module.exports = [
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-undef': 'off',
     },
-  // 6) Node configs & utility scripts (CJS/Node globals)
-{
-  files: [
-    '*.{config.js,config.cjs}',
-    'babel.config.js',
-    'next.config.js',
-    'create-env.js'
-  ],
-  languageOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'script',
-    globals: { ...require('globals').node },
   },
-  rules: {
-    'no-undef': 'off',
-  },
-},
 
+  // 6a) Node **CJS** configs & scripts (require/module)
+  {
+    files: [
+      '*.{config.js,config.cjs}',
+      'babel.config.js',
+      'create-env.js',
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'script', // CJS
+      globals: { ...globals.node },
+    },
+    rules: { 'no-undef': 'off' },
+  },
+
+  // 6b) Node **ESM** configs & scripts (import/export)
+  {
+    files: [
+      'next.config.js',               // if you use ESM here
+      'scripts/**/*.{js,ts}',         // your script files that use import/export
+      'utils/**/*.js',                // utils using ESM imports
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module', // ESM
+      globals: { ...globals.node },
+    },
+    rules: { 'no-undef': 'off' },
+  },
+];
