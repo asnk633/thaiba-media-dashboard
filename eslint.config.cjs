@@ -105,5 +105,21 @@ module.exports = [
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-undef': 'off',
     },
+  // 6) Node configs & utility scripts (CJS/Node globals)
+{
+  files: [
+    '*.{config.js,config.cjs}',
+    'babel.config.js',
+    'next.config.js',
+    'create-env.js'
+  ],
+  languageOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'script',
+    globals: { ...require('globals').node },
   },
-];
+  rules: {
+    'no-undef': 'off',
+  },
+},
+
