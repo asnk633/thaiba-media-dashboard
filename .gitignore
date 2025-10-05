@@ -20,3 +20,8 @@ coverage/**
 lcov.info
 README_badge.md
 .nyc_output/
+coverage/
+coverage/**
+lcov.info
+README_badge.md
+.nyc_output/
