@@ -26,4 +26,14 @@ const customJestConfig = {
   },
 };
 
-module.exports = createJestConfig(customJestConfig);
+module.exports = {
+  // ...existing
+  coverageThreshold: {
+    global: {
+      statements: 5,
+      branches: 3,
+      functions: 5,
+      lines: 5,
+    },
+  },
+};
